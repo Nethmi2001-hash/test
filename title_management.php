@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['form_name'])) {
     }
 }
 
-// Fetch titles
+// test CHANGE Fetch titles
 $result = $con->query("SELECT * FROM user_titles ORDER BY id DESC");
 ?>
 <!DOCTYPE html>
