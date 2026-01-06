@@ -12,134 +12,154 @@ if (empty($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 $servername  = "localhost";
 $db_user_name = "root";
 $db_password = "";
-$dbname      = "nethmi";
+$dbname      = "monastery_healthcare";
 
 $con = new mysqli($servername, $db_user_name, $db_password, $dbname);
 if ($con->connect_error) {
     die("Connection failed: " . $con->connect_error);
 }
 
-// Handle delete request
-if (!empty($_POST['form_name']) && $_POST['form_name'] === "delete" && !empty($_POST['id'])) {
-    $id = $_POST['id'];
-    $stmt = $con->prepare("DELETE FROM user WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    if ($stmt->execute()) {
-        echo "<div class='alert alert-success text-center'>Record deleted successfully</div>";
-    } else {
-        echo "<div class='alert alert-danger text-center'>Error deleting record: " . $con->error . "</div>";
-    }
-}
-
 // Search
 $search = trim($_POST['search'] ?? '');
 if ($search !== '') {
-    $stmt = $con->prepare("SELECT * FROM user WHERE user_name LIKE CONCAT('%', ?, '%') OR email LIKE CONCAT('%', ?, '%')");
+    $stmt = $con->prepare("SELECT u.*, r.role_name FROM users u 
+                          JOIN roles r ON u.role_id = r.role_id 
+                          WHERE u.name LIKE CONCAT('%', ?, '%') OR u.email LIKE CONCAT('%', ?, '%')");
     $stmt->bind_param("ss", $search, $search);
     $stmt->execute();
     $result = $stmt->get_result();
 } else {
-    $result = $con->query("SELECT * FROM user");
+    $result = $con->query("SELECT u.*, r.role_name FROM users u JOIN roles r ON u.role_id = r.role_id ORDER BY u.user_id");
 }
+
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>User Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/flatly/bootstrap.min.css" rel="stylesheet">
+    <title>User Management - Seela Suwa Herath Bikshu Gilan Arana</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        :root {
+            --monastery-saffron: #f57c00;
+            --monastery-orange: #ff9800;
+            --monastery-light: #ffa726;
+            --monastery-dark: #e65100;
+            --monastery-pale: #fff3e0;
+        }
+        body {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+        }
+        .page-header {
+            background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(245, 124, 0, 0.3);
+        }
+        .user-card {
+            transition: transform 0.2s;
+            border-left: 4px solid var(--monastery-saffron);
+            background: white;
+        }
+        .user-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 124, 0, 0.2);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+    </style>
 </head>
-<body class="bg-light">
-<div class="container mt-5">
-
-    <h2 class="mb-4 text-center">User Management</h2>
+<body>
+<div class="container mt-4 mb-5">
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h2 class="mb-0"><i class="bi bi-people"></i> User Management</h2>
+                <p class="mb-0 mt-1 opacity-75">Manage system users and roles</p>
+            </div>
+        </div>
+    </div>
 
     <!-- Search Form -->
-    <form class="d-flex mb-4" method="post">
-        <input class="form-control me-2" type="text" name="search" placeholder="Search by full name" value="<?= htmlspecialchars($search) ?>">
-        <button class="btn btn-outline-success me-2" type="submit">Search</button>
-        <a href="table.php" class="btn btn-secondary">Reset</a>
-    </form>
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form class="row g-3" method="post">
+                <div class="col-md-10">
+                    <input class="form-control" type="text" name="search" placeholder="Search by name or email" value="<?= htmlspecialchars($search) ?>">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100" type="submit"><i class="bi bi-search"></i> Search</button>
+                </div>
+                <?php if($search): ?>
+                <div class="col-12">
+                    <a href="table.php" class="btn btn-secondary btn-sm"><i class="bi bi-x-circle"></i> Clear Search</a>
+                </div>
+                <?php endif; ?>
+            </form>
+        </div>
+    </div>
 
     <!-- User Table -->
-    <table class="table table-striped table-bordered table-hover bg-white">
-       <thead class="table-dark">
-         <tr>
-            <th>ID</th>
-            <th>Full Name</th>
-            <th>Age</th>
-            <th>DOB</th>
-            <th>Phone</th>
-            <th>Gender</th>
-            <th>Title</th>
-            <th>Created At</th>
-            <th>Updated At</th>
-            <th>Actions</th>
-         </tr>
-       </thead>
-       <tbody>
-        <?php if ($result && $result->num_rows > 0): ?>
-            <?php while ($row = $result->fetch_assoc()): ?>
-            <tr>
-                <td><?= htmlspecialchars($row['id']) ?></td>
-                <td><?= htmlspecialchars($row['full_name']) ?></td>
-                <td><?= htmlspecialchars($row['age']) ?></td>
-                <td><?= htmlspecialchars($row['dob']) ?></td>
-                <td><?= htmlspecialchars($row['phone_number']) ?></td>
-                <td><?= htmlspecialchars($row['gender']) ?></td>
-                <td><?= htmlspecialchars($row['user_title'] ?? '—') ?></td>
-                <td><?= htmlspecialchars($row['created_at']) ?></td>
-                <td><?= htmlspecialchars($row['updated_at']) ?></td>
-                <td class="d-flex gap-2">
-                    
-                    <!-- Delete button opens modal -->
-                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?= $row['id'] ?>">
-                        Delete
-                    </button>
-
-                    <!-- Edit button -->
-                    <a href="edit_user.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
-                </td>
-            </tr>
-
-            <!-- Delete Confirmation Modal -->
-            <div class="modal fade" id="deleteModal<?= $row['id'] ?>" tabindex="-1" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">Confirm Delete</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                  </div>
-                  <div class="modal-body">
-                    Are you sure you want to delete user <strong><?= htmlspecialchars($row['full_name']) ?></strong>?<br>
-                    This action cannot be undone.
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <form method="post" class="d-inline">
-                        <input type="hidden" name="id" value="<?= $row['id'] ?>">
-                        <input type="hidden" name="form_name" value="delete">
-                        <button type="submit" class="btn btn-danger">Yes, Delete</button>
-                    </form>
-                  </div>
-                </div>
-              </div>
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-table"></i> All Users</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                   <thead class="table-light">
+                     <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                     </tr>
+                   </thead>
+                   <tbody>
+                    <?php if ($result && $result->num_rows > 0): ?>
+                        <?php while ($row = $result->fetch_assoc()): ?>
+                        <tr>
+                            <td><strong>#<?= htmlspecialchars($row['user_id']) ?></strong></td>
+                            <td><i class="bi bi-person-circle text-primary"></i> <?= htmlspecialchars($row['name']) ?></td>
+                            <td><i class="bi bi-envelope text-muted"></i> <?= htmlspecialchars($row['email']) ?></td>
+                            <td><?= htmlspecialchars($row['phone'] ?? '—') ?></td>
+                            <td><span class="badge bg-info"><?= htmlspecialchars($row['role_name']) ?></span></td>
+                            <td>
+                                <?php if ($row['status'] == 'active'): ?>
+                                    <span class="badge bg-success">Active</span>
+                                <?php else: ?>
+                                    <span class="badge bg-secondary">Inactive</span>
+                                <?php endif; ?>
+                            </td>
+                            <td><?= date('M d, Y', strtotime($row['created_at'])) ?></td>
+                        </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <i class="bi bi-inbox"></i> No users found
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                   </tbody>
+                </table>
             </div>
-
-            <?php endwhile; ?>
-        <?php else: ?>
-            <tr>
-               <td colspan="10" class="text-center">No users found.</td>
-            </tr>
-        <?php endif; ?>
-       </tbody>
-    </table>
-
-    <a href="login.php" class="btn btn-outline-primary mt-3">Go to Login</a>
+        </div>
+    </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 
