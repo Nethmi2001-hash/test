@@ -5,55 +5,30 @@
  * IMPORTANT: This must be accessible from internet (use ngrok for local testing)
  */
 
-session_start();
+require_once 'includes/payhere_config.php';
+require_once 'includes/db_config.php';
 
-// Database connection
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "monastery_healthcare";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+$conn = getDBConnection();
 
 // Get PayHere notification data
-$merchant_id = $_POST['merchant_id'] ?? '';
-$order_id = $_POST['order_id'] ?? '';
-$payhere_amount = $_POST['payhere_amount'] ?? 0;
-$payhere_currency = $_POST['payhere_currency'] ?? '';
-$status_code = $_POST['status_code'] ?? '';
-$md5sig = $_POST['md5sig'] ?? '';
-$method = $_POST['method'] ?? '';
-$status_message = $_POST['status_message'] ?? '';
-$card_holder_name = $_POST['card_holder_name'] ?? '';
-$card_no = $_POST['card_no'] ?? '';
-$custom_1 = $_POST['custom_1'] ?? '';  // category_id
-$custom_2 = $_POST['custom_2'] ?? '';
+$post_data = $_POST;
+$merchant_id = $post_data['merchant_id'] ?? '';
+$order_id = $post_data['order_id'] ?? '';
+$payhere_amount = $post_data['payhere_amount'] ?? 0;
+$payhere_currency = $post_data['payhere_currency'] ?? '';
+$status_code = $post_data['status_code'] ?? '';
+$method = $post_data['method'] ?? '';
+$status_message = $post_data['status_message'] ?? '';
+$card_holder_name = $post_data['card_holder_name'] ?? '';
+$card_no = $post_data['card_no'] ?? '';
+$custom_1 = $post_data['custom_1'] ?? '';  // category_id
+$custom_2 = $post_data['custom_2'] ?? '';
 
-// PayHere merchant secret (get from your PayHere account)
-$merchant_secret = "YOUR_MERCHANT_SECRET";  // REPLACE WITH YOUR SECRET
-
-// Verify signature (security check)
-$local_md5sig = strtoupper(
-    md5(
-        $merchant_id . 
-        $order_id . 
-        $payhere_amount . 
-        $payhere_currency . 
-        $status_code . 
-        strtoupper(md5($merchant_secret))
-    )
-);
-
-// Log the notification (for debugging)
-$log_file = __DIR__ . '/payhere_logs.txt';
-$log_data = date('Y-m-d H:i:s') . " - Order: $order_id, Status: $status_code, Amount: $payhere_amount\n";
-file_put_contents($log_file, $log_data, FILE_APPEND);
+// Log the notification
+logPayHereTransaction($order_id, $status_code, "Notification received", $post_data);
 
 // Verify signature matches
-if ($local_md5sig === $md5sig) {
+if (verifyPayHereNotification($post_data)) {
     // Signature is valid
     
     if ($status_code == 2) {
@@ -76,24 +51,26 @@ if ($local_md5sig === $md5sig) {
         
         if ($stmt->execute()) {
             $donation_id = $stmt->insert_id;
-            $log_data = date('Y-m-d H:i:s') . " - SUCCESS: Donation ID $donation_id saved for Order $order_id\n";
-            file_put_contents($log_file, $log_data, FILE_APPEND);
+            logPayHereTransaction($order_id, 'SUCCESS', "Donation ID $donation_id saved", ['donation_id' => $donation_id]);
+            
+            // Send thank you email with receipt (if email helper exists)
+            if (file_exists(__DIR__ . '/includes/email_helper.php') && !empty($donor_email)) {
+                require_once __DIR__ . '/includes/email_helper.php';
+                sendDonationThankYouEmail($donor_email, $donor_name, $payhere_amount, $order_id, $donation_id);
+            }
         } else {
-            $log_data = date('Y-m-d H:i:s') . " - ERROR: Failed to save donation - " . $stmt->error . "\n";
-            file_put_contents($log_file, $log_data, FILE_APPEND);
+            logPayHereTransaction($order_id, 'ERROR', "Failed to save donation: " . $stmt->error);
         }
         $stmt->close();
         
     } else {
         // Payment failed or other status
-        $log_data = date('Y-m-d H:i:s') . " - FAILED: Order $order_id - $status_message\n";
-        file_put_contents($log_file, $log_data, FILE_APPEND);
+        logPayHereTransaction($order_id, 'FAILED', $status_message, ['status_code' => $status_code]);
     }
     
 } else {
     // Signature mismatch - possible fraud
-    $log_data = date('Y-m-d H:i:s') . " - SECURITY WARNING: MD5 signature mismatch for Order $order_id\n";
-    file_put_contents($log_file, $log_data, FILE_APPEND);
+    logPayHereTransaction($order_id, 'SECURITY_ERROR', "MD5 signature mismatch - possible fraud attempt", $post_data);
 }
 
 $conn->close();

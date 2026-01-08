@@ -88,11 +88,17 @@
     </div>
 </div>
 
+<?php
+require_once 'includes/payhere_config.php';
+?>
+
 <script>
-// PayHere Configuration
-// IMPORTANT: Replace with your actual Merchant ID from PayHere Dashboard
-const MERCHANT_ID = "1221149";  // PayHere Sandbox Merchant ID (for testing)
-const MERCHANT_SECRET = "YOUR_MERCHANT_SECRET";  // Get from PayHere Dashboard
+// PayHere Configuration from centralized config
+const MERCHANT_ID = "<?= PAYHERE_MERCHANT_ID ?>";
+const SANDBOX_MODE = <?= PAYHERE_SANDBOX_MODE ? 'true' : 'false' ?>;
+const RETURN_URL = "<?= PAYHERE_RETURN_URL ?>";
+const CANCEL_URL = "<?= PAYHERE_CANCEL_URL ?>";
+const NOTIFY_URL = "<?= PAYHERE_NOTIFY_URL ?>";
 
 function payWithPayHere() {
     // Get form values
@@ -118,11 +124,11 @@ function payWithPayHere() {
 
     // PayHere Payment Object
     const payment = {
-        sandbox: true,  // TRUE for sandbox/testing, FALSE for live
+        sandbox: SANDBOX_MODE,
         merchant_id: MERCHANT_ID,
-        return_url: window.location.origin + '/test/payhere_return.php',
-        cancel_url: window.location.origin + '/test/payhere_cancel.php',
-        notify_url: window.location.origin + '/test/payhere_notify.php',  // Server-side notification
+        return_url: RETURN_URL,
+        cancel_url: CANCEL_URL,
+        notify_url: NOTIFY_URL,
         order_id: order_id,
         items: purpose || "General Donation",
         amount: amount.toFixed(2),

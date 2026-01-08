@@ -158,6 +158,7 @@ if (count($alerts) == 0) {
     <title>Dashboard - Giribawa Seela Suva Herath Bhikkhu Hospital</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/premium-theme.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -345,7 +346,7 @@ if (count($alerts) == 0) {
     <!-- Statistics Cards -->
     <div class="row g-4 mb-4">
         <div class="col-md-3">
-            <div class="stat-card">
+            <div class="stat-card-premium">
                 <div class="icon">
                     <i class="bi bi-people"></i>
                 </div>
@@ -354,7 +355,7 @@ if (count($alerts) == 0) {
             </div>
         </div>
         <div class="col-md-3">
-            <div class="stat-card">
+            <div class="stat-card-premium">
                 <div class="icon">
                     <i class="bi bi-person-badge"></i>
                 </div>
@@ -363,7 +364,7 @@ if (count($alerts) == 0) {
             </div>
         </div>
         <div class="col-md-3">
-            <div class="stat-card">
+            <div class="stat-card-premium">
                 <div class="icon">
                     <i class="bi bi-calendar-check"></i>
                 </div>
@@ -372,7 +373,7 @@ if (count($alerts) == 0) {
             </div>
         </div>
         <div class="col-md-3">
-            <div class="stat-card">
+            <div class="stat-card-premium">
                 <div class="icon">
                     <i class="bi bi-clock-history"></i>
                 </div>
@@ -387,7 +388,7 @@ if (count($alerts) == 0) {
     <!-- Alerts and Notifications -->
     <div class="row g-4 mb-4">
         <div class="col-md-12">
-            <div class="alert-card">
+            <div class="glass-card">
                 <h5 style="color: var(--monastery-dark); font-weight: 600; margin-bottom: 20px;">
                     <i class="bi bi-bell"></i> Alerts & Notifications
                 </h5>
@@ -404,13 +405,13 @@ if (count($alerts) == 0) {
     <!-- Charts Row -->
     <div class="row g-4 mb-4">
         <div class="col-md-8">
-            <div class="chart-card">
+            <div class="glass-card">
                 <h5><i class="bi bi-bar-chart"></i> Weekly Appointment Trend</h5>
                 <canvas id="weeklyChart" height="80"></canvas>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="upcoming-appointments">
+            <div class="glass-card">
                 <h5 style="color: var(--monastery-dark); font-weight: 600; margin-bottom: 20px;">
                     <i class="bi bi-calendar-day"></i> Today's Appointments
                 </h5>
@@ -444,7 +445,7 @@ if (count($alerts) == 0) {
     <!-- Financial Chart -->
     <div class="row g-4">
         <div class="col-md-12">
-            <div class="chart-card">
+            <div class="glass-card">
                 <h5><i class="bi bi-graph-up"></i> Monthly Donations vs Expenses (Last 6 Months)</h5>
                 <canvas id="financialChart" height="60"></canvas>
             </div>
@@ -458,32 +459,32 @@ if (count($alerts) == 0) {
         <h5 style="color: var(--monastery-dark); margin-bottom: 20px; font-weight: 600;">Quick Actions</h5>
         <div class="row g-3 justify-content-center">
             <div class="col-auto">
-                <a href="patient_appointments.php" class="btn">
+                <a href="patient_appointments.php" class="btn-premium btn-primary-premium">
                     <i class="bi bi-calendar-plus"></i> New Appointment
                 </a>
             </div>
             <div class="col-auto">
-                <a href="donation_management.php" class="btn">
+                <a href="donation_management.php" class="btn-premium btn-success-premium">
                     <i class="bi bi-cash-coin"></i> Add Donation
                 </a>
             </div>
             <div class="col-auto">
-                <a href="bill_management.php" class="btn">
+                <a href="bill_management.php" class="btn-premium btn-warning-premium">
                     <i class="bi bi-receipt"></i> Add Expense
                 </a>
             </div>
             <div class="col-auto">
-                <a href="doctor_availability.php" class="btn">
+                <a href="doctor_availability.php" class="btn-premium btn-info-premium">
                     <i class="bi bi-clock"></i> Doctor Schedule
                 </a>
             </div>
             <div class="col-auto">
-                <a href="category_management.php" class="btn">
+                <a href="category_management.php" class="btn-premium btn-secondary-premium">
                     <i class="bi bi-tag"></i> Categories
                 </a>
             </div>
             <div class="col-auto">
-                <a href="room_management.php" class="btn">
+                <a href="room_management.php" class="btn-premium btn-primary-premium">
                     <i class="bi bi-door-open"></i> Room Management
                 </a>
             </div>
