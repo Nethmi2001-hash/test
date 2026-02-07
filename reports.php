@@ -9,15 +9,8 @@ if (empty($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 }
 
 // Database connection
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "monastery_healthcare";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+require_once __DIR__ . '/includes/db_config.php';
+$conn = getDBConnection();
 
 // Get date range from request or default to current month
 $start_date = $_GET['start_date'] ?? date('Y-m-01');

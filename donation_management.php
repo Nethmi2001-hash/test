@@ -369,6 +369,10 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
             <h5 class="mb-0"><i class="bi bi-list-ul"></i> Recent Donations</h5>
         </div>
         <div class="card-body">
+            <!-- Advanced Search Section -->
+            <div id="advanced-search" data-type="donations" class="mb-4"></div>
+            
+            <div id="donations-list">
             <?php if (count($donations) > 0): ?>
                 <?php foreach ($donations as $donation): ?>
                     <div class="donation-card">
@@ -459,6 +463,7 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
                     <p class="mt-3">No donations recorded yet</p>
                 </div>
             <?php endif; ?>
+            </div><!-- END donations-list -->
         </div>
     </div>
 </div>
@@ -757,7 +762,15 @@ function initiatePayHere() {
     // Close modal
     bootstrap.Modal.getInstance(document.getElementById('payhereModal')).hide();
 }
+
+// Initialize Advanced Search for Donations
+window.addEventListener('load', function() {
+    new AdvancedSearch('donations');
+});
 </script>
+
+<!-- Advanced Search System -->
+<script src="assets/js/advanced-search.js"></script>
 
 </body>
 </html>

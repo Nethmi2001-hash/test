@@ -252,6 +252,10 @@ $conn->close();
                 </div>
             </div>
             <div class="card-body">
+                <!-- Advanced Search Section -->
+                <div id="advanced-search" data-type="monks" class="mb-4"></div>
+                
+                <div id="monks-list">
                 <?php if (count($monks) > 0): ?>
                     <?php foreach ($monks as $monk): ?>
                         <div class="monk-card">
@@ -323,6 +327,7 @@ $conn->close();
                         <p class="text-muted">No monk records found. Click "Add New Monk" to get started.</p>
                     </div>
                 <?php endif; ?>
+                </div><!-- END monks-list -->
             </div>
         </div>
     </div>
@@ -541,6 +546,9 @@ $conn->close();
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Advanced Search System -->
+    <script src="assets/js/advanced-search.js"></script>
     <script>
         function editMonk(monk) {
             document.getElementById('edit_monk_id').value = monk.monk_id;
@@ -559,6 +567,11 @@ $conn->close();
             
             new bootstrap.Modal(document.getElementById('editModal')).show();
         }
+        
+        // Initialize Advanced Search for Monks
+        window.addEventListener('load', function() {
+            new AdvancedSearch('monks');
+        });
     </script>
 </body>
 </html>

@@ -10,15 +10,8 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 include 'navbar.php';
 
 // Database connection
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "monastery_healthcare";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+require_once __DIR__ . '/includes/db_config.php';
+$conn = getDBConnection();
 
 // Get dashboard statistics
 $stats = [
@@ -561,7 +554,21 @@ new Chart(financialCtx, {
         }
     }
 });
+
+// Initialize Browser Notifications
+const monasteryNotifications = new MonasteryNotifications();
+
+// Request permission on page load
+window.addEventListener('load', function() {
+    monasteryNotifications.requestPermission();
+    
+    // Start polling for new activities every 30 seconds
+    monasteryNotifications.startPolling(30);
+});
 </script>
+
+<!-- Browser Notifications System -->
+<script src="assets/js/notifications.js"></script>
 
 </body>
 </html>

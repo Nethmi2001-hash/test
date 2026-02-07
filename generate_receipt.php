@@ -16,15 +16,10 @@ if (!isset($_GET['id'])) {
 $donation_id = intval($_GET['id']);
 
 // Database connection
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "monastery_healthcare";
+require_once __DIR__ . '/includes/db_config.php';
+require_once __DIR__ . '/includes/qrcode_helper.php';
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+$conn = getDBConnection();
 
 // Get donation details
 $stmt = $conn->prepare("
@@ -181,7 +176,25 @@ if ($donation['notes']) {
     $pdf->Ln(5);
 }
 
+// QR Code for verification
+$qr_code_url = generateDonationQR($donation['donation_id']);
+if ($qr_code_url) {
+    $pdf->Ln(10);
+    $pdf->SetFont('Arial', 'B', 12);
+    $pdf->SetTextColor(0, 0, 0);
+    $pdf->Cell(0, 8, 'Scan to Verify Receipt:', 0, 1, 'C');
+    
+    // Add QR code image
+    $pdf->Image($qr_code_url, 75, $pdf->GetY() + 5, 60, 60);
+    $pdf->Ln(65);
+    
+    $pdf->SetFont('Arial', 'I', 9);
+    $pdf->SetTextColor(128, 128, 128);
+    $pdf->Cell(0, 5, 'Scan this QR code with any smartphone to verify this receipt online', 0, 1, 'C');
+}
+
 // Tax Deduction Notice
+$pdf->Ln(5);
 $pdf->SetFont('Arial', 'I', 10);
 $pdf->SetTextColor(128, 128, 128);
 $pdf->MultiCell(0, 5, 'This receipt may be used for tax deduction purposes. Please consult your tax advisor for eligibility. All donations are used for healthcare services and monastery maintenance.');

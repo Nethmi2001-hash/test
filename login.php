@@ -1,26 +1,19 @@
 <?php
 session_start();
 
-// Database configuration
-$servername = "localhost";
-$dbusername = "root";
-$db_password = "";
-$dbname = "monastery_healthcare"; // Updated database name
+require_once __DIR__ . '/includes/db_config.php';
 
-$con = new mysqli($servername, $dbusername, $db_password, $dbname);
-if ($con->connect_error) {
-    die("Connection failed: " . $con->connect_error);
-}
+$con = getDBConnection();
 
 $error = "";
 $success = "";
 
-// Check for logout message
+//check logout success message 
 if (isset($_GET['logout']) && $_GET['logout'] == 'success') {
     $success = "You have been logged out successfully.";
 }
 
-// Check for session timeout
+//check session timeout message 
 if (isset($_GET['timeout']) && $_GET['timeout'] == '1') {
     $error = "Your session has expired. Please login again.";
 }
@@ -32,18 +25,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($email) || empty($password)) {
         $error = "Both email and password are required.";
     } else {
-        // Updated query to use new database structure with role information
-        $stmt = $con->prepare("SELECT u.*, r.role_name 
+        // prepare and execute query to prevent sql  injection 
+        $stmt = $con->prepare("SELECT u.user_id, u.name, u.email, u.password_hash, u.role_id, r.role_name 
                                FROM users u 
                                JOIN roles r ON u.role_id = r.role_id 
-                               WHERE u.email = ? AND u.status = 'active'");
+                               WHERE u.email = ? AND u.status = 'active'
+                               LIMIT 1");
         $stmt->bind_param("s", $email);
         $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
+
+        $user = null;
+        if (method_exists($stmt, 'get_result')) {
+            $result = $stmt->get_result();
+            $user = $result->fetch_assoc();
+        } else {
+            $stmt->bind_result($user_id, $name, $email_db, $password_hash, $role_id, $role_name);
+            if ($stmt->fetch()) {
+                $user = [
+                    'user_id' => $user_id,
+                    'name' => $name,
+                    'email' => $email_db,
+                    'password_hash' => $password_hash,
+                    'role_id' => $role_id,
+                    'role_name' => $role_name
+                ];
+            }
+        }
 
         if ($user && password_verify($password, $user['password_hash'])) {
-            // Set session variables
+            // set session variables
             $_SESSION['logged_in'] = true;
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['username'] = $user['name'];
@@ -52,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['role_name'] = $user['role_name'];
             $_SESSION['last_activity'] = time();
             
-            // Redirect to dashboard
+            // redirect to dashboard
             header("Location: dashboard.php");
             exit();
         } else {
@@ -284,7 +294,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
     <div class="login-container">
-        <!-- Left Side - Image & Info -->
+        <!--left side - image & info-->
         <div class="login-image">
             <div class="monastery-logo">🪷</div>
             <h1>Seela Suwa Herath<br>Bikshu Gilan Arana</h1>
@@ -315,7 +325,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
         
-        <!-- Right Side - Login Form -->
+        <!--right side - login form -->
         <div class="login-card">
             <div class="login-header">
                 <h2>Welcome Back</h2>

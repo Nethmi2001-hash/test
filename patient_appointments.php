@@ -212,7 +212,11 @@ while ($rs = $rooms_res->fetch_assoc()) {
         </div>
     <?php endif; ?>
 
+    <!-- Advanced Search Section -->
+    <div id="advanced-search" data-type="appointments" class="mb-4"></div>
+
     <!-- Appointments Grid -->
+    <div id="appointments-list">
     <div class="row">
         <?php if ($appointments_res->num_rows == 0): ?>
             <div class="col-12">
@@ -380,6 +384,7 @@ while ($rs = $rooms_res->fetch_assoc()) {
             </div>
         <?php endwhile; ?>
     </div>
+    </div><!-- END appointments-list -->
 </div>
 
 <!-- Add New Appointment Modal -->
@@ -458,6 +463,15 @@ while ($rs = $rooms_res->fetch_assoc()) {
         </div>
     </div>
 </div>
+
+<!-- Advanced Search System -->
+<script src="assets/js/advanced-search.js"></script>
+<script>
+// Initialize Advanced Search for Appointments
+window.addEventListener('load', function() {
+    new AdvancedSearch('appointments');
+});
+</script>
 
 </body>
 </html>

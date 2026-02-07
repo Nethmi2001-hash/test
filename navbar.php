@@ -1,5 +1,5 @@
 <?php
-
+require_once __DIR__ . '/includes/language.php';
 ?>
 
 <!-- Premium Dark Mode Toggle -->
@@ -16,11 +16,11 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="dashboard.php"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
-        <li class="nav-item"><a class="nav-link" href="donation_management.php"><i class="bi bi-cash-coin"></i> Donations</a></li>
-        <li class="nav-item"><a class="nav-link" href="bill_management.php"><i class="bi bi-receipt"></i> Expenses</a></li>
-        <li class="nav-item"><a class="nav-link" href="patient_appointments.php"><i class="bi bi-calendar-check"></i> Appointments</a></li>
-        <li class="nav-item"><a class="nav-link" href="reports.php"><i class="bi bi-graph-up-arrow"></i> Reports</a></li>
+        <li class="nav-item"><a class="nav-link" href="dashboard.php"><i class="bi bi-speedometer2"></i> <?= __('dashboard') ?></a></li>
+        <li class="nav-item"><a class="nav-link" href="donation_management.php"><i class="bi bi-cash-coin"></i> <?= __('donations') ?></a></li>
+        <li class="nav-item"><a class="nav-link" href="bill_management.php"><i class="bi bi-receipt"></i> <?= __('bills') ?></a></li>
+        <li class="nav-item"><a class="nav-link" href="patient_appointments.php"><i class="bi bi-calendar-check"></i> <?= __('appointments') ?></a></li>
+        <li class="nav-item"><a class="nav-link" href="reports.php"><i class="bi bi-graph-up-arrow"></i> <?= __('reports') ?></a></li>
         <li class="nav-item"><a class="nav-link" href="chatbot.php"><i class="bi bi-robot"></i> AI Assistant</a></li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
@@ -28,8 +28,8 @@
           </a>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="table.php"><i class="bi bi-people"></i> Users</a></li>
-            <li><a class="dropdown-item" href="monk_management.php"><i class="bi bi-person-hearts"></i> Monks</a></li>
-            <li><a class="dropdown-item" href="doctor_management.php"><i class="bi bi-person-badge"></i> Doctors</a></li>
+            <li><a class="dropdown-item" href="monk_management.php"><i class="bi bi-person-hearts"></i> <?= __('monks') ?></a></li>
+            <li><a class="dropdown-item" href="doctor_management.php"><i class="bi bi-person-badge"></i> <?= __('doctors') ?></a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="import_monks.php"><i class="bi bi-upload"></i> Import Monks</a></li>
             <li><a class="dropdown-item" href="category_management.php"><i class="bi bi-tag"></i> Categories</a></li>
@@ -39,13 +39,27 @@
             <li><a class="dropdown-item" href="room_slot_management.php"><i class="bi bi-calendar3"></i> Room Slots</a></li>
           </ul>
         </li>
+        <!-- Language Switcher -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" title="<?= __('language') ?>">
+            <i class="bi bi-translate"></i> <?= getCurrentLanguage() == 'si' ? 'සිං' : 'EN' ?>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item <?= getCurrentLanguage() == 'en' ? 'active' : '' ?>" href="?lang=en">
+              <i class="bi bi-check-circle <?= getCurrentLanguage() == 'en' ? '' : 'invisible' ?>"></i> English
+            </a></li>
+            <li><a class="dropdown-item <?= getCurrentLanguage() == 'si' ? 'active' : '' ?>" href="?lang=si">
+              <i class="bi bi-check-circle <?= getCurrentLanguage() == 'si' ? '' : 'invisible' ?>"></i> සිංහල
+            </a></li>
+          </ul>
+        </li>
         <!-- Dark Mode Toggle -->
         <li class="nav-item">
           <button id="theme-toggle" class="nav-link btn btn-link" style="border:none; background:none; color: white; font-size: 1.2rem; transition: transform 0.3s;" title="Toggle Dark Mode">
             <i class="bi bi-moon-fill"></i>
           </button>
         </li>
-        <li class="nav-item"><a class="nav-link" href="logout.php"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+        <li class="nav-item"><a class="nav-link" href="logout.php"><i class="bi bi-box-arrow-right"></i> <?= __('logout') ?></a></li>
       </ul>
     </div>
   </div>
