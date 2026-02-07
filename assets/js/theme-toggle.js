@@ -52,9 +52,11 @@
         // Add animation effect
         const toggleBtn = document.getElementById('theme-toggle');
         if (toggleBtn) {
-            toggleBtn.style.transform = 'rotate(360deg)';
+                toggleBtn.style.pointerEvents = 'none';
+                toggleBtn.style.transform = 'rotate(360deg)';
             setTimeout(() => {
                 toggleBtn.style.transform = 'rotate(0deg)';
+                    toggleBtn.style.pointerEvents = 'auto';
             }, 300);
         }
     };

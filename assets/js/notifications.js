@@ -124,8 +124,9 @@ class MonasteryNotifications {
                 position: fixed;
                 top: 80px;
                 right: 20px;
-                z-index: 9999;
+                    z-index: 999;
                 max-width: 350px;
+                    pointer-events: none;
             `;
             document.body.appendChild(container);
         }
@@ -144,6 +145,7 @@ class MonasteryNotifications {
             animation: slideInRight 0.3s ease-out;
             cursor: pointer;
             transition: transform 0.2s;
+                pointer-events: auto;
         `;
 
         toast.innerHTML = `

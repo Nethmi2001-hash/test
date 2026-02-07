@@ -55,7 +55,7 @@ require_once __DIR__ . '/includes/language.php';
         </li>
         <!-- Dark Mode Toggle -->
         <li class="nav-item">
-          <button id="theme-toggle" class="nav-link btn btn-link" style="border:none; background:none; color: white; font-size: 1.2rem; transition: transform 0.3s;" title="Toggle Dark Mode">
+            <button id="theme-toggle" class="nav-link btn btn-link" style="border:none; background:none; color: white; font-size: 1.2rem; transition: transform 0.3s; padding: 0.5rem 1rem; cursor: pointer; z-index: 10; position: relative;" title="Toggle Dark Mode">
             <i class="bi bi-moon-fill"></i>
           </button>
         </li>
