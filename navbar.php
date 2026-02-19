@@ -21,22 +21,22 @@ require_once __DIR__ . '/includes/language.php';
         <li class="nav-item"><a class="nav-link" href="bill_management.php"><i class="bi bi-receipt"></i> <?= __('bills') ?></a></li>
         <li class="nav-item"><a class="nav-link" href="patient_appointments.php"><i class="bi bi-calendar-check"></i> <?= __('appointments') ?></a></li>
         <li class="nav-item"><a class="nav-link" href="reports.php"><i class="bi bi-graph-up-arrow"></i> <?= __('reports') ?></a></li>
-        <li class="nav-item"><a class="nav-link" href="chatbot.php"><i class="bi bi-robot"></i> AI Assistant</a></li>
+        <li class="nav-item"><a class="nav-link" href="chatbot.php"><i class="bi bi-robot"></i> <?= __('ai_assistant') ?></a></li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-            <i class="bi bi-gear"></i> Manage
+            <i class="bi bi-gear"></i> <?= __('manage') ?>
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="table.php"><i class="bi bi-people"></i> Users</a></li>
+            <li><a class="dropdown-item" href="table.php"><i class="bi bi-people"></i> <?= __('users') ?></a></li>
             <li><a class="dropdown-item" href="monk_management.php"><i class="bi bi-person-hearts"></i> <?= __('monks') ?></a></li>
             <li><a class="dropdown-item" href="doctor_management.php"><i class="bi bi-person-badge"></i> <?= __('doctors') ?></a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="import_monks.php"><i class="bi bi-upload"></i> Import Monks</a></li>
-            <li><a class="dropdown-item" href="category_management.php"><i class="bi bi-tag"></i> Categories</a></li>
-            <li><a class="dropdown-item" href="title_management.php"><i class="bi bi-award"></i> Titles</a></li>
-            <li><a class="dropdown-item" href="doctor_availability.php"><i class="bi bi-clock"></i> Doctor Availability</a></li>
-            <li><a class="dropdown-item" href="room_management.php"><i class="bi bi-door-open"></i> Rooms</a></li>
-            <li><a class="dropdown-item" href="room_slot_management.php"><i class="bi bi-calendar3"></i> Room Slots</a></li>
+            <li><a class="dropdown-item" href="import_monks.php"><i class="bi bi-upload"></i> <?= __('import_monks') ?></a></li>
+            <li><a class="dropdown-item" href="category_management.php"><i class="bi bi-tag"></i> <?= __('categories') ?></a></li>
+            <li><a class="dropdown-item" href="title_management.php"><i class="bi bi-award"></i> <?= __('titles') ?></a></li>
+            <li><a class="dropdown-item" href="doctor_availability.php"><i class="bi bi-clock"></i> <?= __('doctor_availability') ?></a></li>
+            <li><a class="dropdown-item" href="room_management.php"><i class="bi bi-door-open"></i> <?= __('rooms') ?></a></li>
+            <li><a class="dropdown-item" href="room_slot_management.php"><i class="bi bi-calendar3"></i> <?= __('room_slots') ?></a></li>
           </ul>
         </li>
         <!-- Language Switcher -->

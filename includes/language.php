@@ -33,6 +33,16 @@ $translations = [
         'bills' => 'Bills',
         'reports' => 'Reports',
         'logout' => 'Logout',
+        'manage' => 'Manage',
+        'users' => 'Users',
+        'ai_assistant' => 'AI Assistant',
+        'import_monks' => 'Import Monks',
+        'categories' => 'Categories',
+        'titles' => 'Titles',
+        'doctor_availability' => 'Doctor Availability',
+        'rooms' => 'Rooms',
+        'room_slots' => 'Room Slots',
+        'language' => 'Language',
         
         // Common
         'welcome' => 'Welcome',
@@ -108,6 +118,16 @@ $translations = [
         'bills' => 'බිල්පත්',
         'reports' => 'වාර්තා',
         'logout' => 'ඉවත් වන්න',
+        'manage' => 'පරිපාලනය',
+        'users' => 'පරිශීලකයන්',
+        'ai_assistant' => 'AI සහායක',
+        'import_monks' => 'භික්ෂූන් ආනයනය',
+        'categories' => 'වර්ග',
+        'titles' => 'පදවි',
+        'doctor_availability' => 'වෛද්‍ය ලබාගැනීමේ වේලාව',
+        'rooms' => 'කාමර',
+        'room_slots' => 'කාමර කාලසටහන්',
+        'language' => 'භාෂාව',
         
         // Common
         'welcome' => 'ආයුබෝවන්',
