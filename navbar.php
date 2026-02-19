@@ -4,12 +4,49 @@ require_once __DIR__ . '/includes/language.php';
 
 <!-- Premium Dark Mode Toggle -->
 <link rel="stylesheet" href="assets/css/premium-theme.css">
+<link rel="stylesheet" href="assets/css/sacred-care-theme.css">
 <script src="assets/js/theme-toggle.js"></script>
 
-<nav class="navbar navbar-expand-lg navbar-dark mb-4" style="background: linear-gradient(135deg, #f57c00 0%, #ff9800 100%);">
+<style>
+  :root {
+    --monastery-saffron: #C2410C;
+    --monastery-gold: #F59E0B;
+    --monastery-accent: #1E3A8A;
+    --monastery-cream: #FFF7ED;
+  }
+
+  .navbar-monastery {
+    background: linear-gradient(135deg, var(--monastery-saffron) 0%, #9A3412 100%) !important;
+    box-shadow: 0 2px 14px rgba(154, 52, 18, 0.30);
+  }
+
+  .navbar-monastery .navbar-brand,
+  .navbar-monastery .nav-link {
+    color: #fff !important;
+    font-weight: 500;
+  }
+
+  .navbar-monastery .nav-link:hover,
+  .navbar-monastery .nav-link:focus {
+    color: var(--monastery-gold) !important;
+  }
+
+  .navbar-monastery .dropdown-menu {
+    border-radius: 10px;
+    border: 1px solid #f3dfc5;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .navbar-monastery .dropdown-item:hover {
+    background: #fff7ed;
+    color: var(--monastery-accent);
+  }
+</style>
+
+<nav class="navbar navbar-expand-lg navbar-dark navbar-monastery mb-4">
   <div class="container-fluid">
     <a class="navbar-brand" href="dashboard.php">
-      <i class="bi bi-hospital"></i> Seela Suwa Herath Arana
+      <i class="bi bi-person-hearts"></i> Seela Suwa Herath Arana
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>

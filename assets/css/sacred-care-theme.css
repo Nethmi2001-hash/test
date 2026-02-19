@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --sc-primary: #C2410C;
+  --sc-secondary: #F59E0B;
+  --sc-accent: #1E3A8A;
+  --sc-bg: #FFF7ED;
+  --sc-card: #FFFFFF;
+  --sc-success: #16A34A;
+  --sc-danger: #DC2626;
+  --sc-text: #1F2937;
+  --sc-muted: #6B7280;
+
+  --bs-primary: #C2410C;
+  --bs-warning: #F59E0B;
+  --bs-info: #1E3A8A;
+  --bs-success: #16A34A;
+  --bs-danger: #DC2626;
+  --bs-light: #FFF7ED;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--sc-bg);
+  color: var(--sc-text);
+}
+
+h1, h2, h3, h4, h5, h6,
+.brand-heading {
+  font-family: 'Playfair Display', serif;
+  color: var(--sc-accent);
+}
+
+.sc-navbar {
+  background: linear-gradient(135deg, #C2410C 0%, #9A3412 100%) !important;
+}
+
+.sc-card {
+  background: var(--sc-card);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(31, 41, 55, 0.08);
+}
+
+.sc-btn-primary {
+  background: var(--sc-primary);
+  border-color: var(--sc-primary);
+  color: #fff;
+}
+
+.sc-btn-primary:hover {
+  background: #9A3412;
+  border-color: #9A3412;
+  color: #fff;
+}
+
+.sc-btn-donation,
+.btn-warning {
+  background: var(--sc-secondary);
+  border-color: var(--sc-secondary);
+  color: #111827;
+  font-weight: 600;
+}
+
+.sc-btn-donation:hover,
+.btn-warning:hover {
+  background: #D97706;
+  border-color: #D97706;
+  color: #111827;
+}
+
+.sc-link,
+a {
+  color: var(--sc-accent);
+}
+
+.sc-link:hover,
+a:hover {
+  color: #1E40AF;
+}
+
+.sc-helping-hand {
+  color: var(--sc-secondary);
+}
+
+.sc-accent-bg {
+  background: var(--sc-accent);
+  color: #fff;
+}
+
+.sc-muted {
+  color: var(--sc-muted);
+}

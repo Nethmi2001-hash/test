@@ -151,14 +151,16 @@ if (count($alerts) == 0) {
     <title>Dashboard - Seela Suwa Herath Bikshu Gilan Arana</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --monastery-green: #2d5016;
-            --monastery-dark-green: #1a3009;
-            --monastery-gold: #D4AF37;
-            --monastery-light-gold: #F5DEB3;
-            --monastery-cream: #F5F1E8;
+            --monastery-green: #C2410C;
+            --monastery-dark-green: #9A3412;
+            --monastery-gold: #F59E0B;
+            --monastery-light-gold: #FDE68A;
+            --monastery-cream: #FFF7ED;
+            --monastery-accent: #1E3A8A;
             --text-dark: #333;
             --text-light: #666;
         }
@@ -296,7 +298,7 @@ if (count($alerts) == 0) {
         }
 
         .chart-card h5, .alert-card h5, .upcoming-card h5 {
-            color: var(--monastery-green);
+            color: var(--monastery-accent);
             font-weight: 600;
             margin-bottom: 20px;
             display: flex;
@@ -382,7 +384,7 @@ if (count($alerts) == 0) {
         }
 
         .quick-actions h5 {
-            color: var(--monastery-green);
+            color: var(--monastery-accent);
             font-weight: 600;
             margin-bottom: 20px;
             font-size: 18px;
@@ -601,7 +603,7 @@ if (count($alerts) == 0) {
             </div>
             <div class="col-auto">
                 <a href="donation_management.php" class="btn-quick">
-                    <i class="bi bi-heart-fill"></i> Add Donation
+                    <i class="bi bi-person-hearts"></i> Add Donation
                 </a>
             </div>
             <div class="col-auto">

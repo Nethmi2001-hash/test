@@ -42,23 +42,26 @@ $stats = $stats_result->fetch_assoc();
     <title>Donate - Seela Suwa Herath Bikshu Gilan Arana</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
     <script type="text/javascript" src="https://www.payhere.lk/lib/payhere.js"></script>
     <style>
         :root {
-            --monastery-saffron: #f57c00;
-            --monastery-orange: #ff9800;
-            --monastery-pale: #fff3e0;
-            --monastery-dark: #e65100;
+            --monastery-green: #C2410C;
+            --monastery-dark-green: #9A3412;
+            --monastery-gold: #F59E0B;
+            --monastery-cream: #FFF7ED;
+            --monastery-soft: #FFF7ED;
+            --monastery-accent: #1E3A8A;
         }
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--monastery-pale) 0%, #ffe0b2 100%);
+            background: linear-gradient(135deg, var(--monastery-cream) 0%, #eee3cc 100%);
         }
 
         .hero-section {
-            background: linear-gradient(135deg, rgba(245, 124, 0, 0.95) 0%, rgba(255, 152, 0, 0.95) 100%),
-                        url('https://images.unsplash.com/photo-1604002260721-2e61e5e2ffc8?w=1920') center/cover;
+            background: linear-gradient(135deg, rgba(45, 80, 22, 0.9) 0%, rgba(26, 48, 9, 0.9) 100%),
+                        url('images/img6.jpeg') center/cover;
             color: white;
             padding: 80px 0;
             text-align: center;
@@ -67,10 +70,10 @@ $stats = $stats_result->fetch_assoc();
         }
 
         .hero-section::before {
-            content: '🪷';
+            content: '🤝';
             position: absolute;
-            font-size: 200px;
-            opacity: 0.1;
+            font-size: 170px;
+            opacity: 0.14;
             top: -50px;
             right: -50px;
             animation: float 6s ease-in-out infinite;
@@ -103,7 +106,7 @@ $stats = $stats_result->fetch_assoc();
         .stats-number {
             font-size: 2.5rem;
             font-weight: bold;
-            color: var(--monastery-saffron);
+            color: var(--monastery-green);
         }
 
         .donation-form {
@@ -114,7 +117,7 @@ $stats = $stats_result->fetch_assoc();
         }
 
         .btn-donate {
-            background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%);
+            background: linear-gradient(135deg, var(--monastery-green) 0%, var(--monastery-dark-green) 100%);
             border: none;
             color: white;
             padding: 15px;
@@ -125,16 +128,16 @@ $stats = $stats_result->fetch_assoc();
 
         .btn-donate:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(245, 124, 0, 0.4);
+            box-shadow: 0 10px 25px rgba(45, 80, 22, 0.35);
             color: white;
         }
 
         .recent-donation-item {
             padding: 15px;
-            background: var(--monastery-pale);
+            background: var(--monastery-soft);
             border-radius: 10px;
             margin-bottom: 10px;
-            border-left: 4px solid var(--monastery-saffron);
+            border-left: 4px solid var(--monastery-green);
         }
 
         .category-card {
@@ -146,13 +149,13 @@ $stats = $stats_result->fetch_assoc();
         }
 
         .category-card:hover, .category-card.selected {
-            border-color: var(--monastery-saffron);
-            background: var(--monastery-pale);
+            border-color: var(--monastery-green);
+            background: var(--monastery-soft);
         }
 
         .category-card.selected {
-            background: var(--monastery-pale);
-            box-shadow: 0 3px 10px rgba(245, 124, 0, 0.2);
+            background: var(--monastery-soft);
+            box-shadow: 0 3px 10px rgba(45, 80, 22, 0.2);
         }
 
         .navbar-custom {
@@ -166,7 +169,13 @@ $stats = $stats_result->fetch_assoc();
         }
 
         .nav-link:hover {
-            color: var(--monastery-saffron) !important;
+            color: var(--monastery-accent) !important;
+        }
+
+        .btn-outline-secondary:hover,
+        .btn-outline-secondary:focus {
+            background: var(--monastery-accent);
+            border-color: var(--monastery-accent);
         }
     </style>
 </head>
@@ -175,8 +184,8 @@ $stats = $stats_result->fetch_assoc();
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container">
-        <a class="navbar-brand" href="#" style="color: var(--monastery-saffron); font-weight: bold;">
-            🪷 Seela Suwa Herath
+        <a class="navbar-brand" href="#" style="color: var(--monastery-green); font-weight: bold;">
+            <i class="bi bi-person-hearts"></i> Seela Suwa Herath
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -205,10 +214,10 @@ $stats = $stats_result->fetch_assoc();
 <!-- Hero Section -->
 <section class="hero-section">
     <div class="container">
-        <h1 class="mb-4">🙏 Support Our Mission</h1>
-        <p class="lead mb-4">Your donations help us provide healthcare and support to monks in need</p>
+        <h1 class="mb-4"><i class="bi bi-person-hearts"></i> Helping Hands for Monastic Care</h1>
+        <p class="lead mb-4">Your donation is an act of compassion that supports medical care for monks in need</p>
         <a href="#donate" class="btn btn-light btn-lg px-5">
-            <i class="bi bi-heart-fill"></i> Donate Now
+            <i class="bi bi-hand-thumbs-up"></i> Offer Support
         </a>
     </div>
 </section>
@@ -219,21 +228,21 @@ $stats = $stats_result->fetch_assoc();
         <div class="row g-4">
             <div class="col-md-4">
                 <div class="stats-card">
-                    <i class="bi bi-people-fill" style="font-size: 3rem; color: var(--monastery-saffron);"></i>
+                    <i class="bi bi-people-fill" style="font-size: 3rem; color: var(--monastery-green);"></i>
                     <div class="stats-number mt-3"><?= number_format($stats['unique_donors'] ?? 0) ?></div>
                     <div class="text-muted">Generous Donors</div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="stats-card">
-                    <i class="bi bi-cash-coin" style="font-size: 3rem; color: var(--monastery-saffron);"></i>
+                    <i class="bi bi-cash-coin" style="font-size: 3rem; color: var(--monastery-green);"></i>
                     <div class="stats-number mt-3">Rs. <?= number_format($stats['total_amount'] ?? 0, 0) ?></div>
                     <div class="text-muted">Total Donations</div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="stats-card">
-                    <i class="bi bi-heart-fill" style="font-size: 3rem; color: var(--monastery-saffron);"></i>
+                    <i class="bi bi-person-hearts" style="font-size: 3rem; color: var(--monastery-green);"></i>
                     <div class="stats-number mt-3"><?= number_format($stats['total_donations'] ?? 0) ?></div>
                     <div class="text-muted">Total Contributions</div>
                 </div>
@@ -248,8 +257,8 @@ $stats = $stats_result->fetch_assoc();
         <div class="row">
             <div class="col-lg-8 mx-auto">
                 <div class="donation-form">
-                    <h2 class="text-center mb-4" style="color: var(--monastery-saffron);">
-                        <i class="bi bi-gift"></i> Make Your Donation
+                    <h2 class="text-center mb-4" style="color: var(--monastery-accent);">
+                        <i class="bi bi-person-hearts"></i> Offer a Helping Hand
                     </h2>
 
                     <form id="donationForm">
@@ -321,8 +330,8 @@ $stats = $stats_result->fetch_assoc();
 <!-- Recent Donations Section -->
 <section id="recent" class="py-5" style="background: white;">
     <div class="container">
-        <h3 class="text-center mb-4" style="color: var(--monastery-saffron);">
-            <i class="bi bi-star-fill"></i> Recent Donations
+        <h3 class="text-center mb-4" style="color: var(--monastery-green);">
+            <i class="bi bi-stars"></i> Recent Helping-Hand Donations
         </h3>
         <div class="row">
             <div class="col-lg-8 mx-auto">
@@ -335,7 +344,7 @@ $stats = $stats_result->fetch_assoc();
                                 <small class="text-muted d-block"><?= htmlspecialchars($donation['category_name']) ?></small>
                             </div>
                             <div class="text-end">
-                                <strong style="color: var(--monastery-saffron);">Rs. <?= number_format($donation['amount'], 2) ?></strong>
+                                <strong style="color: var(--monastery-green);">Rs. <?= number_format($donation['amount'], 2) ?></strong>
                                 <small class="text-muted d-block"><?= date('M d, Y', strtotime($donation['created_at'])) ?></small>
                             </div>
                         </div>
@@ -350,11 +359,11 @@ $stats = $stats_result->fetch_assoc();
 </section>
 
 <!-- Contact Section -->
-<section id="contact" class="py-5" style="background: var(--monastery-pale);">
+<section id="contact" class="py-5" style="background: var(--monastery-soft);">
     <div class="container">
         <div class="row">
             <div class="col-lg-6 mx-auto text-center">
-                <h3 style="color: var(--monastery-saffron);">
+                <h3 style="color: var(--monastery-green);">
                     <i class="bi bi-envelope"></i> Get in Touch
                 </h3>
                 <p class="mt-3">

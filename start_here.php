@@ -6,13 +6,17 @@
     <title>🚀 Quick Start - Monastery Healthcare System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
     <style>
         :root {
-            --monastery-saffron: #f57c00;
-            --monastery-orange: #ff9800;
+            --monastery-green: #C2410C;
+            --monastery-dark-green: #9A3412;
+            --monastery-gold: #F59E0B;
+            --monastery-cream: #FFF7ED;
+            --monastery-accent: #1E3A8A;
         }
         body {
-            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            background: linear-gradient(135deg, var(--monastery-cream) 0%, #eee3cc 100%);
             min-height: 100vh;
             padding: 40px 20px;
         }
@@ -20,7 +24,7 @@
             background: white;
             border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 10px 40px rgba(245, 124, 0, 0.2);
+            box-shadow: 0 10px 40px rgba(45, 80, 22, 0.18);
             max-width: 1200px;
             margin: 0 auto;
         }
@@ -28,10 +32,10 @@
             text-align: center;
             margin-bottom: 40px;
             padding-bottom: 30px;
-            border-bottom: 3px solid var(--monastery-orange);
+            border-bottom: 3px solid var(--monastery-gold);
         }
         .header h1 {
-            color: var(--monastery-saffron);
+            color: var(--monastery-accent);
             font-size: 2.5rem;
             margin-bottom: 10px;
         }
@@ -40,7 +44,7 @@
             font-size: 1.2rem;
         }
         .action-card {
-            background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%);
+            background: linear-gradient(135deg, var(--monastery-green) 0%, var(--monastery-dark-green) 100%);
             color: white;
             border-radius: 15px;
             padding: 30px;
@@ -52,7 +56,7 @@
         }
         .action-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(245, 124, 0, 0.4);
+            box-shadow: 0 10px 30px rgba(45, 80, 22, 0.35);
             color: white;
         }
         .action-card h3 {
@@ -69,7 +73,7 @@
         }
         .step-number {
             background: white;
-            color: var(--monastery-saffron);
+            color: var(--monastery-green);
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -86,7 +90,7 @@
             margin-top: 30px;
         }
         .quick-links h4 {
-            color: var(--monastery-saffron);
+            color: var(--monastery-green);
             margin-bottom: 15px;
         }
         .quick-links a {
@@ -94,14 +98,14 @@
             margin: 5px;
             padding: 8px 15px;
             background: white;
-            border: 2px solid var(--monastery-orange);
-            color: var(--monastery-saffron);
+            border: 2px solid var(--monastery-gold);
+            color: var(--monastery-green);
             border-radius: 8px;
             text-decoration: none;
             transition: all 0.2s;
         }
         .quick-links a:hover {
-            background: var(--monastery-saffron);
+            background: var(--monastery-green);
             color: white;
         }
         .status-badge {
@@ -119,7 +123,7 @@
 
 <div class="main-card">
     <div class="header">
-        <h1>🪷 Monastery Healthcare System</h1>
+        <h1>🤝 Monastery Healthcare System</h1>
         <p>Giribawa Seela Suva Herath Bhikkhu Hospital</p>
         <div style="margin-top: 15px;">
             <span class="status-badge">✅ 90% Complete</span>
@@ -206,14 +210,14 @@
         </ol>
     </div>
 
-    <div class="text-center mt-4" style="padding: 20px; background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%); border-radius: 10px; color: white;">
+    <div class="text-center mt-4" style="padding: 20px; background: linear-gradient(135deg, var(--monastery-green) 0%, var(--monastery-dark-green) 100%); border-radius: 10px; color: white;">
         <h4>🎉 All Features Ready!</h4>
         <p style="margin: 10px 0;">90% Complete • Reports Module • PayHere Integration • AI Chatbot</p>
         <p style="margin: 0; opacity: 0.9;">Default Login: admin@monastery.lk / admin123</p>
     </div>
 
     <div class="text-center mt-3">
-        <p style="color: #666;"><small>🪷 Theruwan Saranai! May the Triple Gem bless this noble work. 🙏</small></p>
+        <p style="color: #666;"><small>🤝 Theruwan Saranai! May this helping-hand service bless all beings. 🙏</small></p>
     </div>
 </div>
 

@@ -65,7 +65,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Register - Seela Suwa Herath Bikshu Gilan Arana</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
     <style>
+        :root {
+            --sc-primary: #C2410C;
+            --sc-primary-dark: #9A3412;
+            --sc-secondary: #F59E0B;
+            --sc-accent: #1E3A8A;
+            --sc-bg: #FFF7ED;
+            --sc-border: #E8DDCC;
+            --sc-card: #FFFFFF;
+            --sc-muted: #6B7280;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -74,77 +86,158 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
-            background-color: #f8f7f4;
-            color: #333;
+            background: radial-gradient(circle at top left, #FFEED9 0%, var(--sc-bg) 40%);
+            color: #1f2937;
             line-height: 1.6;
-            padding: 40px 20px;
+            min-height: 100vh;
         }
 
-        .register-container {
-            max-width: 500px;
-            margin: 0 auto;
-            background: white;
-            padding: 50px;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        .register-layout {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: minmax(320px, 460px) minmax(420px, 1fr);
+        }
+
+        .brand-panel {
+            background: linear-gradient(160deg, var(--sc-primary) 0%, var(--sc-primary-dark) 70%, #7C2D12 100%);
+            color: #fff;
+            padding: 42px 34px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 15%, rgba(245, 158, 11, 0.22), transparent 45%);
+        }
+
+        .brand-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.22);
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.24);
+            margin-bottom: 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.30);
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+            width: fit-content;
+        }
+
+        .brand-title {
+            font-size: 28px;
+            font-weight: 650;
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 1;
+            letter-spacing: 0.2px;
+        }
+
+        .brand-subtitle {
+            font-size: 14px;
+            opacity: 0.92;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 14px;
+        }
+
+        .brand-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            opacity: 0.95;
+        }
+
+        .form-side {
+            padding: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .register-card {
+            width: 100%;
+            max-width: 560px;
+            background: var(--sc-card);
+            border: 1px solid var(--sc-border);
+            border-radius: 18px;
+            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+            padding: 30px;
         }
 
         .form-header {
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 1px solid #e5ddd0;
-            padding-bottom: 30px;
-        }
-
-        .monastery-icon {
-            font-size: 36px;
-            margin-bottom: 12px;
+            margin-bottom: 18px;
         }
 
         .form-title {
-            font-size: 28px;
-            font-weight: 300;
-            color: #2d5016;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--sc-accent);
+            margin-bottom: 4px;
+            letter-spacing: -0.4px;
         }
 
         .form-subtitle {
-            font-size: 13px;
-            color: #666;
-            font-weight: 300;
-        }
-
-        .form-group {
-            margin-bottom: 22px;
+            font-size: 14px;
+            color: var(--sc-muted);
         }
 
         .form-label {
             display: block;
             font-size: 12px;
             font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-            letter-spacing: 0.3px;
+            color: #374151;
+            margin-bottom: 6px;
+            letter-spacing: 0.45px;
             text-transform: uppercase;
         }
 
         .form-control, select {
             width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 11px 14px;
+            border: 1px solid #D8D0C2;
+            border-radius: 10px;
             font-size: 14px;
             font-family: inherit;
-            transition: all 0.3s ease;
-            background: #fafafa;
+            transition: all 0.2s ease;
+            background: #FFFDFA;
         }
 
         .form-control:focus, select:focus {
             outline: none;
-            border-color: #2d5016;
+            border-color: var(--sc-primary);
             background: white;
-            box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.05);
+            box-shadow: 0 0 0 4px rgba(194, 65, 12, 0.12);
         }
 
         select {
@@ -158,17 +251,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .form-hint {
-            font-size: 12px;
-            color: #666;
-            margin-top: 6px;
-            font-weight: 300;
+            font-size: 11px;
+            color: var(--sc-muted);
+            margin-top: 5px;
         }
 
         .alert-box {
-            padding: 14px 16px;
-            border-radius: 4px;
-            margin-bottom: 24px;
-            font-size: 14px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin-bottom: 14px;
+            font-size: 13px;
             border-left: 3px solid;
         }
 
@@ -186,29 +278,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         .btn-register {
             width: 100%;
-            padding: 13px 24px;
-            background: #2d5016;
+            padding: 12px 24px;
+            background: var(--sc-primary);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 10px;
             font-size: 14px;
             font-weight: 600;
             letter-spacing: 0.3px;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 12px;
+            margin-top: 6px;
             text-transform: uppercase;
         }
 
         .btn-register:hover {
-            background: #1a3009;
-            box-shadow: 0 4px 12px rgba(45, 80, 22, 0.2);
+            background: var(--sc-primary-dark);
+            box-shadow: 0 4px 12px rgba(194, 65, 12, 0.25);
         }
 
         .divider-line {
             height: 1px;
-            background: #e5ddd0;
-            margin: 30px 0;
+            background: #ECE5D9;
+            margin: 16px 0;
         }
 
         .login-section {
@@ -217,12 +309,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         .login-text {
             font-size: 13px;
-            color: #666;
+            color: var(--sc-muted);
             margin-bottom: 12px;
         }
 
         .btn-login {
-            color: #2d5016;
+            color: var(--sc-accent);
             text-decoration: none;
             font-weight: 600;
             font-size: 13px;
@@ -232,130 +324,181 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .btn-login:hover {
-            color: #D4AF37;
+            color: var(--sc-secondary);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .form-grid .full-width {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 1024px) {
+            .register-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .brand-panel {
+                padding: 22px;
+            }
+
+            .brand-image {
+                height: 200px;
+            }
+
+            .form-side {
+                padding: 18px;
+            }
+
+            .register-card {
+                padding: 22px;
+            }
         }
 
         @media (max-width: 640px) {
-            .register-container {
-                padding: 30px 20px;
+            .form-grid {
+                grid-template-columns: 1fr;
             }
 
             .form-title {
-                font-size: 24px;
+                font-size: 26px;
             }
 
-            .monastery-icon {
-                font-size: 28px;
+            .register-card {
+                padding: 18px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="register-container">
-        <div class="form-header">
-            <div class="monastery-icon">🤝</div>
-            <h1 class="form-title">Create Account</h1>
-            <p class="form-subtitle">Join our monastic community</p>
+    <div class="register-layout">
+        <div class="brand-panel">
+            <img src="images/img4.jpeg" alt="Seela Suwa Herath" class="brand-image">
+            <div class="brand-badge"><i class="bi bi-person-hearts"></i> Helping-Hand Community</div>
+            <h2 class="brand-title">Join Sacred Care</h2>
+            <p class="brand-subtitle">Create your account to support monastery healthcare and donations.</p>
+            <ul class="brand-list">
+                <li><i class="bi bi-check-circle"></i> Secure account with role-based access</li>
+                <li><i class="bi bi-check-circle"></i> Transparent donation and healthcare workflows</li>
+                <li><i class="bi bi-check-circle"></i> Trusted and compassionate service platform</li>
+            </ul>
         </div>
 
-        <?php if ($error): ?>
-            <div class="alert-box alert-error">
-                <i class="bi bi-exclamation-triangle"></i> <?php echo htmlspecialchars($error); ?>
+        <div class="form-side">
+            <div class="register-card">
+                <div class="form-header">
+                    <h1 class="form-title">Create Account</h1>
+                    <p class="form-subtitle">Use your details to join the monastery healthcare platform.</p>
+                </div>
+
+                <?php if ($error): ?>
+                    <div class="alert-box alert-error">
+                        <i class="bi bi-exclamation-triangle"></i> <?php echo htmlspecialchars($error); ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($success): ?>
+                    <div class="alert-box alert-success">
+                        <i class="bi bi-check-circle"></i> <?php echo htmlspecialchars($success); ?>
+                    </div>
+                <?php endif; ?>
+
+                <form method="POST">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label class="form-label" for="name">Full Name</label>
+                            <input 
+                                type="text" 
+                                id="name" 
+                                name="name" 
+                                class="form-control" 
+                                placeholder="John Smith"
+                                value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label class="form-label" for="email">Email Address</label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                class="form-control" 
+                                placeholder="your@email.com"
+                                value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="phone">Phone Number</label>
+                            <input 
+                                type="tel" 
+                                id="phone" 
+                                name="phone" 
+                                class="form-control" 
+                                placeholder="0712345678"
+                                value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>"
+                                required
+                            >
+                            <div class="form-hint">Sri Lankan format (071-078)</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="role_id">Role</label>
+                            <select id="role_id" name="role_id" class="form-control" required>
+                                <option value="">Select role...</option>
+                                <?php foreach ($roles as $role): ?>
+                                    <option value="<?php echo $role['role_id']; ?>">
+                                        <?php echo htmlspecialchars($role['role_name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="password">Password</label>
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                class="form-control" 
+                                placeholder="••••••••"
+                                required
+                            >
+                            <div class="form-hint">Minimum 6 characters</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="password_confirm">Confirm Password</label>
+                            <input 
+                                type="password" 
+                                id="password_confirm" 
+                                name="password_confirm" 
+                                class="form-control" 
+                                placeholder="••••••••"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group full-width">
+                            <button type="submit" class="btn-register">Create Account</button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="divider-line"></div>
+
+                <div class="login-section">
+                    <p class="login-text">Already have an account?</p>
+                    <a href="login.php" class="btn-login">Sign In</a>
+                </div>
             </div>
-        <?php endif; ?>
-
-        <?php if ($success): ?>
-            <div class="alert-box alert-success">
-                <i class="bi bi-check-circle"></i> <?php echo htmlspecialchars($success); ?>
-            </div>
-        <?php endif; ?>
-
-        <form method="POST">
-            <div class="form-group">
-                <label class="form-label" for="name">Full Name</label>
-                <input 
-                    type="text" 
-                    id="name" 
-                    name="name" 
-                    class="form-control" 
-                    placeholder="John Smith"
-                    value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>"
-                    required
-                >
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="email">Email Address</label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
-                    class="form-control" 
-                    placeholder="your@email.com"
-                    value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>"
-                    required
-                >
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="phone">Phone Number</label>
-                <input 
-                    type="tel" 
-                    id="phone" 
-                    name="phone" 
-                    class="form-control" 
-                    placeholder="0712345678"
-                    value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>"
-                    required
-                >
-                <div class="form-hint">Sri Lankan format: 10 digits (071-078)</div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="role_id">Role</label>
-                <select id="role_id" name="role_id" required>
-                    <option value="">Select your role...</option>
-                    <?php foreach ($roles as $role): ?>
-                        <option value="<?php echo $role['role_id']; ?>">
-                            <?php echo htmlspecialchars($role['role_name']); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="password">Password</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    class="form-control" 
-                    placeholder="••••••••"
-                    required
-                >
-                <div class="form-hint">Minimum 6 characters</div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="password_confirm">Confirm Password</label>
-                <input 
-                    type="password" 
-                    id="password_confirm" 
-                    name="password_confirm" 
-                    class="form-control" 
-                    placeholder="••••••••"
-                    required
-                >
-            </div>
-
-            <button type="submit" class="btn-register">Create Account</button>
-        </form>
-
-        <div class="divider-line"></div>
-
-        <div class="login-section">
-            <p class="login-text">Already have an account?</p>
-            <a href="login.php" class="btn-login">Sign In</a>
         </div>
     </div>
 

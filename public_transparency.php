@@ -87,17 +87,21 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
     <title>Transparency Dashboard - Seela Suwa Herath</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --monastery-saffron: #f57c00;
-            --monastery-orange: #ff9800;
+            --monastery-green: #C2410C;
+            --monastery-dark-green: #9A3412;
+            --monastery-gold: #F59E0B;
+            --monastery-cream: #FFF7ED;
+            --monastery-accent: #1E3A8A;
         }
         body {
-            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            background: linear-gradient(135deg, var(--monastery-cream) 0%, #eee3cc 100%);
         }
         .hero-section {
-            background: linear-gradient(135deg, rgba(245, 124, 0, 0.95) 0%, rgba(255, 152, 0, 0.95) 100%);
+            background: linear-gradient(135deg, rgba(45, 80, 22, 0.95) 0%, rgba(26, 48, 9, 0.95) 100%);
             color: white;
             padding: 60px 0;
             text-align: center;
@@ -118,7 +122,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
         .stat-number {
             font-size: 2.5rem;
             font-weight: bold;
-            color: var(--monastery-saffron);
+            color: var(--monastery-green);
         }
         .stat-label {
             color: #666;
@@ -136,7 +140,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
             background: #f8f9fa;
             border-radius: 10px;
             margin-bottom: 10px;
-            border-left: 4px solid var(--monastery-saffron);
+            border-left: 4px solid var(--monastery-green);
         }
         .activity-item.expense {
             border-left-color: #dc3545;
@@ -151,6 +155,17 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
         .balance-negative {
             color: #dc3545;
         }
+
+        .btn-helping-hand {
+            background: var(--monastery-gold);
+            color: #111827;
+            border: none;
+        }
+
+        .btn-helping-hand:hover {
+            background: #D97706;
+            color: #111827;
+        }
     </style>
 </head>
 <body>
@@ -158,12 +173,12 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container">
-        <a class="navbar-brand" href="#" style="color: var(--monastery-saffron); font-weight: bold;">
-            🪷 Seela Suwa Herath - Transparency Dashboard
+        <a class="navbar-brand" href="#" style="color: var(--monastery-green); font-weight: bold;">
+            <i class="bi bi-person-hearts"></i> Seela Suwa Herath - Transparency Dashboard
         </a>
         <div class="ms-auto">
-            <a href="public_donate.php" class="btn btn-sm" style="background: var(--monastery-saffron); color: white;">
-                <i class="bi bi-heart-fill"></i> Donate
+            <a href="public_donate.php" class="btn btn-sm btn-helping-hand">
+                <i class="bi bi-person-hearts"></i> Offer Support
             </a>
             <a href="login.php" class="btn btn-sm btn-outline-secondary ms-2">
                 <i class="bi bi-box-arrow-in-right"></i> Staff Login
@@ -175,8 +190,8 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
 <!-- Hero Section -->
 <section class="hero-section">
     <div class="container">
-        <h1 class="mb-3">📊 Financial Transparency</h1>
-        <p class="lead">See exactly how your donations help our monastery and monks</p>
+        <h1 class="mb-3"><i class="bi bi-bar-chart-line"></i> Financial Transparency</h1>
+        <p class="lead">See clearly how helping-hand donations support monk healthcare</p>
         <p class="small">Updated in real-time • Year <?= $current_year ?></p>
     </div>
 </section>
@@ -213,7 +228,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
-                    <i class="bi bi-graph-up-arrow" style="font-size: 3rem; color: var(--monastery-saffron);"></i>
+                    <i class="bi bi-graph-up-arrow" style="font-size: 3rem; color: var(--monastery-green);"></i>
                     <div class="stat-number">Rs. <?= number_format($donations_stats['average'] ?? 0, 0) ?></div>
                     <div class="stat-label">Average Donation</div>
                     <small class="text-muted">Per contribution</small>
@@ -230,7 +245,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
             <!-- Donation Breakdown -->
             <div class="col-md-6">
                 <div class="chart-card">
-                    <h5 style="color: var(--monastery-saffron); margin-bottom: 20px;">
+                    <h5 style="color: var(--monastery-accent); margin-bottom: 20px;">
                         <i class="bi bi-pie-chart"></i> How Donations Are Categorized
                     </h5>
                     <canvas id="donationsChart" height="300"></canvas>
@@ -252,7 +267,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
         <div class="row mt-4">
             <div class="col-12">
                 <div class="chart-card">
-                    <h5 style="color: var(--monastery-saffron); margin-bottom: 20px;">
+                    <h5 style="color: var(--monastery-accent); margin-bottom: 20px;">
                         <i class="bi bi-graph-up"></i> Monthly Donation Trend <?= $current_year ?>
                     </h5>
                     <canvas id="monthlyChart" height="100"></canvas>
@@ -266,7 +281,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
 <section class="py-4">
     <div class="container">
         <div class="chart-card">
-            <h5 style="color: var(--monastery-saffron); margin-bottom: 20px;">
+            <h5 style="color: var(--monastery-accent); margin-bottom: 20px;">
                 <i class="bi bi-clock-history"></i> Recent Financial Activities
             </h5>
             <div class="row">
@@ -296,10 +311,10 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
 <!-- Call to Action -->
 <section class="py-5" style="background: white;">
     <div class="container text-center">
-        <h3 style="color: var(--monastery-saffron);">Support Our Mission</h3>
-        <p class="lead mb-4">Your donation directly helps monks receive healthcare and support</p>
-        <a href="public_donate.php" class="btn btn-lg" style="background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%); color: white; padding: 15px 50px;">
-            <i class="bi bi-heart-fill"></i> Make a Donation
+        <h3 style="color: var(--monastery-accent);">Support with a Helping Hand</h3>
+        <p class="lead mb-4">Your donation directly helps monks receive healthcare and compassionate support</p>
+        <a href="public_donate.php" class="btn btn-lg" style="background: linear-gradient(135deg, var(--monastery-gold) 0%, #D97706 100%); color: #111827; padding: 15px 50px;">
+            <i class="bi bi-person-hearts"></i> Offer Support
         </a>
     </div>
 </section>
@@ -328,7 +343,7 @@ new Chart(donationsCtx, {
         ?>],
         datasets: [{
             data: [<?= implode(',', $data) ?>],
-            backgroundColor: ['#28a745', '#20c997', '#17a2b8', '#6610f2', '#6f42c1', '#e83e8c']
+            backgroundColor: ['#2d5016', '#3f6a24', '#5f7f3a', '#8ea05e', '#D4AF37', '#e5c977']
         }]
     },
     options: {
@@ -357,7 +372,7 @@ new Chart(expensesCtx, {
         ?>],
         datasets: [{
             data: [<?= implode(',', $data) ?>],
-            backgroundColor: ['#dc3545', '#fd7e14', '#ffc107', '#ff9800', '#f57c00', '#e65100']
+            backgroundColor: ['#7f1d1d', '#9a3412', '#b45309', '#92400e', '#6b4423', '#3f3f46']
         }]
     },
     options: {
@@ -385,8 +400,8 @@ new Chart(monthlyCtx, {
         datasets: [{
             label: 'Donations (Rs.)',
             data: monthlyData,
-            borderColor: '#f57c00',
-            backgroundColor: 'rgba(245, 124, 0, 0.1)',
+            borderColor: '#2d5016',
+            backgroundColor: 'rgba(45, 80, 22, 0.12)',
             tension: 0.4,
             fill: true
         }]
