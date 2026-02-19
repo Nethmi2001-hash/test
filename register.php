@@ -2,65 +2,61 @@
 session_start();
 require_once __DIR__ . '/includes/db_config.php';
 
+$error = "";
+$success = "";
 $con = getDBConnection();
 
-$success = "";
-$error = "";
-
-// Fetch roles for dropdown
-$roles_res = $con->query("SELECT role_id, role_name FROM roles WHERE role_name IN ('Donor', 'Monk', 'Helper')");
+// Get all roles
+$roles = [];
+$result = $con->query("SELECT role_id, role_name FROM roles");
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $roles[] = $row;
+    }
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = trim($_POST['full_name'] ?? '');
+    $name = trim($_POST['name'] ?? '');
     $email = trim($_POST['email'] ?? '');
-    $phone_prefix = $_POST['phone_number_prefix'] ?? '';
-    $phone_number_part = trim($_POST['phone_number'] ?? '');
-    $phone = ($phone_prefix && $phone_number_part) ? $phone_prefix . $phone_number_part : '';
-    $role_id = (int)($_POST['role_id'] ?? 3); // Default to Donor
+    $phone = trim($_POST['phone'] ?? '');
+    $role_id = $_POST['role_id'] ?? '';
     $password = $_POST['password'] ?? '';
-    $confirm_password = $_POST['confirm_password'] ?? '';
+    $password_confirm = $_POST['password_confirm'] ?? '';
 
     // Validation
-    if (!$name) {
-        $error = "Full name is required.";
-    } elseif (!$email) {
-        $error = "Email is required.";
+    if (empty($name) || empty($email) || empty($phone) || empty($role_id) || empty($password)) {
+        $error = "All fields are required.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = "Invalid email format.";
-    } elseif (!$phone_prefix || !$phone_number_part) {
-        $error = "Please select a phone prefix and enter the rest of your number.";
-    } elseif (!preg_match('/^0(71|72|74|75|76|77|78)[0-9]{7}$/', $phone)) {
-        $error = "Invalid Sri Lankan phone number format.";
-    } elseif (!$password || !$confirm_password) {
-        $error = "Password and Confirm Password are required.";
+        $error = "Please enter a valid email address.";
+    } elseif (!preg_match('/^(071|072|073|074|075|076|077|078|070)\d{7}$/', $phone)) {
+        $error = "Please enter a valid Sri Lankan phone number (e.g., 0712345678).";
     } elseif (strlen($password) < 6) {
-        $error = "Password must be at least 6 characters.";
-    } elseif ($password !== $confirm_password) {
+        $error = "Password must be at least 6 characters long.";
+    } elseif ($password !== $password_confirm) {
         $error = "Passwords do not match.";
     } else {
         // Check if email already exists
-        $stmt_check = $con->prepare("SELECT user_id FROM users WHERE email = ?");
-        $stmt_check->bind_param("s", $email);
-        $stmt_check->execute();
-        $result_check = $stmt_check->get_result();
-
-        if ($result_check->num_rows > 0) {
-            $error = "Email already registered. Please <a href='login.php'>login</a> instead.";
+        $stmt = $con->prepare("SELECT user_id FROM users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $existing = $stmt->get_result()->fetch_assoc();
+        
+        if ($existing) {
+            $error = "This email is already registered.";
         } else {
-            // Insert new user
+            // Hash password and insert user
             $password_hash = password_hash($password, PASSWORD_BCRYPT);
-            $stmt = $con->prepare("INSERT INTO users (name, email, phone, password_hash, role_id, status) VALUES (?, ?, ?, ?, ?, 'active')");
-            $stmt->bind_param("ssssi", $name, $email, $phone, $password_hash, $role_id);
-
+            $stmt = $con->prepare("INSERT INTO users (name, email, phone, role_id, password_hash, status) VALUES (?, ?, ?, ?, ?, 'active')");
+            $stmt->bind_param("sssss", $name, $email, $phone, $role_id, $password_hash);
+            
             if ($stmt->execute()) {
                 $success = "Registration successful! Redirecting to login...";
                 header("refresh:2;url=login.php");
             } else {
-                $error = "Registration failed: " . $con->error;
+                $error = "Registration failed. Please try again.";
             }
             $stmt->close();
         }
-        $stmt_check->close();
     }
 }
 ?>
@@ -73,10 +69,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         :root {
-            --healthcare-blue: #0066cc;
-            --healthcare-dark: #0052a3;
-            --healthcare-light: #e6f2ff;
-            --monastery-saffron: #f57c00;
+            --monastery-green: #2d5016;
+            --monastery-dark-green: #1a3009;
+            --monastery-gold: #D4AF37;
+            --monastery-light-gold: #F5DEB3;
+            --monastery-cream: #F5F1E8;
+            --text-dark: #333;
+            --text-light: #666;
         }
         
         * {
@@ -87,41 +86,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         body {
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: linear-gradient(135deg, var(--monastery-green) 0%, var(--monastery-dark-green) 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0066cc 0%, #0052a3 50%, #f57c00 100%);
-            position: relative;
-            overflow: hidden;
-            padding: 20px;
+            background-attachment: fixed;
+            padding: 40px 20px;
         }
         
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="50" font-size="40" opacity="0.05">🤝</text></svg>') repeat;
-            animation: float 60s linear infinite;
-        }
-        
-        @keyframes float {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-100px); }
-        }
-        
-        .register-container {
-            max-width: 700px;
-            width: 100%;
+        .container-register {
+            max-width: 500px;
+            margin: 0 auto;
             background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
-            position: relative;
-            z-index: 1;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
             animation: slideIn 0.6s ease-out;
         }
         
@@ -136,317 +113,284 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
         
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
         .register-header {
-            background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
-            color: white;
-            padding: 40px;
             text-align: center;
-            position: relative;
-            overflow: hidden;
+            margin-bottom: 30px;
         }
         
-        .register-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 250px;
-            height: 250px;
-            background: radial-gradient(circle, rgba(255, 152, 0, 0.2) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-        
-        .register-header h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .register-header .helping-hands {
-            font-size: 3.5rem;
+        .monastery-emoji {
+            font-size: 50px;
+            display: inline-block;
+            animation: pulse 2.5s ease-in-out infinite;
             margin-bottom: 15px;
-            position: relative;
-            z-index: 1;
         }
         
-        .register-header p {
-            font-size: 1.05rem;
-            opacity: 0.9;
-            position: relative;
-            z-index: 1;
-            margin: 0;
+        .register-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--monastery-green);
+            margin-bottom: 10px;
         }
         
-        .register-body {
-            padding: 40px;
+        .register-subtitle {
+            font-size: 14px;
+            color: var(--text-light);
         }
         
-        .form-label {
-            color: #555;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-        
-        .form-control, .form-select {
-            border: 2px solid #ddd;
-            padding: 12px 15px;
-            height: 50px;
-            transition: all 0.3s;
-            background: white;
-            color: #333;
-            font-size: 1rem;
-        }
-        
-        .form-control:focus, .form-select:focus {
-            border-color: #0066cc;
-            box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
-            background: white;
-            color: #333;
-        }
-        
-        .form-control::placeholder {
-            color: #999;
-        }
-        
-        .input-group .form-select {
-            max-width: 150px;
-        }
-        
-        .input-group .form-control {
-            border-left: none;
-        }
-        
-        .btn-register {
-            background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
-            border: none;
-            height: 50px;
-            font-size: 1.05rem;
-            font-weight: bold;
-            color: white;
-            border-radius: 8px;
-            transition: all 0.3s;
-            margin-top: 10px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
-        }
-        
-        .btn-register:hover {
-            background: linear-gradient(135deg, #0052a3 0%, #003d7a 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
-            color: white;
-        }
-        
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid;
-            font-size: 0.95rem;
-            font-weight: 500;
+        .form-group {
             margin-bottom: 20px;
         }
         
+        .form-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            display: block;
+            font-size: 14px;
+        }
+        
+        .form-control {
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            color: var(--text-dark);
+            width: 100%;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--monastery-gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+        
+        select.form-control {
+            cursor: pointer;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .btn-register {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--monastery-green) 0%, #1a3009 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(45, 80, 22, 0.3);
+        }
+        
+        .btn-register:active {
+            transform: translateY(0);
+        }
+        
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
         .alert-danger {
-            background: #fee;
-            border-color: #f77;
-            color: #c33;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
         
         .alert-success {
-            background: #efe;
-            border-color: #7f7;
-            color: #3c3;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
         
-        .text-center-custom {
+        .login-link {
             text-align: center;
             margin-top: 20px;
-            color: #666;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
         }
         
-        .text-center-custom a {
-            color: #0066cc;
+        .login-link-text {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .btn-login {
+            color: var(--monastery-green);
             text-decoration: none;
-            font-weight: bold;
-            transition: all 0.3s;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         
-        .text-center-custom a:hover {
-            color: #0052a3;
-            text-decoration: underline;
+        .btn-login:hover {
+            color: var(--monastery-gold);
         }
         
-        .form-text {
-            color: #888;
-            font-size: 0.85rem;
+        .password-hint {
+            font-size: 12px;
+            color: var(--text-light);
             margin-top: 5px;
         }
         
-        @media (max-width: 600px) {
-            .register-container {
-                border-radius: 15px;
-            }
-            
-            .register-header {
-                padding: 30px 20px;
-            }
-            
-            .register-header h1 {
-                font-size: 1.8rem;
-            }
-            
-            .register-header .helping-hands {
-                font-size: 2.5rem;
-            }
-            
-            .register-body {
+        @media (max-width: 500px) {
+            .container-register {
                 padding: 25px;
             }
             
-            .input-group .form-select {
-                max-width: 120px;
+            .register-title {
+                font-size: 24px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
             }
         }
     </style>
-    
-    <script>
-        function validateForm() {
-            var password = document.getElementById("password").value;
-            var confirmPassword = document.getElementById("confirm_password").value;
-            
-            if (password !== confirmPassword) {
-                alert("Passwords do not match!");
-                return false;
-            }
-            
-            if (password.length < 6) {
-                alert("Password must be at least 6 characters!");
-                return false;
-            }
-            
-            return true;
-        }
-    </script>
 </head>
 <body>
-    <div class="register-container">
-        <!-- HEADER -->
+    <div class="container-register">
         <div class="register-header">
-            <div class="helping-hands">🤝</div>
-            <h1>Create Your Account</h1>
-            <p>Join Seela Suwa Herath Monastery Community</p>
+            <div class="monastery-emoji">🤝</div>
+            <h1 class="register-title">Create Account</h1>
+            <p class="register-subtitle">Join our monastery healthcare community</p>
         </div>
         
-        <!-- BODY -->
-        <div class="register-body">
-            <?php if (!empty($error)): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-triangle"></i> <strong>Error!</strong> <?= $error ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            <?php endif; ?>
-            
-            <?php if (!empty($success)): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="bi bi-check-circle"></i> <strong>Success!</strong> <?= $success ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            <?php endif; ?>
-            
-            <form action="register.php" method="post" onsubmit="return validateForm();">
-                <!-- Full Name -->
-                <div class="mb-4">
-                    <label for="full_name" class="form-label">
-                        <i class="bi bi-person"></i> Full Name
-                    </label>
-                    <input type="text" id="full_name" name="full_name" class="form-control" 
-                           placeholder="Enter your full name" required autofocus>
-                </div>
-                
-                <!-- Email -->
-                <div class="mb-4">
-                    <label for="email" class="form-label">
-                        <i class="bi bi-envelope"></i> Email Address
-                    </label>
-                    <input type="email" id="email" name="email" class="form-control" 
-                           placeholder="your@email.com" required>
-                </div>
-                
-                <!-- Phone Number -->
-                <div class="mb-4">
-                    <label for="phone_number_prefix" class="form-label">
-                        <i class="bi bi-telephone"></i> Phone Number
-                    </label>
-                    <div class="input-group">
-                        <select name="phone_number_prefix" id="phone_number_prefix" class="form-select" required>
-                            <option value="">Prefix</option>
-                            <option value="071">Dialog (071)</option>
-                            <option value="077">Dialog (077)</option>
-                            <option value="078">Dialog (078)</option>
-                            <option value="072">Mobitel (072)</option>
-                            <option value="076">Hutch (076)</option>
-                            <option value="075">Airtel (075)</option>
-                            <option value="074">Hutch (074)</option>
-                        </select>
-                        <input type="tel" id="phone_number" name="phone_number" class="form-control" 
-                               placeholder="1234567" pattern="[0-9]{7}" maxlength="7" required>
-                    </div>
-                    <small class="form-text">Enter 7 digits after the prefix</small>
-                </div>
-                
-                <!-- Role Selection -->
-                <div class="mb-4">
-                    <label for="role_id" class="form-label">
-                        <i class="bi bi-person-badge"></i> Join As
-                    </label>
-                    <select name="role_id" id="role_id" class="form-select" required>
-                        <option value="">Select your role</option>
-                        <?php 
-                        $roles_res->data_seek(0); // Reset pointer
-                        while ($role = $roles_res->fetch_assoc()): 
-                        ?>
-                            <option value="<?= $role['role_id'] ?>" <?= $role['role_name'] == 'Donor' ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($role['role_name']) ?>
-                            </option>
-                        <?php endwhile; ?>
-                    </select>
-                    <small class="form-text">Choose how you'll participate in the community</small>
-                </div>
-                
-                <!-- Password -->
-                <div class="mb-4">
-                    <label for="password" class="form-label">
-                        <i class="bi bi-lock"></i> Password
-                    </label>
-                    <input type="password" id="password" name="password" class="form-control" 
-                           placeholder="Minimum 6 characters" required>
-                    <small class="form-text">Use a strong password with letters and numbers</small>
-                </div>
-                
-                <!-- Confirm Password -->
-                <div class="mb-4">
-                    <label for="confirm_password" class="form-label">
-                        <i class="bi bi-lock-fill"></i> Confirm Password
-                    </label>
-                    <input type="password" id="confirm_password" name="confirm_password" class="form-control" 
-                           placeholder="Re-enter your password" required>
-                </div>
-                
-                <!-- Submit Button -->
-                <button type="submit" class="btn btn-register w-100">
-                    <i class="bi bi-person-plus"></i> Create Account
-                </button>
-            </form>
-            
-            <!-- Login Link -->
-            <div class="text-center-custom">
-                Already have an account? <a href="login.php">Login here</a>
+        <?php if ($error): ?>
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?>
             </div>
+        <?php endif; ?>
+        
+        <?php if ($success): ?>
+            <div class="alert alert-success">
+                <i class="bi bi-check-circle"></i> <?php echo htmlspecialchars($success); ?>
+            </div>
+        <?php endif; ?>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label class="form-label" for="name">
+                    <i class="bi bi-person"></i> Full Name
+                </label>
+                <input 
+                    type="text" 
+                    id="name" 
+                    name="name" 
+                    class="form-control" 
+                    placeholder="Enter your full name"
+                    value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>"
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="email">
+                    <i class="bi bi-envelope"></i> Email Address
+                </label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    class="form-control" 
+                    placeholder="Enter your email"
+                    value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>"
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="phone">
+                    <i class="bi bi-telephone"></i> Phone Number
+                </label>
+                <input 
+                    type="tel" 
+                    id="phone" 
+                    name="phone" 
+                    class="form-control" 
+                    placeholder="0712345678"
+                    value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>"
+                    required
+                >
+                <small class="password-hint">Sri Lankan format: 10 digits (071-078 prefix)</small>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="role_id">
+                    <i class="bi bi-person-badge"></i> Role
+                </label>
+                <select id="role_id" name="role_id" class="form-control" required>
+                    <option value="">Select your role...</option>
+                    <?php foreach ($roles as $role): ?>
+                        <option value="<?php echo $role['role_id']; ?>">
+                            <?php echo htmlspecialchars($role['role_name']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="password">
+                    <i class="bi bi-lock"></i> Password
+                </label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="form-control" 
+                    placeholder="Enter your password"
+                    required
+                >
+                <small class="password-hint">At least 6 characters</small>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="password_confirm">
+                    <i class="bi bi-lock-check"></i> Confirm Password
+                </label>
+                <input 
+                    type="password" 
+                    id="password_confirm" 
+                    name="password_confirm" 
+                    class="form-control" 
+                    placeholder="Confirm your password"
+                    required
+                >
+            </div>
+            
+            <button type="submit" class="btn-register">
+                <i class="bi bi-person-plus"></i> Create Account
+            </button>
+        </form>
+        
+        <div class="login-link">
+            <p class="login-link-text">Already have an account?</p>
+            <a href="login.php" class="btn-login">
+                <i class="bi bi-box-arrow-in-right"></i> Login here
+            </a>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-<?php $con->close(); ?>

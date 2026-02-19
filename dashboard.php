@@ -148,246 +148,391 @@ if (count($alerts) == 0) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard - Giribawa Seela Suva Herath Bhikkhu Hospital</title>
+    <title>Dashboard - Seela Suwa Herath Bikshu Gilan Arana</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/css/premium-theme.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --monastery-saffron: #f57c00;
-            --monastery-orange: #ff9800;
-            --monastery-light: #ffa726;
-            --monastery-dark: #e65100;
-            --monastery-pale: #fff3e0;
+            --monastery-green: #2d5016;
+            --monastery-dark-green: #1a3009;
+            --monastery-gold: #D4AF37;
+            --monastery-light-gold: #F5DEB3;
+            --monastery-cream: #F5F1E8;
+            --text-dark: #333;
+            --text-light: #666;
         }
+
         body {
-            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            background: linear-gradient(135deg, var(--monastery-cream) 0%, #E8DCC4 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-attachment: fixed;
         }
+
+        .page-section {
+            margin-top: 40px;
+        }
+
         .welcome-card {
-            background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%);
+            background: linear-gradient(135deg, var(--monastery-green) 0%, var(--monastery-dark-green) 100%);
             color: white;
             border-radius: 20px;
             padding: 40px;
             margin-bottom: 30px;
-            box-shadow: 0 8px 25px rgba(245, 124, 0, 0.3);
+            box-shadow: 0 15px 40px rgba(45, 80, 22, 0.4);
             position: relative;
             overflow: hidden;
+            animation: slideInDown 0.6s ease-out;
         }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
         .welcome-card::before {
-            content: "🪷";
+            content: '';
             position: absolute;
-            font-size: 120px;
-            opacity: 0.1;
-            right: -20px;
-            top: -20px;
-            transform: rotate(-15deg);
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
         }
+
+        .welcome-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .welcome-emoji {
+            font-size: 60px;
+            display: inline-block;
+            animation: pulse 2.5s ease-in-out infinite;
+            margin-right: 20px;
+        }
+
         .stat-card {
             background: white;
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-            transition: all 0.3s;
-            border-left: 4px solid var(--monastery-saffron);
+            box-shadow: 0 8px 25px rgba(45, 80, 22, 0.1);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            border-top: 4px solid var(--monastery-gold);
             height: 100%;
+            animation: fadeInUp 0.6s ease-out;
         }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
         .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(245, 124, 0, 0.2);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(45, 80, 22, 0.2);
+            border-top-color: var(--monastery-green);
         }
-        .stat-card .icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%);
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--monastery-green) 0%, #3d5d2d 100%);
             border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 24px;
+            color: var(--monastery-light-gold);
+            font-size: 32px;
             margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(45, 80, 22, 0.2);
         }
-        .stat-card h3 {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--monastery-dark);
+
+        .stat-number {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--monastery-green);
             margin: 10px 0;
+            line-height: 1;
         }
-        .stat-card p {
-            color: #666;
-            margin: 0;
-            font-size: 1rem;
-        }
-        .quick-actions .btn {
-            background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%);
-            border: none;
-            color: white;
-            padding: 15px 25px;
-            border-radius: 12px;
-            transition: all 0.3s;
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 14px;
             font-weight: 500;
         }
-        .quick-actions .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(245, 124, 0, 0.3);
-        }
-        .chart-card {
+
+        .chart-card, .alert-card, .upcoming-card {
             background: white;
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 8px 25px rgba(45, 80, 22, 0.1);
             margin-bottom: 25px;
+            animation: fadeInUp 0.6s ease-out;
+            border-top: 4px solid var(--monastery-gold);
         }
-        .chart-card h5 {
-            color: var(--monastery-dark);
-            border-left: 4px solid var(--monastery-saffron);
-            padding-left: 15px;
-            margin-bottom: 20px;
+
+        .chart-card h5, .alert-card h5, .upcoming-card h5 {
+            color: var(--monastery-green);
             font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .upcoming-appointments {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+
+        .chart-card h5 i, .alert-card h5 i, .upcoming-card h5 i {
+            font-size: 20px;
+            color: var(--monastery-gold);
         }
-        .appointment-item {
-            padding: 15px;
-            border-left: 3px solid var(--monastery-orange);
-            background: var(--monastery-pale);
-            border-radius: 8px;
-            margin-bottom: 10px;
-            transition: all 0.2s;
-        }
-        .appointment-item:hover {
-            border-left-width: 5px;
-            transform: translateX(5px);
-        }
-        .lotus-divider {
-            text-align: center;
-            color: var(--monastery-orange);
-            font-size: 24px;
-            margin: 20px 0;
-        }
-        .greeting-time {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-        .alert-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-            margin-bottom: 25px;
-        }
+
         .alert-item {
             padding: 15px;
             border-radius: 10px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 4px solid;
+            text-decoration: none;
+            color: inherit;
         }
+
         .alert-item:hover {
-            transform: translateX(5px);
+            transform: translateX(8px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
+
         .alert-item.warning {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
+            background: #fff8e1;
+            border-left-color: #ffc107;
         }
+
         .alert-item.info {
-            background: #cfe2ff;
-            border-left: 4px solid #0d6efd;
+            background: #e3f2fd;
+            border-left-color: #2196f3;
         }
+
         .alert-item.success {
-            background: #d1e7dd;
-            border-left: 4px solid #198754;
+            background: #e8f5e9;
+            border-left-color: #4caf50;
         }
+
         .alert-item i {
             font-size: 1.5rem;
             margin-right: 15px;
+            min-width: 30px;
         }
-        .alert-item.warning i { color: #ffc107; }
-        .alert-item.info i { color: #0d6efd; }
-        .alert-item.success i { color: #198754; }
+
+        .appointment-item {
+            padding: 15px;
+            border-left: 3px solid var(--monastery-gold);
+            background: #faf8f3;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .appointment-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(45, 80, 22, 0.1);
+            border-left-width: 5px;
+        }
+
+        .appointment-time {
+            font-weight: 600;
+            color: var(--monastery-green);
+            font-size: 1rem;
+        }
+
+        .appointment-monk {
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .quick-actions {
+            text-align: center;
+            margin: 40px 0;
+            animation: fadeInUp 0.6s ease-out 0.5s both;
+        }
+
+        .quick-actions h5 {
+            color: var(--monastery-green);
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .btn-quick {
+            background: linear-gradient(135deg, var(--monastery-green) 0%, #3d5d2d 100%);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 8px 5px;
+            box-shadow: 0 5px 15px rgba(45, 80, 22, 0.2);
+        }
+
+        .btn-quick:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(45, 80, 22, 0.35);
+            color: white;
+        }
+
+        .btn-quick:active {
+            transform: translateY(-1px);
+        }
+
+        .monastery-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        .no-data {
+            text-align: center;
+            color: var(--text-light);
+            padding: 40px 20px;
+        }
+
+        .no-data i {
+            font-size: 3rem;
+            opacity: 0.2;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .welcome-card {
+                padding: 25px;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .btn-quick {
+                font-size: 13px;
+                padding: 10px 15px;
+            }
+
+            .monastery-image {
+                height: 200px;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="container-fluid mt-4 mb-5 px-4">
-    <!-- Welcome Card with Lotus -->
+<div class="container-fluid page-section px-4 pb-5">
+    <!-- Monastery Image Hero -->
+    <img src="images/img2.jpeg" alt="Seela Suwa Herath Monastery" class="monastery-image">
+
+    <!-- Welcome Card -->
     <div class="welcome-card">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <div class="greeting-time">
-                    <i class="bi bi-sun"></i> <?= date('l, F j, Y') ?> • <?= date('g:i A') ?>
+        <div class="welcome-content">
+            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                <span class="welcome-emoji">🤝</span>
+                <div>
+                    <small style="opacity: 0.9;">
+                        <i class="bi bi-calendar3"></i> <?= date('l, F j, Y') ?> • 
+                        <i class="bi bi-clock"></i> <?= date('g:i A') ?>
+                    </small>
+                    <h1 style="margin: 10px 0; font-size: 2.2rem;">Welcome, <?= htmlspecialchars($_SESSION['username']) ?>!</h1>
+                    <p style="margin: 5px 0; font-size: 1rem; opacity: 0.95;">
+                        <i class="bi bi-shield-check"></i> Role: <strong><?= htmlspecialchars($_SESSION['role_name']) ?></strong>
+                    </p>
                 </div>
-                <h1 class="mb-2">🙏 Ayubowan, <?= htmlspecialchars($_SESSION['username']) ?>!</h1>
-                <p class="mb-0" style="font-size: 1.1rem;">Welcome to Giribawa Seela Suva Herath Bhikkhu Hospital</p>
-                <p class="mb-0 mt-2 opacity-75">
-                    <i class="bi bi-award"></i> Role: <?= htmlspecialchars($_SESSION['role_name']) ?>
-                </p>
-            </div>
-            <div class="col-md-4 text-end">
-                <div style="font-size: 4rem; opacity: 0.3;">☸️</div>
             </div>
         </div>
     </div>
 
     <!-- Statistics Cards -->
     <div class="row g-4 mb-4">
-        <div class="col-md-3">
-            <div class="stat-card-premium">
-                <div class="icon">
-                    <i class="bi bi-people"></i>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-people-fill"></i>
                 </div>
-                <h3><?= $stats['total_monks'] ?></h3>
-                <p>Active Monks</p>
+                <div class="stat-number"><?= $stats['total_monks'] ?></div>
+                <div class="stat-label">Active Monks</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="stat-card-premium">
-                <div class="icon">
-                    <i class="bi bi-person-badge"></i>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-hospital"></i>
                 </div>
-                <h3><?= $stats['total_doctors'] ?></h3>
-                <p>Active Doctors</p>
+                <div class="stat-number"><?= $stats['total_doctors'] ?></div>
+                <div class="stat-label">Doctors on Staff</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="stat-card-premium">
-                <div class="icon">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon">
                     <i class="bi bi-calendar-check"></i>
                 </div>
-                <h3><?= $stats['total_appointments'] ?></h3>
-                <p>Appointments (This Month)</p>
+                <div class="stat-number"><?= $stats['total_appointments'] ?></div>
+                <div class="stat-label">Appointments (Month)</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="stat-card-premium">
-                <div class="icon">
-                    <i class="bi bi-clock-history"></i>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-hourglass-split"></i>
                 </div>
-                <h3><?= $stats['pending_appointments'] ?></h3>
-                <p>Pending Appointments</p>
+                <div class="stat-number"><?= $stats['pending_appointments'] ?></div>
+                <div class="stat-label">Pending</div>
             </div>
         </div>
     </div>
 
-    <div class="lotus-divider">🪷 • 🪷 • 🪷</div>
-
-    <!-- Alerts and Notifications -->
+    <!-- Alerts Section -->
     <div class="row g-4 mb-4">
-        <div class="col-md-12">
-            <div class="glass-card">
-                <h5 style="color: var(--monastery-dark); font-weight: 600; margin-bottom: 20px;">
-                    <i class="bi bi-bell"></i> Alerts & Notifications
+        <div class="col-lg-12">
+            <div class="alert-card">
+                <h5>
+                    <i class="bi bi-bell-fill"></i> Alerts & Notifications
                 </h5>
                 <?php foreach ($alerts as $alert): ?>
-                    <a href="<?= $alert['link'] ?>" class="alert-item <?= $alert['type'] ?>" style="text-decoration: none; color: inherit;">
-                        <i class="<?= $alert['icon'] ?>"></i>
+                    <a href="<?= $alert['link'] ?>" class="alert-item <?= $alert['type'] ?>">
+                        <i class="bi <?= $alert['icon'] ?>"></i>
                         <span><?= $alert['message'] ?></span>
                     </a>
                 <?php endforeach; ?>
@@ -395,40 +540,38 @@ if (count($alerts) == 0) {
         </div>
     </div>
 
-    <!-- Charts Row -->
+    <!-- Charts and Appointments Row -->
     <div class="row g-4 mb-4">
-        <div class="col-md-8">
-            <div class="glass-card">
-                <h5><i class="bi bi-bar-chart"></i> Weekly Appointment Trend</h5>
+        <div class="col-lg-8">
+            <div class="chart-card">
+                <h5>
+                    <i class="bi bi-graph-up"></i> Weekly Appointment Trend
+                </h5>
                 <canvas id="weeklyChart" height="80"></canvas>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="glass-card">
-                <h5 style="color: var(--monastery-dark); font-weight: 600; margin-bottom: 20px;">
-                    <i class="bi bi-calendar-day"></i> Today's Appointments
+        <div class="col-lg-4">
+            <div class="upcoming-card">
+                <h5>
+                    <i class="bi bi-calendar-event"></i> Today's Schedule
                 </h5>
                 <?php if (count($today_appointments) > 0): ?>
                     <?php foreach ($today_appointments as $apt): ?>
                         <div class="appointment-item">
-                            <div class="d-flex justify-content-between">
-                                <strong><?= date('g:i A', strtotime($apt['app_time'])) ?></strong>
-                                <span class="badge" style="background: var(--monastery-saffron);">Scheduled</span>
+                            <div class="appointment-time">
+                                <i class="bi bi-clock"></i> <?= date('g:i A', strtotime($apt['app_time'])) ?>
+                                <span style="float: right; background: var(--monastery-gold); color: var(--text-dark); padding: 2px 8px; border-radius: 5px; font-size: 11px;">Scheduled</span>
                             </div>
-                            <div class="mt-2">
-                                <small class="text-muted">Monk:</small><br>
-                                <strong><?= htmlspecialchars($apt['monk_name']) ?></strong>
-                            </div>
-                            <div class="mt-1">
-                                <small class="text-muted">Doctor:</small><br>
-                                <?= htmlspecialchars($apt['doctor_name']) ?>
+                            <div class="appointment-monk">
+                                <strong><?= htmlspecialchars($apt['monk_name']) ?></strong><br>
+                                <small>with Dr. <?= htmlspecialchars($apt['doctor_name']) ?></small>
                             </div>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <div class="text-center text-muted py-4">
-                        <i class="bi bi-calendar-x" style="font-size: 3rem; opacity: 0.3;"></i>
-                        <p class="mt-2">No appointments scheduled for today</p>
+                    <div class="no-data">
+                        <i class="bi bi-calendar-x"></i>
+                        <p>No appointments today</p>
                     </div>
                 <?php endif; ?>
             </div>
@@ -436,49 +579,49 @@ if (count($alerts) == 0) {
     </div>
 
     <!-- Financial Chart -->
-    <div class="row g-4">
-        <div class="col-md-12">
-            <div class="glass-card">
-                <h5><i class="bi bi-graph-up"></i> Monthly Donations vs Expenses (Last 6 Months)</h5>
-                <canvas id="financialChart" height="60"></canvas>
+    <div class="row g-4 mb-4">
+        <div class="col-lg-12">
+            <div class="chart-card">
+                <h5>
+                    <i class="bi bi-graph-up-arrow"></i> Financial Overview (Last 6 Months)
+                </h5>
+                <canvas id="financialChart" height="50"></canvas>
             </div>
         </div>
     </div>
 
-    <div class="lotus-divider">🪷 • 🪷 • 🪷</div>
-
     <!-- Quick Actions -->
-    <div class="quick-actions text-center mb-4">
-        <h5 style="color: var(--monastery-dark); margin-bottom: 20px; font-weight: 600;">Quick Actions</h5>
+    <div class="quick-actions">
+        <h5>⚡ Quick Actions</h5>
         <div class="row g-3 justify-content-center">
             <div class="col-auto">
-                <a href="patient_appointments.php" class="btn-premium btn-primary-premium">
+                <a href="patient_appointments.php" class="btn-quick">
                     <i class="bi bi-calendar-plus"></i> New Appointment
                 </a>
             </div>
             <div class="col-auto">
-                <a href="donation_management.php" class="btn-premium btn-success-premium">
-                    <i class="bi bi-cash-coin"></i> Add Donation
+                <a href="donation_management.php" class="btn-quick">
+                    <i class="bi bi-heart-fill"></i> Add Donation
                 </a>
             </div>
             <div class="col-auto">
-                <a href="bill_management.php" class="btn-premium btn-warning-premium">
-                    <i class="bi bi-receipt"></i> Add Expense
+                <a href="bill_management.php" class="btn-quick">
+                    <i class="bi bi-receipt"></i> Record Expense
                 </a>
             </div>
             <div class="col-auto">
-                <a href="doctor_availability.php" class="btn-premium btn-info-premium">
-                    <i class="bi bi-clock"></i> Doctor Schedule
+                <a href="doctor_availability.php" class="btn-quick">
+                    <i class="bi bi-clock-history"></i> Doctor Schedule
                 </a>
             </div>
             <div class="col-auto">
-                <a href="category_management.php" class="btn-premium btn-secondary-premium">
-                    <i class="bi bi-tag"></i> Categories
+                <a href="monk_management.php" class="btn-quick">
+                    <i class="bi bi-people"></i> Manage Monks
                 </a>
             </div>
             <div class="col-auto">
-                <a href="room_management.php" class="btn-premium btn-primary-premium">
-                    <i class="bi bi-door-open"></i> Room Management
+                <a href="room_management.php" class="btn-quick">
+                    <i class="bi bi-door-open"></i> Rooms
                 </a>
             </div>
         </div>
@@ -495,27 +638,31 @@ new Chart(weeklyCtx, {
         datasets: [{
             label: 'Appointments',
             data: <?= json_encode(array_column($weekly_data, 'count')) ?>,
-            backgroundColor: 'rgba(245, 124, 0, 0.2)',
-            borderColor: '#f57c00',
+            backgroundColor: 'rgba(45, 80, 22, 0.1)',
+            borderColor: '#2d5016',
             borderWidth: 3,
             fill: true,
-            tension: 0.4
+            tension: 0.4,
+            pointBackgroundColor: '#D4AF37',
+            pointBorderColor: '#2d5016',
+            pointRadius: 6,
+            pointHoverRadius: 8
         }]
     },
     options: {
         responsive: true,
         maintainAspectRatio: true,
         plugins: {
-            legend: {
-                display: false
-            }
+            legend: { display: false }
         },
         scales: {
             y: {
                 beginAtZero: true,
-                ticks: {
-                    stepSize: 1
-                }
+                ticks: { stepSize: 1 },
+                grid: { color: 'rgba(45, 80, 22, 0.05)' }
+            },
+            x: {
+                grid: { color: 'rgba(45, 80, 22, 0.05)' }
             }
         }
     }
@@ -531,12 +678,14 @@ new Chart(financialCtx, {
             label: 'Donations',
             data: <?= json_encode(array_column($monthly_financial, 'donations')) ?>,
             backgroundColor: '#4caf50',
-            borderRadius: 8
+            borderRadius: 8,
+            borderSkipped: false
         }, {
             label: 'Expenses',
             data: <?= json_encode(array_column($monthly_financial, 'expenses')) ?>,
-            backgroundColor: '#f57c00',
-            borderRadius: 8
+            backgroundColor: '#D4AF37',
+            borderRadius: 8,
+            borderSkipped: false
         }]
     },
     options: {
@@ -544,30 +693,24 @@ new Chart(financialCtx, {
         maintainAspectRatio: true,
         plugins: {
             legend: {
-                position: 'top'
+                position: 'top',
+                labels: { boxWidth: 15, font: { size: 13 } }
             }
         },
         scales: {
             y: {
-                beginAtZero: true
+                beginAtZero: true,
+                grid: { color: 'rgba(45, 80, 22, 0.05)' }
+            },
+            x: {
+                grid: { color: 'rgba(45, 80, 22, 0.05)' }
             }
         }
     }
 });
-
-// Initialize Browser Notifications
-const monasteryNotifications = new MonasteryNotifications();
-
-// Request permission on page load
-window.addEventListener('load', function() {
-    monasteryNotifications.requestPermission();
-    
-    // Start polling for new activities every 30 seconds
-    monasteryNotifications.startPolling(30);
-});
 </script>
 
-<!-- Browser Notifications System -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/notifications.js"></script>
 
 </body>
