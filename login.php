@@ -8,12 +8,10 @@ $con = getDBConnection();
 $error = "";
 $success = "";
 
-//check logout success message 
 if (isset($_GET['logout']) && $_GET['logout'] == 'success') {
     $success = "You have been logged out successfully.";
 }
 
-//check session timeout message 
 if (isset($_GET['timeout']) && $_GET['timeout'] == '1') {
     $error = "Your session has expired. Please login again.";
 }
@@ -25,7 +23,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($email) || empty($password)) {
         $error = "Both email and password are required.";
     } else {
-        // prepare and execute query to prevent sql injection 
         $stmt = $con->prepare("SELECT u.user_id, u.name, u.email, u.password_hash, u.role_id, r.role_name 
                                FROM users u 
                                JOIN roles r ON u.role_id = r.role_id 
@@ -53,7 +50,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         if ($user && password_verify($password, $user['password_hash'])) {
-            // set session variables
             $_SESSION['logged_in'] = true;
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['username'] = $user['name'];
@@ -62,7 +58,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['role_name'] = $user['role_name'];
             $_SESSION['last_activity'] = time();
             
-            // redirect to dashboard
             header("Location: dashboard.php");
             exit();
         } else {
@@ -75,414 +70,402 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Seela Suwa Herath Bikshu Gilan Arana</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        :root {
-            --monastery-green: #2d5016;
-            --monastery-dark-green: #1a3009;
-            --monastery-gold: #D4AF37;
-            --monastery-light-gold: #F5DEB3;
-            --monastery-cream: #F5F1E8;
-            --text-dark: #333;
-            --text-light: #666;
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, var(--monastery-green) 0%, var(--monastery-dark-green) 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-attachment: fixed;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background-color: #f8f7f4;
+            color: #333;
+            line-height: 1.6;
         }
-        
-        .container-login {
+
+        .page-wrapper {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 0;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            max-width: 900px;
-            width: 100%;
-            animation: slideIn 0.6s ease-out;
+            min-height: 100vh;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
         }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-        
-        .image-section {
-            background: linear-gradient(135deg, var(--monastery-green) 0%, var(--monastery-dark-green) 100%);
-            padding: 50px 30px;
+
+        .hero-section {
+            background: linear-gradient(135deg, #2d5016 0%, #1a3009 100%);
+            color: white;
+            padding: 60px 40px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: white;
             position: relative;
             overflow: hidden;
         }
-        
-        .image-section::before {
+
+        .hero-section::before {
             content: '';
             position: absolute;
             top: -50%;
             right: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
-            animation: float 60s linear infinite;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+            animation: drift 20s linear infinite;
         }
-        
-        .monastery-image {
+
+        @keyframes drift {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, 20px); }
+        }
+
+        .hero-image {
             width: 100%;
             height: 350px;
             object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             z-index: 2;
             position: relative;
         }
-        
-        .monastery-header {
+
+        .hero-content {
             text-align: center;
             z-index: 2;
             position: relative;
         }
-        
-        .monastery-emoji {
-            font-size: 50px;
-            display: inline-block;
-            animation: pulse 2.5s ease-in-out infinite;
-            margin-bottom: 15px;
+
+        .monastery-name {
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
         }
-        
-        .monastery-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
-            margin-bottom: 10px;
-        }
-        
-        .monastery-tagline {
+
+        .monastery-subtitle {
             font-size: 14px;
-            color: var(--monastery-light-gold);
-            font-style: italic;
+            opacity: 0.85;
+            letter-spacing: 0.5px;
+            font-weight: 300;
         }
-        
+
         .form-section {
-            padding: 50px;
+            padding: 60px 50px;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            background: white;
         }
-        
+
+        .form-header {
+            margin-bottom: 40px;
+        }
+
         .form-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--monastery-green);
-            margin-bottom: 10px;
+            font-size: 32px;
+            font-weight: 300;
+            color: #2d5016;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
-        
+
         .form-subtitle {
             font-size: 14px;
-            color: var(--text-light);
-            margin-bottom: 30px;
+            color: #666;
+            font-weight: 300;
         }
-        
+
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
-        
+
         .form-label {
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 8px;
             display: block;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
         }
-        
+
         .form-control {
-            padding: 12px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
             font-size: 14px;
+            font-family: inherit;
             transition: all 0.3s ease;
-            color: var(--text-dark);
+            background: #fafafa;
         }
-        
+
         .form-control:focus {
             outline: none;
-            border-color: var(--monastery-gold);
-            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+            border-color: #2d5016;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.05);
         }
-        
-        .btn-login {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, var(--monastery-green) 0%, #1a3009 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin-top: 10px;
-        }
-        
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(45, 80, 22, 0.3);
-        }
-        
-        .btn-login:active {
-            transform: translateY(0);
-        }
-        
-        .alert {
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+
+        .alert-box {
+            padding: 14px 16px;
+            border-radius: 4px;
+            margin-bottom: 24px;
             font-size: 14px;
-            animation: slideIn 0.3s ease-out;
+            border-left: 3px solid;
         }
-        
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+
+        .alert-error {
+            background: #fef2f2;
+            border-left-color: #dc2626;
+            color: #991b1b;
         }
-        
+
         .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: #f0fdf4;
+            border-left-color: #16a34a;
+            color: #166534;
         }
-        
-        .signup-link {
-            text-align: center;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-        
-        .signup-link-text {
-            color: var(--text-light);
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-        
-        .btn-signup {
-            background-color: var(--monastery-gold);
-            color: var(--text-dark);
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            width: 100%;
-            text-align: center;
-        }
-        
-        .btn-signup:hover {
-            background-color: #C9A027;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
-        }
-        
-        .demo-credentials {
-            background-color: #f0f0f0;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+
+        .demo-box {
+            background: #f9f6f0;
+            border: 1px solid #e5ddd0;
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 24px;
             font-size: 13px;
-            border-left: 4px solid var(--monastery-gold);
         }
-        
+
         .demo-label {
             font-weight: 600;
-            color: var(--monastery-green);
+            color: #2d5016;
             margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
-        
+
         .demo-item {
-            color: var(--text-dark);
-            margin-bottom: 5px;
+            margin-bottom: 6px;
+            color: #333;
         }
-        
-        .donate-button {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+
+        .btn-login {
+            width: 100%;
+            padding: 13px 24px;
+            background: #2d5016;
             color: white;
-            padding: 15px 25px;
-            border-radius: 50px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
             cursor: pointer;
-            font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+            margin-top: 12px;
+            text-transform: uppercase;
+        }
+
+        .btn-login:hover {
+            background: #1a3009;
+            box-shadow: 0 4px 12px rgba(45, 80, 22, 0.2);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .divider-line {
+            height: 1px;
+            background: #ddd;
+            margin: 30px 0;
+        }
+
+        .signup-section {
+            text-align: center;
+        }
+
+        .signup-text {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .btn-signup {
+            width: 100%;
+            padding: 13px 24px;
+            background: #D4AF37;
+            color: #2d5016;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            text-transform: uppercase;
+        }
+
+        .btn-signup:hover {
+            background: #C9A027;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+        }
+
+        .donation-cta {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            background: #dc2626;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 8px;
+            box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3);
+            transition: all 0.3s ease;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
             z-index: 100;
         }
-        
-        .donate-button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.5);
+
+        .donation-cta:hover {
+            background: #b91c1c;
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+            transform: translateY(-2px);
         }
-        
-        @media (max-width: 768px) {
-            .container-login {
+
+        @media (max-width: 1024px) {
+            .page-wrapper {
                 grid-template-columns: 1fr;
             }
-            
-            .image-section {
-                padding: 30px 20px;
-                min-height: 250px;
+
+            .hero-section {
+                padding: 40px 30px;
+                min-height: 400px;
             }
-            
+
+            .hero-image {
+                height: 250px;
+            }
+
             .form-section {
-                padding: 30px 20px;
+                padding: 40px 30px;
             }
-            
+
+            .donation-cta {
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 18px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 640px) {
             .form-title {
                 font-size: 24px;
             }
-            
-            .monastery-image {
-                height: 200px;
-                margin-bottom: 15px;
+
+            .form-section {
+                padding: 30px 20px;
             }
-            
-            .donate-button {
-                bottom: 20px;
-                right: 20px;
-                padding: 12px 20px;
-                font-size: 14px;
+
+            .hero-section {
+                padding: 30px 20px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container-login">
-        <!-- Image Section -->
-        <div class="image-section">
-            <div class="monastery-header">
-                <div class="monastery-emoji">🤝</div>
-                <h1 class="monastery-title">Seela Suwa Herath</h1>
-                <p class="monastery-tagline">Bikshu Gilan Arana</p>
+    <div class="page-wrapper">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <img src="images/img5.jpeg" alt="Seela Suwa Herath Monastery" class="hero-image">
+            <div class="hero-content">
+                <h1 class="monastery-name">Seela Suwa Herath</h1>
+                <p class="monastery-subtitle">Bikshu Gilan Arana Healthcare</p>
             </div>
-            <img src="images/img1.jpeg" alt="Monastery" class="monastery-image">
         </div>
-        
-        <!-- Form Section -->
+
+        <!-- Login Form Section -->
         <div class="form-section">
-            <h2 class="form-title">Welcome Back</h2>
-            <p class="form-subtitle">Login to your account</p>
-            
+            <div class="form-header">
+                <h2 class="form-title">Sign In</h2>
+                <p class="form-subtitle">Access your account to continue</p>
+            </div>
+
             <?php if ($error): ?>
-                <div class="alert alert-danger">
-                    <i class="bi bi-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?>
+                <div class="alert-box alert-error">
+                    <i class="bi bi-exclamation-triangle"></i> <?php echo htmlspecialchars($error); ?>
                 </div>
             <?php endif; ?>
-            
+
             <?php if ($success): ?>
-                <div class="alert alert-success">
+                <div class="alert-box alert-success">
                     <i class="bi bi-check-circle"></i> <?php echo htmlspecialchars($success); ?>
                 </div>
             <?php endif; ?>
-            
-            <div class="demo-credentials">
-                <div class="demo-label">📋 Demo Login Credentials</div>
+
+            <div class="demo-box">
+                <div class="demo-label">Demo Credentials</div>
                 <div class="demo-item"><strong>Email:</strong> admin@monastery.com</div>
                 <div class="demo-item"><strong>Password:</strong> password123</div>
             </div>
-            
+
             <form method="POST">
                 <div class="form-group">
-                    <label class="form-label" for="email">
-                        <i class="bi bi-envelope"></i> Email Address
-                    </label>
+                    <label class="form-label" for="email">Email Address</label>
                     <input 
                         type="email" 
                         id="email" 
                         name="email" 
                         class="form-control" 
-                        placeholder="Enter your email"
+                        placeholder="your@email.com"
                         required
                     >
                 </div>
-                
+
                 <div class="form-group">
-                    <label class="form-label" for="password">
-                        <i class="bi bi-lock"></i> Password
-                    </label>
+                    <label class="form-label" for="password">Password</label>
                     <input 
                         type="password" 
                         id="password" 
                         name="password" 
                         class="form-control" 
-                        placeholder="Enter your password"
+                        placeholder="••••••••"
                         required
                     >
                 </div>
-                
-                <button type="submit" class="btn-login">
-                    <i class="bi bi-box-arrow-in-right"></i> Login
-                </button>
+
+                <button type="submit" class="btn-login">Sign In</button>
             </form>
-            
-            <div class="signup-link">
-                <p class="signup-link-text">Don't have an account yet?</p>
-                <a href="register.php" class="btn-signup">
-                    <i class="bi bi-person-plus"></i> Create Account
-                </a>
+
+            <div class="divider-line"></div>
+
+            <div class="signup-section">
+                <p class="signup-text">Don't have an account?</p>
+                <a href="register.php" class="btn-signup">Create Account</a>
             </div>
         </div>
     </div>
-    
-    <!-- Donation Button -->
-    <a href="public_donate.php" class="donate-button">
-        <i class="bi bi-heart-fill"></i> Donate Now
+
+    <a href="public_donate.php" class="donation-cta">
+        <i class="bi bi-heart-fill"></i> Support Us
     </a>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

@@ -6,7 +6,6 @@ $error = "";
 $success = "";
 $con = getDBConnection();
 
-// Get all roles
 $roles = [];
 $result = $con->query("SELECT role_id, role_name FROM roles");
 if ($result) {
@@ -23,19 +22,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'] ?? '';
     $password_confirm = $_POST['password_confirm'] ?? '';
 
-    // Validation
     if (empty($name) || empty($email) || empty($phone) || empty($role_id) || empty($password)) {
         $error = "All fields are required.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Please enter a valid email address.";
     } elseif (!preg_match('/^(071|072|073|074|075|076|077|078|070)\d{7}$/', $phone)) {
-        $error = "Please enter a valid Sri Lankan phone number (e.g., 0712345678).";
+        $error = "Please enter a valid Sri Lankan phone number (0712345678).";
     } elseif (strlen($password) < 6) {
         $error = "Password must be at least 6 characters long.";
     } elseif ($password !== $password_confirm) {
         $error = "Passwords do not match.";
     } else {
-        // Check if email already exists
         $stmt = $con->prepare("SELECT user_id FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -44,7 +41,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($existing) {
             $error = "This email is already registered.";
         } else {
-            // Hash password and insert user
             $password_hash = password_hash($password, PASSWORD_BCRYPT);
             $stmt = $con->prepare("INSERT INTO users (name, email, phone, role_id, password_hash, status) VALUES (?, ?, ?, ?, ?, 'active')");
             $stmt->bind_param("sssss", $name, $email, $phone, $role_id, $password_hash);
@@ -62,267 +58,247 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Seela Suwa Herath Bikshu Gilan Arana</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        :root {
-            --monastery-green: #2d5016;
-            --monastery-dark-green: #1a3009;
-            --monastery-gold: #D4AF37;
-            --monastery-light-gold: #F5DEB3;
-            --monastery-cream: #F5F1E8;
-            --text-dark: #333;
-            --text-light: #666;
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, var(--monastery-green) 0%, var(--monastery-dark-green) 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-attachment: fixed;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background-color: #f8f7f4;
+            color: #333;
+            line-height: 1.6;
             padding: 40px 20px;
         }
-        
-        .container-register {
+
+        .register-container {
             max-width: 500px;
             margin: 0 auto;
             background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
-            animation: slideIn 0.6s ease-out;
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        .register-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .monastery-emoji {
-            font-size: 50px;
-            display: inline-block;
-            animation: pulse 2.5s ease-in-out infinite;
-            margin-bottom: 15px;
-        }
-        
-        .register-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--monastery-green);
-            margin-bottom: 10px;
-        }
-        
-        .register-subtitle {
-            font-size: 14px;
-            color: var(--text-light);
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-label {
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 8px;
-            display: block;
-            font-size: 14px;
-        }
-        
-        .form-control {
-            padding: 12px 15px;
-            border: 2px solid #ddd;
+            padding: 50px;
             border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            color: var(--text-dark);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #e5ddd0;
+            padding-bottom: 30px;
+        }
+
+        .monastery-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .form-title {
+            font-size: 28px;
+            font-weight: 300;
+            color: #2d5016;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .form-subtitle {
+            font-size: 13px;
+            color: #666;
+            font-weight: 300;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .form-control, select {
             width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: #fafafa;
         }
-        
-        .form-control:focus {
+
+        .form-control:focus, select:focus {
             outline: none;
-            border-color: var(--monastery-gold);
-            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+            border-color: #2d5016;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.05);
         }
-        
-        select.form-control {
+
+        select {
             cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 20px;
+            padding-right: 36px;
         }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+
+        .form-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 6px;
+            font-weight: 300;
         }
-        
+
+        .alert-box {
+            padding: 14px 16px;
+            border-radius: 4px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            border-left: 3px solid;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            border-left-color: #dc2626;
+            color: #991b1b;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            border-left-color: #16a34a;
+            color: #166534;
+        }
+
         .btn-register {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, var(--monastery-green) 0%, #1a3009 100%);
+            width: 100%;
+            padding: 13px 24px;
+            background: #2d5016;
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 4px;
+            font-size: 14px;
             font-weight: 600;
+            letter-spacing: 0.3px;
             cursor: pointer;
             transition: all 0.3s ease;
-            width: 100%;
-            margin-top: 10px;
+            margin-top: 12px;
+            text-transform: uppercase;
         }
-        
+
         .btn-register:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(45, 80, 22, 0.3);
+            background: #1a3009;
+            box-shadow: 0 4px 12px rgba(45, 80, 22, 0.2);
         }
-        
-        .btn-register:active {
-            transform: translateY(0);
+
+        .divider-line {
+            height: 1px;
+            background: #e5ddd0;
+            margin: 30px 0;
         }
-        
-        .alert {
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            animation: slideIn 0.3s ease-out;
-        }
-        
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .login-link {
+
+        .login-section {
             text-align: center;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
         }
-        
-        .login-link-text {
-            color: var(--text-light);
-            font-size: 14px;
-            margin-bottom: 10px;
+
+        .login-text {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 12px;
         }
-        
+
         .btn-login {
-            color: var(--monastery-green);
+            color: #2d5016;
             text-decoration: none;
             font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
             transition: all 0.3s ease;
         }
-        
+
         .btn-login:hover {
-            color: var(--monastery-gold);
+            color: #D4AF37;
         }
-        
-        .password-hint {
-            font-size: 12px;
-            color: var(--text-light);
-            margin-top: 5px;
-        }
-        
-        @media (max-width: 500px) {
-            .container-register {
-                padding: 25px;
+
+        @media (max-width: 640px) {
+            .register-container {
+                padding: 30px 20px;
             }
-            
-            .register-title {
+
+            .form-title {
                 font-size: 24px;
             }
-            
-            .form-row {
-                grid-template-columns: 1fr;
+
+            .monastery-icon {
+                font-size: 28px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container-register">
-        <div class="register-header">
-            <div class="monastery-emoji">🤝</div>
-            <h1 class="register-title">Create Account</h1>
-            <p class="register-subtitle">Join our monastery healthcare community</p>
+    <div class="register-container">
+        <div class="form-header">
+            <div class="monastery-icon">🤝</div>
+            <h1 class="form-title">Create Account</h1>
+            <p class="form-subtitle">Join our monastic community</p>
         </div>
-        
+
         <?php if ($error): ?>
-            <div class="alert alert-danger">
-                <i class="bi bi-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?>
+            <div class="alert-box alert-error">
+                <i class="bi bi-exclamation-triangle"></i> <?php echo htmlspecialchars($error); ?>
             </div>
         <?php endif; ?>
-        
+
         <?php if ($success): ?>
-            <div class="alert alert-success">
+            <div class="alert-box alert-success">
                 <i class="bi bi-check-circle"></i> <?php echo htmlspecialchars($success); ?>
             </div>
         <?php endif; ?>
-        
+
         <form method="POST">
             <div class="form-group">
-                <label class="form-label" for="name">
-                    <i class="bi bi-person"></i> Full Name
-                </label>
+                <label class="form-label" for="name">Full Name</label>
                 <input 
                     type="text" 
                     id="name" 
                     name="name" 
                     class="form-control" 
-                    placeholder="Enter your full name"
+                    placeholder="John Smith"
                     value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>"
                     required
                 >
             </div>
-            
+
             <div class="form-group">
-                <label class="form-label" for="email">
-                    <i class="bi bi-envelope"></i> Email Address
-                </label>
+                <label class="form-label" for="email">Email Address</label>
                 <input 
                     type="email" 
                     id="email" 
                     name="email" 
                     class="form-control" 
-                    placeholder="Enter your email"
+                    placeholder="your@email.com"
                     value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>"
                     required
                 >
             </div>
-            
+
             <div class="form-group">
-                <label class="form-label" for="phone">
-                    <i class="bi bi-telephone"></i> Phone Number
-                </label>
+                <label class="form-label" for="phone">Phone Number</label>
                 <input 
                     type="tel" 
                     id="phone" 
@@ -332,14 +308,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>"
                     required
                 >
-                <small class="password-hint">Sri Lankan format: 10 digits (071-078 prefix)</small>
+                <div class="form-hint">Sri Lankan format: 10 digits (071-078)</div>
             </div>
-            
+
             <div class="form-group">
-                <label class="form-label" for="role_id">
-                    <i class="bi bi-person-badge"></i> Role
-                </label>
-                <select id="role_id" name="role_id" class="form-control" required>
+                <label class="form-label" for="role_id">Role</label>
+                <select id="role_id" name="role_id" required>
                     <option value="">Select your role...</option>
                     <?php foreach ($roles as $role): ?>
                         <option value="<?php echo $role['role_id']; ?>">
@@ -348,46 +322,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <?php endforeach; ?>
                 </select>
             </div>
-            
+
             <div class="form-group">
-                <label class="form-label" for="password">
-                    <i class="bi bi-lock"></i> Password
-                </label>
+                <label class="form-label" for="password">Password</label>
                 <input 
                     type="password" 
                     id="password" 
                     name="password" 
                     class="form-control" 
-                    placeholder="Enter your password"
+                    placeholder="••••••••"
                     required
                 >
-                <small class="password-hint">At least 6 characters</small>
+                <div class="form-hint">Minimum 6 characters</div>
             </div>
-            
+
             <div class="form-group">
-                <label class="form-label" for="password_confirm">
-                    <i class="bi bi-lock-check"></i> Confirm Password
-                </label>
+                <label class="form-label" for="password_confirm">Confirm Password</label>
                 <input 
                     type="password" 
                     id="password_confirm" 
                     name="password_confirm" 
                     class="form-control" 
-                    placeholder="Confirm your password"
+                    placeholder="••••••••"
                     required
                 >
             </div>
-            
-            <button type="submit" class="btn-register">
-                <i class="bi bi-person-plus"></i> Create Account
-            </button>
+
+            <button type="submit" class="btn-register">Create Account</button>
         </form>
-        
-        <div class="login-link">
-            <p class="login-link-text">Already have an account?</p>
-            <a href="login.php" class="btn-login">
-                <i class="bi bi-box-arrow-in-right"></i> Login here
-            </a>
+
+        <div class="divider-line"></div>
+
+        <div class="login-section">
+            <p class="login-text">Already have an account?</p>
+            <a href="login.php" class="btn-login">Sign In</a>
         </div>
     </div>
 
