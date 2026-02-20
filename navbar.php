@@ -177,7 +177,6 @@ function isActivePage($pages, $currentPage) {
     <a class="sidebar-link <?= isActivePage('dashboard.php', $currentPage) ?>" href="dashboard.php"><i class="bi bi-house-door"></i> Dashboard</a>
     <a class="sidebar-link <?= isActivePage('donation_management.php', $currentPage) ?>" href="donation_management.php"><i class="bi bi-cash-stack"></i> Donation Management</a>
     <a class="sidebar-link <?= isActivePage('bill_management.php', $currentPage) ?>" href="bill_management.php"><i class="bi bi-receipt"></i> Bill Management</a>
-    <a class="sidebar-link <?= isActivePage(['room_management.php','room_slot_management.php'], $currentPage) ?>" href="room_management.php"><i class="bi bi-door-open"></i> Room & Slots</a>
     <a class="sidebar-link <?= isActivePage('patient_appointments.php', $currentPage) ?>" href="patient_appointments.php"><i class="bi bi-calendar-week"></i> Appointments</a>
     <a class="sidebar-link <?= isActivePage('reports.php', $currentPage) ?>" href="reports.php"><i class="bi bi-bar-chart-line"></i> Reports</a>
     <a class="sidebar-link <?= isActivePage('chatbot.php', $currentPage) ?>" href="chatbot.php"><i class="bi bi-robot"></i> Chatbot</a>
@@ -186,7 +185,8 @@ function isActivePage($pages, $currentPage) {
       <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; padding: 0 12px; margin-bottom: 8px;"><i class="bi bi-gear-fill"></i> System Management</div>
       <a class="sidebar-link <?= isActivePage('monk_management.php', $currentPage) ?>" href="monk_management.php"><i class="bi bi-person-hearts"></i> Monk Management</a>
       <a class="sidebar-link <?= isActivePage('doctor_management.php', $currentPage) ?>" href="doctor_management.php"><i class="bi bi-person-badge"></i> Doctor Management</a>
-      <a class="sidebar-link <?= isActivePage(['room_management.php','room_slot_management.php'], $currentPage) ?>" href="room_management.php"><i class="bi bi-door-open"></i> Room & Slot Management</a>
+      <a class="sidebar-link <?= isActivePage('room_management.php', $currentPage) ?>" href="room_management.php"><i class="bi bi-door-open"></i> Room Management</a>
+      <a class="sidebar-link <?= isActivePage('room_slot_management.php', $currentPage) ?>" href="room_slot_management.php"><i class="bi bi-calendar-range"></i> Room Slot Management</a>
       <a class="sidebar-link <?= isActivePage('table.php', $currentPage) ?>" href="table.php"><i class="bi bi-people"></i> User Management</a>
       <a class="sidebar-link <?= isActivePage('category_management.php', $currentPage) ?>" href="category_management.php"><i class="bi bi-tags"></i> Category Management</a>
       <a class="sidebar-link <?= isActivePage('title_management.php', $currentPage) ?>" href="title_management.php"><i class="bi bi-award"></i> Title Management</a>

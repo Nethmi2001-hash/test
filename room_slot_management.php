@@ -134,7 +134,7 @@ while ($r = $rooms_res->fetch_assoc()) {
     <div class="page-header">
         <div class="row align-items-center">
             <div class="col">
-                <h2 class="mb-0"><i class="bi bi-clock-history"></i> Room Slot Management</h2>
+                <h2 class="mb-0"><i class="bi bi-calendar-range"></i> Room Slot Management</h2>
                 <p class="mb-0 mt-1 opacity-75">Manage time slots for room bookings</p>
             </div>
             <div class="col-auto">
@@ -147,7 +147,7 @@ while ($r = $rooms_res->fetch_assoc()) {
     <div class="identity-strip interactive-lift mb-4">
         <img src="images/img1.jpeg" alt="Founder - Ven. Solewewa Chandrasiri Thero" class="identity-photo">
         <div>
-            <div class="identity-title"><i class="bi bi-clock-history"></i> Care Schedule Reliability</div>
+            <div class="identity-title"><i class="bi bi-calendar-check"></i> Care Schedule Reliability</div>
             <div class="identity-text">Reliable slot planning helps monks receive timely care with minimal waiting and better coordination.</div>
         </div>
     </div>
