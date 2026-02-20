@@ -19,16 +19,11 @@ $conn = new mysqli($servername, $username, $password, $dbname);
     <title>AI Assistant - Monastery System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
+    <link rel="stylesheet" href="assets/css/monastery-theme.css">
     <style>
-        :root {
-            --monastery-saffron: #f57c00;
-            --monastery-orange: #ff9800;
-            --monastery-light: #ffa726;
-            --monastery-dark: #e65100;
-            --monastery-pale: #fff3e0;
-        }
         body {
-            background-color: #f8f9fa;
+            background: linear-gradient(135deg, var(--bg-main) 0%, #efe6d8 100%);
             padding-top: 20px;
         }
         .chat-container {
@@ -36,8 +31,8 @@ $conn = new mysqli($servername, $username, $password, $dbname);
             margin: 0 auto;
         }
         .chat-header {
-            background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%);
-            color: white;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff;
             padding: 20px;
             border-radius: 10px 10px 0 0;
             text-align: center;
@@ -46,8 +41,8 @@ $conn = new mysqli($servername, $username, $password, $dbname);
             height: 500px;
             overflow-y: auto;
             padding: 20px;
-            background: white;
-            border: 2px solid var(--monastery-orange);
+            background: #fff;
+            border: 2px solid var(--primary);
             border-top: none;
         }
         .message {
@@ -69,8 +64,8 @@ $conn = new mysqli($servername, $username, $password, $dbname);
             margin: 0 10px;
         }
         .message.bot .message-avatar {
-            background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%);
-            color: white;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff;
         }
         .message.user .message-avatar {
             background: #6c757d;
@@ -83,8 +78,8 @@ $conn = new mysqli($servername, $username, $password, $dbname);
             word-wrap: break-word;
         }
         .message.bot .message-content {
-            background: var(--monastery-pale);
-            border: 1px solid var(--monastery-light);
+            background: #f5efe6;
+            border: 1px solid #d8c1a0;
         }
         .message.user .message-content {
             background: #e9ecef;
@@ -92,9 +87,9 @@ $conn = new mysqli($servername, $username, $password, $dbname);
         }
         .chat-input {
             padding: 20px;
-            background: white;
-            border: 2px solid var(--monastery-orange);
-            border-top: 1px solid var(--monastery-light);
+            background: #fff;
+            border: 2px solid var(--primary);
+            border-top: 1px solid #d8c1a0;
             border-radius: 0 0 10px 10px;
         }
         .typing-indicator {
@@ -107,7 +102,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: var(--monastery-saffron);
+            background: var(--primary);
             margin: 0 2px;
             animation: typing 1.4s infinite;
         }
@@ -128,9 +123,9 @@ $conn = new mysqli($servername, $username, $password, $dbname);
             margin-bottom: 15px;
         }
         .quick-question-btn {
-            background: var(--monastery-pale);
-            border: 1px solid var(--monastery-orange);
-            color: var(--monastery-dark);
+            background: #f5efe6;
+            border: 1px solid var(--primary);
+            color: var(--accent);
             padding: 8px 15px;
             border-radius: 20px;
             cursor: pointer;
@@ -138,8 +133,8 @@ $conn = new mysqli($servername, $username, $password, $dbname);
             transition: all 0.3s;
         }
         .quick-question-btn:hover {
-            background: var(--monastery-orange);
-            color: white;
+            background: var(--primary);
+            color: #fff;
         }
         .language-selector {
             margin-bottom: 15px;
@@ -148,7 +143,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
             background: #f8f9fa;
             padding: 10px;
             border-radius: 5px;
-            border-left: 3px solid var(--monastery-orange);
+            border-left: 3px solid var(--primary);
             margin: 10px 0;
         }
     </style>

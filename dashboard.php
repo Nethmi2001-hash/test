@@ -152,15 +152,16 @@ if (count($alerts) == 0) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
+    <link rel="stylesheet" href="assets/css/monastery-theme.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --monastery-green: #C2410C;
-            --monastery-dark-green: #9A3412;
-            --monastery-gold: #F59E0B;
-            --monastery-light-gold: #FDE68A;
-            --monastery-cream: #FFF7ED;
-            --monastery-accent: #1E3A8A;
+            --monastery-green: #A67C52;
+            --monastery-dark-green: #8D6844;
+            --monastery-gold: #7A1E1E;
+            --monastery-light-gold: #F5EFE6;
+            --monastery-cream: #FAF8F3;
+            --monastery-accent: #7A1E1E;
             --text-dark: #333;
             --text-light: #666;
         }
@@ -176,7 +177,7 @@ if (count($alerts) == 0) {
         }
 
         .welcome-card {
-            background: linear-gradient(135deg, var(--monastery-green) 0%, var(--monastery-dark-green) 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border-radius: 20px;
             padding: 40px;
@@ -235,6 +236,24 @@ if (count($alerts) == 0) {
             display: inline-block;
             animation: pulse 2.5s ease-in-out infinite;
             margin-right: 20px;
+        }
+
+        .founder-strip {
+            background: #fff;
+            border-radius: 16px;
+            padding: 18px;
+            margin-top: -14px;
+            margin-bottom: 26px;
+            border: 1px solid rgba(110, 134, 98, 0.15);
+            box-shadow: 0 12px 24px rgba(32, 42, 29, 0.12);
+        }
+
+        .founder-photo {
+            width: 84px;
+            height: 84px;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 3px solid #ECE5D8;
         }
 
         .stat-card {
@@ -330,18 +349,18 @@ if (count($alerts) == 0) {
         }
 
         .alert-item.warning {
-            background: #fff8e1;
-            border-left-color: #ffc107;
+            background: #FFF4DE;
+            border-left-color: #B89062;
         }
 
         .alert-item.info {
-            background: #e3f2fd;
-            border-left-color: #2196f3;
+            background: #ECF2E8;
+            border-left-color: var(--primary);
         }
 
         .alert-item.success {
-            background: #e8f5e9;
-            border-left-color: #4caf50;
+            background: #E9F4EA;
+            border-left-color: var(--success);
         }
 
         .alert-item i {
@@ -482,6 +501,14 @@ if (count($alerts) == 0) {
                     </p>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="alert" style="background: linear-gradient(135deg, rgba(110, 134, 98, 0.08) 0%, rgba(79, 102, 69, 0.05) 100%); border-left: 3px solid var(--primary); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <img src="images/img1.jpeg" alt="Founder" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
+        <div style="font-size: 0.875rem; line-height: 1.4;">
+            <div style="font-weight: 600; color: var(--primary);">Seela Suwa Herath Bikshu Gilan Arana</div>
+            <div style="opacity: 0.75; font-size: 0.8rem;">Founded by Ven. Solewewa Chandrasiri Thero</div>
         </div>
     </div>
 
@@ -645,8 +672,8 @@ new Chart(weeklyCtx, {
             borderWidth: 3,
             fill: true,
             tension: 0.4,
-            pointBackgroundColor: '#D4AF37',
-            pointBorderColor: '#2d5016',
+            pointBackgroundColor: '#7A1E1E',
+            pointBorderColor: '#A67C52',
             pointRadius: 6,
             pointHoverRadius: 8
         }]
@@ -679,13 +706,13 @@ new Chart(financialCtx, {
         datasets: [{
             label: 'Donations',
             data: <?= json_encode(array_column($monthly_financial, 'donations')) ?>,
-            backgroundColor: '#4caf50',
+            backgroundColor: '#2E7D32',
             borderRadius: 8,
             borderSkipped: false
         }, {
             label: 'Expenses',
             data: <?= json_encode(array_column($monthly_financial, 'expenses')) ?>,
-            backgroundColor: '#D4AF37',
+            backgroundColor: '#7A1E1E',
             borderRadius: 8,
             borderSkipped: false
         }]

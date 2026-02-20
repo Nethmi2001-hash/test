@@ -147,37 +147,30 @@ while ($rs = $rooms_res->fetch_assoc()) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/premium-theme.css">
+    <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
+    <link rel="stylesheet" href="assets/css/monastery-theme.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <style>
-        :root {
-            --monastery-saffron: #f57c00;
-            --monastery-orange: #ff9800;
-            --monastery-light: #ffa726;
-            --monastery-dark: #e65100;
-            --monastery-pale: #fff3e0;
-        }
-        body {
-            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-        }
+        body { background: linear-gradient(135deg, var(--bg-main) 0%, #efe6d8 100%); }
         .appointment-card {
             transition: transform 0.2s;
-            border-left: 4px solid var(--monastery-saffron);
-            background: white;
+            border-left: 4px solid var(--primary);
+            background: #fff;
         }
         .appointment-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(245, 124, 0, 0.2);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14);
         }
         .page-header {
-            background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 15px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff;
+            padding: 1.8rem;
+            border-radius: 14px;
             margin-bottom: 2rem;
-            box-shadow: 0 5px 20px rgba(245, 124, 0, 0.3);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
         }
         .btn-primary {
-            background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             border: none;
         }
     </style>
@@ -195,6 +188,13 @@ while ($rs = $rooms_res->fetch_assoc()) {
                     <i class="bi bi-plus-circle"></i> New Appointment
                 </button>
             </div>
+        </div>
+    </div>
+    <div class="alert" style="background: linear-gradient(135deg, rgba(110, 134, 98, 0.08) 0%, rgba(79, 102, 69, 0.05) 100%); border-left: 3px solid var(--primary); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <img src="images/img1.jpeg" alt="Founder" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
+        <div style="font-size: 0.875rem; line-height: 1.4;">
+            <div style="font-weight: 600; color: var(--primary);">Seela Suwa Herath Bikshu Gilan Arana</div>
+            <div style="opacity: 0.75; font-size: 0.8rem;">Founded by Ven. Solewewa Chandrasiri Thero</div>
         </div>
     </div>
 

@@ -7,13 +7,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
+    <link rel="stylesheet" href="assets/css/monastery-theme.css">
     <style>
         :root {
-            --monastery-green: #C2410C;
-            --monastery-dark-green: #9A3412;
-            --monastery-gold: #F59E0B;
-            --monastery-cream: #FFF7ED;
-            --monastery-accent: #1E3A8A;
+            --monastery-green: #A67C52;
+            --monastery-dark-green: #8D6844;
+            --monastery-gold: #A67C52;
+            --monastery-cream: #FAF8F3;
+            --monastery-accent: #7A1E1E;
         }
         body {
             background: linear-gradient(135deg, var(--monastery-cream) 0%, #eee3cc 100%);

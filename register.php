@@ -66,14 +66,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
+    <link rel="stylesheet" href="assets/css/monastery-theme.css">
     <style>
         :root {
-            --sc-primary: #C2410C;
-            --sc-primary-dark: #9A3412;
-            --sc-secondary: #F59E0B;
-            --sc-accent: #1E3A8A;
-            --sc-bg: #FFF7ED;
-            --sc-border: #E8DDCC;
+            --sc-primary: #6E8662;
+            --sc-primary-dark: #4F6645;
+            --sc-secondary: #ECE5D8;
+            --sc-accent: #8A5A3B;
+            --sc-bg: #F7F4EE;
+            --sc-border: #DCD4C7;
             --sc-card: #FFFFFF;
             --sc-muted: #6B7280;
         }
@@ -177,7 +178,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-size: 13px;
             opacity: 0.95;
         }
+        .donation-cta {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
+            color: #FFFFFF;
+            padding: 16px 28px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 800;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 32px rgba(46, 125, 50, 0.5),
+                        0 4px 16px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s ease;
+            letter-spacing: 0.5px;
+            z-index: 9999;
+            border: 3px solid rgba(255, 255, 255, 0.4);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            animation: gentle-pulse 3s ease-in-out infinite;
+        }
 
+        @keyframes gentle-pulse {
+            0%, 100% { box-shadow: 0 8px 32px rgba(46, 125, 50, 0.5), 0 4px 16px rgba(0, 0, 0, 0.2); }
+            50% { box-shadow: 0 8px 40px rgba(46, 125, 50, 0.65), 0 4px 20px rgba(0, 0, 0, 0.25); }
+        }
+
+        .donation-cta i {
+            font-size: 18px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .donation-cta:hover {
+            background: linear-gradient(135deg, #1B5E20 0%, #0D4715 100%);
+            box-shadow: 0 12px 48px rgba(46, 125, 50, 0.65),
+                        0 6px 24px rgba(0, 0, 0, 0.3);
+            transform: translateY(-4px) scale(1.08);
+            color: #FFFFFF;
+            border-color: rgba(255, 255, 255, 0.6);
+        }
         .form-side {
             padding: 34px;
             display: flex;
@@ -192,11 +235,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border: 1px solid var(--sc-border);
             border-radius: 18px;
             box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
-            padding: 30px;
+            padding: 20px 24px;
         }
 
         .form-header {
-            margin-bottom: 18px;
+            margin-bottom: 14px;
         }
 
         .form-title {
@@ -257,11 +300,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .alert-box {
-            padding: 12px 14px;
-            border-radius: 10px;
-            margin-bottom: 14px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
             font-size: 13px;
             border-left: 3px solid;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .alert-error {
@@ -377,7 +423,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     <div class="register-layout">
         <div class="brand-panel">
-            <img src="images/img4.jpeg" alt="Seela Suwa Herath" class="brand-image">
+            <img src="images/img3.jpeg" alt="Seela Suwa Herath" class="brand-image">
             <div class="brand-badge"><i class="bi bi-person-hearts"></i> Helping-Hand Community</div>
             <h2 class="brand-title">Join Sacred Care</h2>
             <p class="brand-subtitle">Create your account to support monastery healthcare and donations.</p>
@@ -386,6 +432,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <li><i class="bi bi-check-circle"></i> Transparent donation and healthcare workflows</li>
                 <li><i class="bi bi-check-circle"></i> Trusted and compassionate service platform</li>
             </ul>
+            <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.2);">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <img src="images/img1.jpeg" alt="Founder" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.5);">
+                    <div style="font-size: 0.85rem; line-height: 1.4; opacity: 0.95;">
+                        <div style="font-weight: 600;">Founded by Ven. Solewewa Chandrasiri Thero</div>
+                        <div style="opacity: 0.8; font-size: 0.8rem;">Monastery healthcare & donation platform</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="form-side">
@@ -502,6 +557,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 
+    <a href="public_donate.php" class="donation-cta" title="Support Monastery Healthcare">
+        <i class="bi bi-hearts"></i> Offer Helping Hand
+    </a>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/ui-interactions.js"></script>
 </body>
 </html>

@@ -9,7 +9,7 @@ require_once __DIR__ . '/includes/payhere_config.php';
 $con = getDBConnection();
 
 // Fetch recent verified donations (public view)
-$recent_donations_query = "SELECT donor_name, amount, created_at, c.name AS category_name 
+$recent_donations_query = "SELECT d.donor_name, d.amount, d.created_at, c.name AS category_name 
                            FROM donations d
                            LEFT JOIN categories c ON d.category_id = c.category_id
                            WHERE d.status IN ('paid', 'verified')
@@ -43,15 +43,16 @@ $stats = $stats_result->fetch_assoc();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
+    <link rel="stylesheet" href="assets/css/monastery-theme.css">
     <script type="text/javascript" src="https://www.payhere.lk/lib/payhere.js"></script>
     <style>
         :root {
-            --monastery-green: #C2410C;
-            --monastery-dark-green: #9A3412;
-            --monastery-gold: #F59E0B;
-            --monastery-cream: #FFF7ED;
-            --monastery-soft: #FFF7ED;
-            --monastery-accent: #1E3A8A;
+            --monastery-green: #A67C52;
+            --monastery-dark-green: #8D6844;
+            --monastery-gold: #A67C52;
+            --monastery-cream: #FAF8F3;
+            --monastery-soft: #F5EFE6;
+            --monastery-accent: #7A1E1E;
         }
         
         body {
@@ -60,7 +61,7 @@ $stats = $stats_result->fetch_assoc();
         }
 
         .hero-section {
-            background: linear-gradient(135deg, rgba(45, 80, 22, 0.9) 0%, rgba(26, 48, 9, 0.9) 100%),
+            background: linear-gradient(135deg, rgba(64, 83, 56, 0.92) 0%, rgba(42, 58, 36, 0.92) 100%),
                         url('images/img6.jpeg') center/cover;
             color: white;
             padding: 80px 0;
@@ -70,13 +71,45 @@ $stats = $stats_result->fetch_assoc();
         }
 
         .hero-section::before {
-            content: '🤝';
+            content: '\f4ce';
+            font-family: 'bootstrap-icons';
             position: absolute;
-            font-size: 170px;
-            opacity: 0.14;
+            font-size: 140px;
+            opacity: 0.12;
             top: -50px;
             right: -50px;
             animation: float 6s ease-in-out infinite;
+        }
+
+        .mission-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 999px;
+            padding: 6px 16px;
+            font-size: 0.92rem;
+            margin-bottom: 14px;
+        }
+
+        .founder-highlight {
+            background: #fff;
+            border-radius: 18px;
+            padding: 20px;
+            margin-top: -34px;
+            position: relative;
+            z-index: 5;
+            box-shadow: 0 14px 30px rgba(32, 42, 29, 0.14);
+            border: 1px solid rgba(110, 134, 98, 0.15);
+        }
+
+        .founder-photo {
+            width: 92px;
+            height: 92px;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 3px solid #ECE5D8;
         }
 
         @keyframes float {
@@ -106,7 +139,7 @@ $stats = $stats_result->fetch_assoc();
         .stats-number {
             font-size: 2.5rem;
             font-weight: bold;
-            color: var(--monastery-green);
+            color: var(--primary);
         }
 
         .donation-form {
@@ -138,6 +171,12 @@ $stats = $stats_result->fetch_assoc();
             border-radius: 10px;
             margin-bottom: 10px;
             border-left: 4px solid var(--monastery-green);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .recent-donation-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(32, 42, 29, 0.12);
         }
 
         .category-card {
@@ -177,6 +216,15 @@ $stats = $stats_result->fetch_assoc();
             background: var(--monastery-accent);
             border-color: var(--monastery-accent);
         }
+
+        .section-title {
+            color: var(--monastery-accent);
+            font-weight: 700;
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+        }
     </style>
 </head>
 <body>
@@ -214,11 +262,26 @@ $stats = $stats_result->fetch_assoc();
 <!-- Hero Section -->
 <section class="hero-section">
     <div class="container">
-        <h1 class="mb-4"><i class="bi bi-person-hearts"></i> Helping Hands for Monastic Care</h1>
-        <p class="lead mb-4">Your donation is an act of compassion that supports medical care for monks in need</p>
+        <div class="mission-badge"><i class="bi bi-heart-pulse"></i> Monastery Healthcare & Donation Platform</div>
+        <h1 class="mb-3"><i class="bi bi-person-hearts"></i> Helping Hands for Monastic Care</h1>
+        <p class="lead mb-4">This platform funds medical treatment, medicines, and wellness support for monks at Seela Suwa Herath Bikshu Gilan Arana.</p>
         <a href="#donate" class="btn btn-light btn-lg px-5">
             <i class="bi bi-hand-thumbs-up"></i> Offer Support
         </a>
+    </div>
+</section>
+
+<section class="container">
+    <div class="founder-highlight interactive-lift">
+        <div class="row align-items-center g-3">
+            <div class="col-auto">
+                <img src="images/img1.jpeg" alt="Solewewa Chandrasiri Thero - Founder" class="founder-photo">
+            </div>
+            <div class="col">
+                <h5 class="mb-1 section-title"><i class="bi bi-award"></i> Founder: Ven. Solewewa Chandrasiri Thero</h5>
+                <p class="mb-0 text-muted">Seela Suwa Herath Bikshu Gilan Arana was founded to provide compassionate healthcare for monks, supported by transparent public donations.</p>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -228,21 +291,21 @@ $stats = $stats_result->fetch_assoc();
         <div class="row g-4">
             <div class="col-md-4">
                 <div class="stats-card">
-                    <i class="bi bi-people-fill" style="font-size: 3rem; color: var(--monastery-green);"></i>
+                    <i class="bi bi-people-fill stat-icon icon-tone-primary"></i>
                     <div class="stats-number mt-3"><?= number_format($stats['unique_donors'] ?? 0) ?></div>
                     <div class="text-muted">Generous Donors</div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="stats-card">
-                    <i class="bi bi-cash-coin" style="font-size: 3rem; color: var(--monastery-green);"></i>
+                    <i class="bi bi-cash-coin stat-icon icon-tone-primary"></i>
                     <div class="stats-number mt-3">Rs. <?= number_format($stats['total_amount'] ?? 0, 0) ?></div>
                     <div class="text-muted">Total Donations</div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="stats-card">
-                    <i class="bi bi-person-hearts" style="font-size: 3rem; color: var(--monastery-green);"></i>
+                    <i class="bi bi-person-hearts stat-icon icon-tone-accent"></i>
                     <div class="stats-number mt-3"><?= number_format($stats['total_donations'] ?? 0) ?></div>
                     <div class="text-muted">Total Contributions</div>
                 </div>
@@ -257,7 +320,7 @@ $stats = $stats_result->fetch_assoc();
         <div class="row">
             <div class="col-lg-8 mx-auto">
                 <div class="donation-form">
-                    <h2 class="text-center mb-4" style="color: var(--monastery-accent);">
+                    <h2 class="text-center mb-4 section-title">
                         <i class="bi bi-person-hearts"></i> Offer a Helping Hand
                     </h2>
 
@@ -330,7 +393,7 @@ $stats = $stats_result->fetch_assoc();
 <!-- Recent Donations Section -->
 <section id="recent" class="py-5" style="background: white;">
     <div class="container">
-        <h3 class="text-center mb-4" style="color: var(--monastery-green);">
+        <h3 class="text-center mb-4 section-title">
             <i class="bi bi-stars"></i> Recent Helping-Hand Donations
         </h3>
         <div class="row">
@@ -469,6 +532,7 @@ function payWithPayHere() {
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/ui-interactions.js"></script>
 
 <!-- Chatbot Widget -->
 <div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">

@@ -86,63 +86,33 @@ while ($d = $doctors_res->fetch_assoc()) {
     <title>Doctor Availability - Seela Suwa Herath Bikshu Gilan Arana</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/premium-theme.css">
+    <link rel="stylesheet" href="assets/css/monastery-theme.css">
+    <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <style>
-        :root {
-            --monastery-saffron: #f57c00;
-            --monastery-orange: #ff9800;
-            --monastery-light: #ffa726;
-            --monastery-dark: #e65100;
-            --monastery-pale: #fff3e0;
-        }
-        body {
-            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-        }
-        .availability-card {
-            border-left: 4px solid var(--monastery-saffron);
-            transition: transform 0.2s;
-            background: white;
-        }
-        .availability-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .day-badge {
-            font-size: 0.85rem;
-            padding: 0.4rem 0.8rem;
-        }
-        .time-badge {
-            background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%);
-            color: white;
-            padding: 0.3rem 0.7rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-        }
-        .doctor-header {
-            background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 10px 10px 0 0;
-        }
-        .specialization-badge {
-            background: rgba(255,255,255,0.2);
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.85rem;
-        }
-    </style>
 </head>
 <body class="bg-light">
 <div class="container mt-4 mb-5">
-    <div class="row mb-4">
-        <div class="col">
-            <h2><i class="bi bi-calendar-week"></i> Doctor Availability Management</h2>
-            <p class="text-muted">Manage weekly schedules for doctors</p>
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h2 class="mb-0"><i class="bi bi-calendar-week"></i> Doctor Availability Management</h2>
+                <p class="mb-0 mt-1 opacity-75">Manage weekly schedules for doctors</p>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <i class="bi bi-plus-circle"></i> Add New Schedule
+                </button>
+            </div>
         </div>
-        <div class="col-auto">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-                <i class="bi bi-plus-circle"></i> Add New Schedule
-            </button>
+    </div>
+
+    <!-- Founder Identity Strip -->
+    <div class="alert" style="background: linear-gradient(135deg, rgba(110, 134, 98, 0.08) 0%, rgba(79, 102, 69, 0.05) 100%); border-left: 3px solid var(--primary); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <img src="images/img1.jpeg" alt="Founder" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
+        <div style="font-size: 0.875rem; line-height: 1.4;">
+            <div style="font-weight: 600; color: var(--primary);">Seela Suwa Herath Bikshu Gilan Arana</div>
+            <div style="opacity: 0.75; font-size: 0.8rem;">Founded by Ven. Solewewa Chandrasiri Thero</div>
         </div>
     </div>
 

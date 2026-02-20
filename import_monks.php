@@ -121,56 +121,8 @@ $conn->close();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/premium-theme.css">
-    <style>
-        body {
-            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-        }
-        .page-header {
-            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 15px;
-            margin-bottom: 2rem;
-            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
-        }
-        .upload-area {
-            border: 3px dashed #FF6B35;
-            border-radius: 15px;
-            padding: 3rem;
-            text-align: center;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .upload-area:hover {
-            border-color: #F7931E;
-            background: #FFF8F0;
-        }
-        .upload-area i {
-            font-size: 4rem;
-            color: #FF6B35;
-            margin-bottom: 1rem;
-        }
-        .step-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .step-number {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #FF6B35, #F7931E);
-            color: white;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-right: 1rem;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/monastery-theme.css">
+    <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
 </head>
 <body>
 
@@ -179,6 +131,15 @@ $conn->close();
     <div class="page-header">
         <h2 class="mb-0"><i class="bi bi-file-earmark-excel"></i> Import Monk Data from Excel</h2>
         <p class="mb-0 mt-1 opacity-75">Bulk upload monk information from Excel spreadsheet</p>
+    </div>
+
+    <!-- Founder Identity Strip -->
+    <div class="alert" style="background: linear-gradient(135deg, rgba(110, 134, 98, 0.08) 0%, rgba(79, 102, 69, 0.05) 100%); border-left: 3px solid var(--primary); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <img src="images/img1.jpeg" alt="Founder" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
+        <div style="font-size: 0.875rem; line-height: 1.4;">
+            <div style="font-weight: 600; color: var(--primary);">Seela Suwa Herath Bikshu Gilan Arana</div>
+            <div style="opacity: 0.75; font-size: 0.8rem;">Founded by Ven. Solewewa Chandrasiri Thero</div>
+        </div>
     </div>
 
     <?php if ($error): ?>
@@ -200,7 +161,7 @@ $conn->close();
         <div class="col-md-8">
             <!-- Upload Form -->
             <div class="card shadow-sm mb-4">
-                <div class="card-header" style="background: linear-gradient(135deg, #FF6B35, #F7931E); color: white;">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border-bottom: 3px solid var(--accent);">
                     <h5 class="mb-0"><i class="bi bi-cloud-upload"></i> Upload Excel File</h5>
                 </div>
                 <div class="card-body">

@@ -88,24 +88,56 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
+    <link rel="stylesheet" href="assets/css/monastery-theme.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --monastery-green: #C2410C;
-            --monastery-dark-green: #9A3412;
-            --monastery-gold: #F59E0B;
-            --monastery-cream: #FFF7ED;
-            --monastery-accent: #1E3A8A;
+            --monastery-green: #A67C52;
+            --monastery-dark-green: #8D6844;
+            --monastery-gold: #A67C52;
+            --monastery-cream: #FAF8F3;
+            --monastery-accent: #7A1E1E;
         }
         body {
             background: linear-gradient(135deg, var(--monastery-cream) 0%, #eee3cc 100%);
         }
         .hero-section {
-            background: linear-gradient(135deg, rgba(45, 80, 22, 0.95) 0%, rgba(26, 48, 9, 0.95) 100%);
+            background: linear-gradient(135deg, rgba(64, 83, 56, 0.95) 0%, rgba(42, 58, 36, 0.95) 100%);
             color: white;
             padding: 60px 0;
             text-align: center;
             box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .mission-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 999px;
+            padding: 6px 16px;
+            font-size: 0.92rem;
+            margin-bottom: 14px;
+        }
+
+        .founder-strip {
+            background: #fff;
+            border-radius: 16px;
+            padding: 18px;
+            margin-top: -24px;
+            position: relative;
+            z-index: 5;
+            border: 1px solid rgba(110, 134, 98, 0.15);
+            box-shadow: 0 12px 24px rgba(32, 42, 29, 0.12);
+        }
+
+        .founder-photo {
+            width: 84px;
+            height: 84px;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 3px solid #ECE5D8;
         }
         .stat-card {
             background: white;
@@ -122,7 +154,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
         .stat-number {
             font-size: 2.5rem;
             font-weight: bold;
-            color: var(--monastery-green);
+            color: var(--primary);
         }
         .stat-label {
             color: #666;
@@ -150,10 +182,18 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         .balance-positive {
-            color: #28a745;
+            color: var(--success);
         }
         .balance-negative {
-            color: #dc3545;
+            color: var(--danger);
+        }
+
+        .stat-icon { font-size: 3rem; }
+
+        .section-title {
+            color: var(--monastery-accent);
+            margin-bottom: 20px;
+            font-weight: 700;
         }
 
         .btn-helping-hand {
@@ -190,9 +230,24 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
 <!-- Hero Section -->
 <section class="hero-section">
     <div class="container">
+        <div class="mission-badge"><i class="bi bi-shield-heart"></i> Public Trust & Healthcare Impact</div>
         <h1 class="mb-3"><i class="bi bi-bar-chart-line"></i> Financial Transparency</h1>
-        <p class="lead">See clearly how helping-hand donations support monk healthcare</p>
+        <p class="lead">See exactly how donations are used for monk healthcare, medicines, and care services.</p>
         <p class="small">Updated in real-time • Year <?= $current_year ?></p>
+    </div>
+</section>
+
+<section class="container">
+    <div class="founder-strip interactive-lift">
+        <div class="row g-3 align-items-center">
+            <div class="col-auto">
+                <img src="images/img1.jpeg" alt="Solewewa Chandrasiri Thero - Founder" class="founder-photo">
+            </div>
+            <div class="col">
+                <h6 class="mb-1 section-title"><i class="bi bi-award"></i> Founded by Ven. Solewewa Chandrasiri Thero</h6>
+                <p class="mb-0 text-muted">This system exists to serve monk healthcare with dignity, transparency, and compassionate donor support.</p>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -202,7 +257,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
         <div class="row">
             <div class="col-md-3">
                 <div class="stat-card">
-                    <i class="bi bi-cash-coin" style="font-size: 3rem; color: #28a745;"></i>
+                    <i class="bi bi-cash-coin stat-icon icon-tone-success"></i>
                     <div class="stat-number">Rs. <?= number_format($donations_stats['total'] ?? 0, 0) ?></div>
                     <div class="stat-label">Total Donations</div>
                     <small class="text-muted"><?= number_format($donations_stats['count'] ?? 0) ?> contributions</small>
@@ -210,7 +265,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
-                    <i class="bi bi-receipt" style="font-size: 3rem; color: #dc3545;"></i>
+                    <i class="bi bi-receipt stat-icon icon-tone-danger"></i>
                     <div class="stat-number">Rs. <?= number_format($expenses_stats['total'] ?? 0, 0) ?></div>
                     <div class="stat-label">Total Expenses</div>
                     <small class="text-muted"><?= number_format($expenses_stats['count'] ?? 0) ?> bills paid</small>
@@ -218,7 +273,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
-                    <i class="bi bi-calculator" style="font-size: 3rem; color: <?= $balance >= 0 ? '#28a745' : '#dc3545' ?>;"></i>
+                    <i class="bi bi-calculator stat-icon <?= $balance >= 0 ? 'icon-tone-success' : 'icon-tone-danger' ?>"></i>
                     <div class="stat-number <?= $balance >= 0 ? 'balance-positive' : 'balance-negative' ?>">
                         Rs. <?= number_format(abs($balance), 0) ?>
                     </div>
@@ -228,7 +283,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
-                    <i class="bi bi-graph-up-arrow" style="font-size: 3rem; color: var(--monastery-green);"></i>
+                    <i class="bi bi-graph-up-arrow stat-icon icon-tone-primary"></i>
                     <div class="stat-number">Rs. <?= number_format($donations_stats['average'] ?? 0, 0) ?></div>
                     <div class="stat-label">Average Donation</div>
                     <small class="text-muted">Per contribution</small>
@@ -245,7 +300,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
             <!-- Donation Breakdown -->
             <div class="col-md-6">
                 <div class="chart-card">
-                    <h5 style="color: var(--monastery-accent); margin-bottom: 20px;">
+                    <h5 class="section-title">
                         <i class="bi bi-pie-chart"></i> How Donations Are Categorized
                     </h5>
                     <canvas id="donationsChart" height="300"></canvas>
@@ -255,7 +310,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
             <!-- Expense Breakdown -->
             <div class="col-md-6">
                 <div class="chart-card">
-                    <h5 style="color: #dc3545; margin-bottom: 20px;">
+                    <h5 class="section-title">
                         <i class="bi bi-pie-chart-fill"></i> How Funds Are Used
                     </h5>
                     <canvas id="expensesChart" height="300"></canvas>
@@ -267,7 +322,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
         <div class="row mt-4">
             <div class="col-12">
                 <div class="chart-card">
-                    <h5 style="color: var(--monastery-accent); margin-bottom: 20px;">
+                    <h5 class="section-title">
                         <i class="bi bi-graph-up"></i> Monthly Donation Trend <?= $current_year ?>
                     </h5>
                     <canvas id="monthlyChart" height="100"></canvas>
@@ -281,7 +336,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
 <section class="py-4">
     <div class="container">
         <div class="chart-card">
-            <h5 style="color: var(--monastery-accent); margin-bottom: 20px;">
+            <h5 class="section-title">
                 <i class="bi bi-clock-history"></i> Recent Financial Activities
             </h5>
             <div class="row">
@@ -422,6 +477,7 @@ new Chart(monthlyCtx, {
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/ui-interactions.js"></script>
 </body>
 </html>
 <?php $con->close(); ?>
