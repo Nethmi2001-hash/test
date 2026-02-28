@@ -279,7 +279,7 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
                         <tr>
                             <th>Donor</th>
                             <th>Amount</th>
-                            <th>Payment</th>
+                            <th>Receipt</th>
                             <th>Status</th>
                             <th>Date</th>
                             <th>Actions</th>
@@ -302,20 +302,12 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
                                 <br><small class="text-muted"><?= htmlspecialchars($donation['category_name']) ?></small>
                             </td>
                             <td>
-                                <?php
-                                $method_badge = [
-                                    'cash' => 'badge-success',
-                                    'bank_transfer' => 'badge-primary',
-                                    'card' => 'badge-neutral',
-                                    'payhere' => 'badge-warning'
-                                ];
-                                $badge_class = $method_badge[$donation['payment_method']] ?? 'badge-neutral';
-                                ?>
-                                <span class="badge-modern <?= $badge_class ?>">
-                                    <?= strtoupper(str_replace('_', ' ', $donation['payment_method'])) ?>
-                                </span>
-                                <?php if ($donation['reference_number']): ?>
-                                    <br><small class="text-muted">Ref: <?= htmlspecialchars($donation['reference_number']) ?></small>
+                                <?php if (!empty($donation['slip_path'])): ?>
+                                    <a href="#" class="btn-modern btn-primary-modern btn-sm-modern" onclick="viewSlip('<?= htmlspecialchars($donation['slip_path']) ?>', '<?= htmlspecialchars($donation['donor_name']) ?>')" title="View Uploaded Bank Slip">
+                                        <i class="bi bi-image"></i> View Slip
+                                    </a>
+                                <?php else: ?>
+                                    <span class="text-muted"><i class="bi bi-dash-circle"></i> No Slip</span>
                                 <?php endif; ?>
                             </td>
                             <td>
@@ -665,6 +657,28 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
 
 <?php include 'includes/footer.php'; ?>
 
+<!-- Bank Slip Viewer Modal -->
+<div class="modal fade" id="slipViewerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius:16px;overflow:hidden;">
+            <div class="modal-header" style="background:linear-gradient(135deg,#065f46,#059669);color:#fff;border:none;">
+                <h5 class="modal-title"><i class="bi bi-image"></i> <span id="slipModalTitle">Bank Slip</span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center p-4" style="background:#f8fafc;">
+                <img id="slipImage" src="" alt="Bank Slip" style="max-width:100%;max-height:70vh;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.12);cursor:zoom-in;" onclick="window.open(this.src,'_blank')">
+                <p class="text-muted mt-3 mb-0"><small><i class="bi bi-zoom-in"></i> Click image to open full size in new tab</small></p>
+            </div>
+            <div class="modal-footer" style="border:none;justify-content:center;">
+                <a id="slipDownloadLink" href="#" download class="btn-modern btn-primary-modern btn-sm-modern">
+                    <i class="bi bi-download"></i> Download Slip
+                </a>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 function editDonation(donation) {
@@ -725,6 +739,13 @@ function initiatePayHere() {
 window.addEventListener('load', function() {
     new AdvancedSearch('donations');
 });
+
+function viewSlip(slipPath, donorName) {
+    document.getElementById('slipImage').src = slipPath;
+    document.getElementById('slipDownloadLink').href = slipPath;
+    document.getElementById('slipModalTitle').textContent = 'Bank Slip - ' + donorName;
+    new bootstrap.Modal(document.getElementById('slipViewerModal')).show();
+}
 </script>
 
 <!-- Advanced Search System -->
