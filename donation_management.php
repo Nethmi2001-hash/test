@@ -655,7 +655,7 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
 <div class="modal fade" id="slipViewerModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content" style="border-radius:16px;overflow:hidden;">
-            <div class="modal-header" style="background:linear-gradient(135deg,#065f46,#059669);color:#fff;border:none;">
+            <div class="modal-header" style="background:linear-gradient(135deg,#c2410c,#f97316);color:#fff;border:none;">
                 <h5 class="modal-title"><i class="bi bi-image"></i> <span id="slipModalTitle">Bank Slip</span></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>

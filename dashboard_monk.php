@@ -223,8 +223,8 @@ if ($monk_id) {
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="--stat-color: #059669;">
-                <div class="stat-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-check-circle"></i></div>
+            <div class="stat-card" style="--stat-color: #f97316;">
+                <div class="stat-icon" style="background:#fff7ed;color:#f97316;"><i class="bi bi-check-circle"></i></div>
                 <div class="stat-info">
                     <div class="stat-label">Completed Visits</div>
                     <div class="stat-value"><?= $stats['completed_appointments'] ?></div>
@@ -345,7 +345,7 @@ if ($monk_id) {
                     <?php endif; ?>
                     <?php if ($rec['medication']): ?>
                     <div class="col-md-4">
-                        <div style="font-weight:600;color:#059669;margin-bottom:4px;">Medication</div>
+                        <div style="font-weight:600;color:#f97316;margin-bottom:4px;">Medication</div>
                         <div style="color:var(--text-secondary);"><?= htmlspecialchars($rec['medication']) ?></div>
                     </div>
                     <?php endif; ?>
@@ -389,7 +389,7 @@ if ($monk_id) {
         </div>
         <div class="col-xl-4 col-md-6">
             <a href="doctor_management.php" class="quick-action-card">
-                <div class="quick-action-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-person-badge"></i></div>
+                <div class="quick-action-icon" style="background:#fff7ed;color:#f97316;"><i class="bi bi-person-badge"></i></div>
                 <span class="quick-action-label">View Doctors</span>
             </a>
         </div>

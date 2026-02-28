@@ -106,8 +106,8 @@ if ($r) $total_monastery_expenses = $r->fetch_assoc()['t'];
     <!-- Stat Cards -->
     <div class="row g-4 mb-4 stagger-children">
         <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="--stat-color: #059669;">
-                <div class="stat-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-cash-stack"></i></div>
+            <div class="stat-card" style="--stat-color: #f97316;">
+                <div class="stat-icon" style="background:#fff7ed;color:#f97316;"><i class="bi bi-cash-stack"></i></div>
                 <div class="stat-info">
                     <div class="stat-label">Total Donated</div>
                     <div class="stat-value">Rs.<?= number_format($stats['total_donated']) ?></div>
@@ -191,7 +191,7 @@ if ($r) $total_monastery_expenses = $r->fetch_assoc()['t'];
                 </div>
                 <div class="col-md-4 text-center">
                     <?php $balance = $total_monastery_donations - $total_monastery_expenses; ?>
-                    <div style="font-size:28px;font-weight:800;color:<?= $balance >= 0 ? '#059669' : '#dc2626' ?>;">Rs.<?= number_format(abs($balance)) ?></div>
+                    <div style="font-size:28px;font-weight:800;color:<?= $balance >= 0 ? '#f97316' : '#dc2626' ?>;">Rs.<?= number_format(abs($balance)) ?></div>
                     <div style="font-size:13px;color:var(--text-secondary);margin-top:4px;"><?= $balance >= 0 ? 'Balance' : 'Deficit' ?></div>
                 </div>
             </div>
@@ -276,7 +276,7 @@ if ($r) $total_monastery_expenses = $r->fetch_assoc()['t'];
     <div class="row g-3 mb-4 stagger-children">
         <div class="col-xl-3 col-md-6">
             <a href="public_donate.php" class="quick-action-card">
-                <div class="quick-action-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-heart"></i></div>
+                <div class="quick-action-icon" style="background:#fff7ed;color:#f97316;"><i class="bi bi-heart"></i></div>
                 <span class="quick-action-label">Make Donation</span>
             </a>
         </div>
@@ -312,12 +312,12 @@ new Chart(trendCtx, {
         datasets: [{
             label: 'Donations (Rs.)',
             data: <?= json_encode(array_column($monthly_trend, 'amount')) ?>,
-            backgroundColor: 'rgba(5, 150, 105, 0.08)',
-            borderColor: '#059669',
+            backgroundColor: 'rgba(249, 115, 22, 0.08)',
+            borderColor: '#f97316',
             borderWidth: 2.5,
             fill: true,
             tension: 0.4,
-            pointBackgroundColor: '#059669',
+            pointBackgroundColor: '#f97316',
             pointBorderColor: '#fff',
             pointBorderWidth: 2,
             pointRadius: 5,
@@ -338,7 +338,7 @@ new Chart(trendCtx, {
 <?php if (count($by_category) > 0): ?>
 // Category Chart
 const catCtx = document.getElementById('categoryChart').getContext('2d');
-const catColors = ['#059669', '#0284c7', '#7c3aed', '#d97706', '#dc2626', '#0891b2'];
+const catColors = ['#f97316', '#0284c7', '#7c3aed', '#d97706', '#dc2626', '#0891b2'];
 new Chart(catCtx, {
     type: 'doughnut',
     data: {

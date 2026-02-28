@@ -165,7 +165,7 @@ $conn->close();
             </div>
         </div>
         <div class="col-xl-4 col-md-6">
-            <div class="stat-card" style="--stat-color: #059669;">
+            <div class="stat-card" style="--stat-color: #f97316;">
                 <div class="stat-icon blue"><i class="bi bi-check-circle-fill"></i></div>
                 <div class="stat-info">
                     <div class="stat-label">Active Monks</div>

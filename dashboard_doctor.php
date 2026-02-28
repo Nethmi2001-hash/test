@@ -165,8 +165,8 @@ if ($doctor_id) {
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="--stat-color: #059669;">
-                <div class="stat-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-check2-circle"></i></div>
+            <div class="stat-card" style="--stat-color: #f97316;">
+                <div class="stat-icon" style="background:#fff7ed;color:#f97316;"><i class="bi bi-check2-circle"></i></div>
                 <div class="stat-info">
                     <div class="stat-label">Completed (Month)</div>
                     <div class="stat-value"><?= $stats['month_completed'] ?></div>
@@ -360,7 +360,7 @@ if ($doctor_id) {
         </div>
         <div class="col-xl-3 col-md-6">
             <a href="doctor_availability.php" class="quick-action-card">
-                <div class="quick-action-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-clock-history"></i></div>
+                <div class="quick-action-icon" style="background:#fff7ed;color:#f97316;"><i class="bi bi-clock-history"></i></div>
                 <span class="quick-action-label">My Availability</span>
             </a>
         </div>

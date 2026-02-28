@@ -343,12 +343,12 @@ new Chart(weeklyCtx, {
         datasets: [{
             label: 'Appointments',
             data: <?= json_encode(array_column($weekly_data, 'count')) ?>,
-            backgroundColor: 'rgba(16, 185, 129, 0.08)',
-            borderColor: '#059669',
+            backgroundColor: 'rgba(249, 115, 22, 0.08)',
+            borderColor: '#f97316',
             borderWidth: 2.5,
             fill: true,
             tension: 0.4,
-            pointBackgroundColor: '#059669',
+            pointBackgroundColor: '#f97316',
             pointBorderColor: '#fff',
             pointBorderWidth: 2,
             pointRadius: 5,
@@ -375,7 +375,7 @@ new Chart(financialCtx, {
         datasets: [{
             label: 'Donations',
             data: <?= json_encode(array_column($monthly_financial, 'donations')) ?>,
-            backgroundColor: '#10b981',
+            backgroundColor: '#f97316',
             borderRadius: 6,
             borderSkipped: false
         }, {

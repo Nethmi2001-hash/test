@@ -12,11 +12,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --green-500: #6E8662;
-            --green-600: #5C7350;
-            --green-700: #4A6040;
-            --green-50: #f3f6f1;
-            --green-100: #e4ebe0;
+            --green-500: #f97316;
+            --green-600: #ea580c;
+            --green-700: #c2410c;
+            --green-50: #fff7ed;
+            --green-100: #ffedd5;
         }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -136,7 +136,7 @@
             margin-bottom: 12px;
         }
         .bg-green  { background: linear-gradient(135deg, var(--green-500), var(--green-700)); }
-        .bg-emerald { background: linear-gradient(135deg, #059669, #047857); }
+        .bg-emerald { background: linear-gradient(135deg, #f97316, #c2410c); }
         .bg-violet { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
         .bg-amber  { background: linear-gradient(135deg, #d97706, #b45309); }
         .bg-cyan   { background: linear-gradient(135deg, #0891b2, #0e7490); }
@@ -276,7 +276,7 @@
         <h1>Monastery Healthcare System</h1>
         <p class="subtitle">Giribawa Seela Suva Herath Bhikkhu Hospital</p>
         <div class="d-flex justify-content-center gap-2 flex-wrap">
-            <span class="badge-status text-white" style="background:#059669;">
+            <span class="badge-status text-white" style="background:#f97316;">
                 <i class="bi bi-check-circle-fill me-1"></i>90% Complete
             </span>
             <span class="badge-status text-white" style="background:#0891b2;">

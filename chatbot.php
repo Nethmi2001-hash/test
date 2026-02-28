@@ -70,15 +70,7 @@ while ($row = $categories_result->fetch_assoc()) {
             width: 44px;
             height: 44px;
             border-radius: 12px;
-            background: linear-gradient(135deg, #6E8662 0%, #4a6340 100%);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
         .chat-header-info h5 {
             margin: 0;
             font-size: 16px;
@@ -97,16 +89,7 @@ while ($row = $categories_result->fetch_assoc()) {
             align-items: center;
             gap: 5px;
             font-size: 11px;
-            color: var(--success, #059669);
-            font-weight: 500;
-        }
-
-        .chat-header-status::before {
-            content: '';
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--success, #059669);
+            color: var(--success, #f97316);
             animation: pulse-dot 2s infinite;
         }
 
@@ -174,7 +157,7 @@ while ($row = $categories_result->fetch_assoc()) {
         }
 
         .message.bot .message-avatar {
-            background: linear-gradient(135deg, #6E8662 0%, #4a6340 100%);
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
             color: #fff;
         }
 
@@ -199,9 +182,7 @@ while ($row = $categories_result->fetch_assoc()) {
         }
 
         .message.user .message-content {
-            background: #6E8662;
-            color: #ffffff;
-            border-top-right-radius: 4px;
+            background: #f97316;
         }
 
         /* Typing Indicator */
@@ -278,10 +259,9 @@ while ($row = $categories_result->fetch_assoc()) {
         }
 
         .quick-question-btn:hover {
-            background: #6E8662;
+            background: #f97316;
             color: #fff;
-            border-color: #6E8662;
-            transform: translateY(-1px);
+            border-color: #f97316;
         }
 
         /* Chat Input Area */
@@ -313,8 +293,8 @@ while ($row = $categories_result->fetch_assoc()) {
 
         .chat-input-row .form-control-modern:focus {
             outline: none;
-            border-color: #6E8662;
-            box-shadow: 0 0 0 3px rgba(110, 134, 98, 0.12);
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
         }
 
         .chat-input-row .form-control-modern::placeholder {
@@ -326,7 +306,7 @@ while ($row = $categories_result->fetch_assoc()) {
             height: 44px;
             border-radius: 12px;
             border: none;
-            background: linear-gradient(135deg, #6E8662 0%, #4a6340 100%);
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
             color: #fff;
             display: flex;
             align-items: center;
@@ -339,7 +319,7 @@ while ($row = $categories_result->fetch_assoc()) {
 
         .chat-send-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(110, 134, 98, 0.35);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
         }
 
         .chat-send-btn:active {
@@ -365,7 +345,7 @@ while ($row = $categories_result->fetch_assoc()) {
 
         .chat-meta-row select:focus {
             outline: none;
-            border-color: #6E8662;
+            border-color: #f97316;
         }
 
         .chat-meta-row small {
@@ -374,7 +354,7 @@ while ($row = $categories_result->fetch_assoc()) {
         }
 
         .chat-meta-row a {
-            color: #6E8662;
+            color: #f97316;
             font-weight: 500;
         }
 
@@ -387,14 +367,14 @@ while ($row = $categories_result->fetch_assoc()) {
             background: var(--bg-body, #f8fafc);
             padding: 14px;
             border-radius: 10px;
-            border-left: 3px solid #6E8662;
+            border-left: 3px solid #f97316;
             margin: 10px 0;
             font-size: 13px;
         }
 
         /* Modal overrides */
         .modal-header.chat-modal-header {
-            background: linear-gradient(135deg, #6E8662 0%, #4a6340 100%);
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
             color: #fff;
             border-radius: var(--border-radius-lg, 16px) var(--border-radius-lg, 16px) 0 0;
         }
@@ -416,7 +396,7 @@ while ($row = $categories_result->fetch_assoc()) {
         }
 
         [data-theme="dark"] .message.user .message-content {
-            background: #6E8662;
+            background: #f97316;
             color: #fff;
         }
 
@@ -427,9 +407,9 @@ while ($row = $categories_result->fetch_assoc()) {
         }
 
         [data-theme="dark"] .quick-question-btn:hover {
-            background: #6E8662;
+            background: #f97316;
             color: #fff;
-            border-color: #6E8662;
+            border-color: #f97316;
         }
 
         [data-theme="dark"] .chat-card,
@@ -503,7 +483,7 @@ while ($row = $categories_result->fetch_assoc()) {
                 </div>
 
                 <div class="typing-indicator" id="typingIndicator">
-                    <div class="message-avatar" style="width:28px;height:28px;border-radius:8px;font-size:13px;background:linear-gradient(135deg,#6E8662,#4a6340);color:#fff;display:flex;align-items:center;justify-content:center;">🪷</div>
+                    <div class="message-avatar" style="width:28px;height:28px;border-radius:8px;font-size:13px;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;display:flex;align-items:center;justify-content:center;">🪷</div>
                     <div class="typing-bubble">
                         <span></span><span></span><span></span>
                         <small class="ms-1" style="color:var(--text-secondary,#64748b);">AI is thinking...</small>
@@ -583,7 +563,7 @@ define('OPENAI_TEMPERATURE', 0.7);
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <a href="https://platform.openai.com/api-keys" target="_blank" class="btn" style="background:#6E8662;color:#fff;border:none;">
+                    <a href="https://platform.openai.com/api-keys" target="_blank" class="btn" style="background:#f97316;color:#fff;border:none;">
                         <i class="bi bi-box-arrow-up-right"></i> Get API Key
                     </a>
                 </div>

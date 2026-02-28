@@ -107,20 +107,20 @@ $stats = $stats_result->fetch_assoc();
             color: var(--primary-700);
         }
         .topbar-links .btn-login {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #1a3a2a;
+            background: #fff;
+            color: #ea580c;
             padding: 8px 20px;
             border-radius: var(--border-radius-full);
             font-weight: 700;
         }
         .topbar-links .btn-login:hover {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: #1a3a2a;
+            background: #ffedd5;
+            color: #c2410c;
         }
 
         /* ---- Hero Section ---- */
         .hero-section {
-            background: linear-gradient(160deg, #1a3a2a 0%, #0f3d1e 30%, #1a4a2a 60%, #0d2818 100%);
+            background: linear-gradient(160deg, #9a3412 0%, #c2410c 30%, #ea580c 60%, #f97316 100%);
             color: #fff;
             padding: 100px 24px 110px;
             text-align: center;
@@ -171,7 +171,7 @@ $stats = $stats_result->fetch_assoc();
             text-shadow: 0 2px 24px rgba(0,0,0,0.18);
         }
         .hero-section h1 .hero-highlight {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            background: linear-gradient(135deg, #fff, #ffedd5);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -185,8 +185,8 @@ $stats = $stats_result->fetch_assoc();
             line-height: 1.65;
         }
         .hero-section .btn-hero {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #1a3a2a;
+            background: #fff;
+            color: #ea580c;
             font-weight: 800;
             padding: 16px 40px;
             border-radius: var(--border-radius-full);
@@ -197,12 +197,12 @@ $stats = $stats_result->fetch_assoc();
             align-items: center;
             gap: 10px;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.30);
+            box-shadow: 0 4px 20px rgba(255,255,255,0.25);
         }
         .hero-section .btn-hero:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 32px rgba(251, 191, 36, 0.40);
-            color: #1a3a2a;
+            box-shadow: 0 8px 32px rgba(255,255,255,0.35);
+            color: #c2410c;
         }
         .hero-trust {
             display: flex;
@@ -234,7 +234,7 @@ $stats = $stats_result->fetch_assoc();
             max-width: 800px;
             margin-left: auto;
             margin-right: auto;
-            border-left: 4px solid #fbbf24;
+            border-left: 4px solid #f97316;
         }
         .founder-photo {
             width: 80px;
@@ -332,7 +332,7 @@ $stats = $stats_result->fetch_assoc();
         }
         .form-control-modern:focus {
             border-color: var(--primary-400);
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
             background: #fff;
             outline: none;
         }
@@ -364,7 +364,7 @@ $stats = $stats_result->fetch_assoc();
         .category-card.selected {
             border-color: var(--primary-500);
             background: var(--primary-50);
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
         }
         .category-card strong { color: var(--slate-700); font-size: 0.92rem; }
         .category-card p { color: var(--slate-500); font-size: 0.82rem; }
@@ -405,7 +405,7 @@ $stats = $stats_result->fetch_assoc();
         }
         .btn-primary-modern:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(5, 150, 105, 0.3);
+            box-shadow: 0 8px 24px rgba(249, 115, 22, 0.3);
             color: #fff;
         }
 
@@ -535,19 +535,19 @@ $stats = $stats_result->fetch_assoc();
             align-items: center;
             justify-content: center;
             font-size: 1.4rem;
-            box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35);
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.35);
             text-decoration: none;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .chatbot-fab:hover {
             transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 10px 28px rgba(5, 150, 105, 0.45);
+            box-shadow: 0 10px 28px rgba(249, 115, 22, 0.45);
             color: #fff;
         }
 
         /* ---- Bank Details Card ---- */
         .bank-details-card {
-            border: 2px solid var(--primary-200, #bbf7d0);
+            border: 2px solid var(--primary-200, #fed7aa);
             border-radius: var(--border-radius-lg, 16px);
             overflow: hidden;
             background: #fff;
@@ -843,7 +843,7 @@ $stats = $stats_result->fetch_assoc();
         <div class="row g-4">
             <div class="col-md-4">
                 <div class="impact-card">
-                    <div class="impact-icon" style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #16a34a;"><i class="bi bi-hospital"></i></div>
+                    <div class="impact-icon" style="background: linear-gradient(135deg, #fff7ed, #ffedd5); color: #ea580c;"><i class="bi bi-hospital"></i></div>
                     <h5>Medical Treatment</h5>
                     <p>Consultations, surgeries, and ongoing medical care for monks in need of specialist attention</p>
                 </div>
@@ -1194,7 +1194,7 @@ $stats = $stats_result->fetch_assoc();
 <!-- Footer -->
 <footer class="public-footer">
     <p class="mb-1">&copy; <?= date('Y') ?> <strong>Seela Suwa Herath Bikshu Gilan Arana</strong>. All rights reserved.</p>
-    <p class="mb-0" style="font-size: 0.82rem;"><i class="bi bi-shield-check" style="color: #fbbf24;"></i> All donations are transparently managed &amp; verified within 24-48 hours</p>
+    <p class="mb-0" style="font-size: 0.82rem;"><i class="bi bi-shield-check" style="color: #f97316;"></i> All donations are transparently managed &amp; verified within 24-48 hours</p>
 </footer>
 
 <script>
@@ -1376,7 +1376,7 @@ document.getElementById('donationForm').addEventListener('submit', function(e) {
 }
 
 .chat-widget-header {
-    background: linear-gradient(135deg, #4A6040 0%, #3D5035 100%);
+    background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
     color: #fff;
     padding: 16px 18px;
     display: flex;
@@ -1430,7 +1430,7 @@ document.getElementById('donationForm').addEventListener('submit', function(e) {
     width: 30px;
     height: 30px;
     border-radius: 8px;
-    background: linear-gradient(135deg, #6E8662, #4A6040);
+    background: linear-gradient(135deg, #f97316, #ea580c);
     color: #fff;
     display: flex;
     align-items: center;
@@ -1453,7 +1453,7 @@ document.getElementById('donationForm').addEventListener('submit', function(e) {
     border-top-left-radius: 4px;
 }
 .cw-msg.cw-user .cw-bubble {
-    background: linear-gradient(135deg, #6E8662, #4A6040);
+    background: linear-gradient(135deg, #f97316, #ea580c);
     color: #fff;
     border-top-right-radius: 4px;
 }
@@ -1467,20 +1467,20 @@ document.getElementById('donationForm').addEventListener('submit', function(e) {
     background: #fff;
 }
 .chat-widget-quick button {
-    background: #f0fdf4;
-    border: 1px solid #dcfce7;
+    background: #fff7ed;
+    border: 1px solid #ffedd5;
     border-radius: 99px;
     padding: 5px 12px;
     font-size: 11.5px;
-    color: #3D5035;
+    color: #9a3412;
     cursor: pointer;
     transition: all 0.2s;
     font-weight: 500;
 }
 .chat-widget-quick button:hover {
-    background: #6E8662;
+    background: #f97316;
     color: #fff;
-    border-color: #6E8662;
+    border-color: #f97316;
 }
 
 .chat-widget-input {
@@ -1500,13 +1500,13 @@ document.getElementById('donationForm').addEventListener('submit', function(e) {
     outline: none;
     transition: border-color 0.2s;
 }
-.chat-widget-input input:focus { border-color: #6E8662; box-shadow: 0 0 0 3px rgba(110,134,98,0.1); }
+.chat-widget-input input:focus { border-color: #f97316; box-shadow: 0 0 0 3px rgba(249,115,22,0.1); }
 .chat-widget-input button {
     width: 38px;
     height: 38px;
     border-radius: 10px;
     border: none;
-    background: linear-gradient(135deg, #6E8662, #4A6040);
+    background: linear-gradient(135deg, #f97316, #ea580c);
     color: #fff;
     display: flex;
     align-items: center;
