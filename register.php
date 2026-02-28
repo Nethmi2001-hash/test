@@ -238,10 +238,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 
-    <a href="public_donate.php" class="donation-cta" title="Support Monastery Healthcare" style="position:fixed;bottom:20px;right:20px;background:linear-gradient(135deg,var(--primary-600),var(--primary-700));color:#fff;padding:14px 24px;border-radius:50px;font-size:14px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(110,134,98,0.4);z-index:9999;border:2px solid rgba(255,255,255,0.3);transition:all 0.3s;">
-        <i class="bi bi-hearts"></i> Offer Helping Hand
-    </a>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
