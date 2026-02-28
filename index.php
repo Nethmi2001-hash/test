@@ -221,7 +221,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             z-index: 2;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 120px 24px 80px;
+            padding: 100px 24px 64px;
             display: grid;
             grid-template-columns: 1fr 1fr;
             align-items: center;
@@ -448,7 +448,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
 
         /* ========== SECTION COMMON ========== */
         .hp-section {
-            padding: 100px 24px;
+            padding: 64px 24px;
         }
         .hp-section-inner {
             max-width: 1200px;
@@ -547,9 +547,9 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
         .hp-about-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 64px;
+            gap: 48px;
             align-items: center;
-            margin-top: 48px;
+            margin-top: 32px;
         }
         .hp-about-images {
             display: grid;
@@ -629,7 +629,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
         }
         .hp-donate-inner .hp-section-desc {
             color: rgba(255,255,255,0.7);
-            margin: 0 auto 36px;
+            margin: 0 auto 24px;
         }
 
         /* ========== ROLES ========== */
@@ -637,7 +637,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 20px;
-            margin-top: 48px;
+            margin-top: 32px;
         }
         .hp-role-card {
             text-align: center;
@@ -690,7 +690,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             padding: 48px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.02), 0 16px 40px rgba(0,0,0,0.04);
             border: 1px solid var(--slate-200);
-            margin-top: 48px;
+            margin-top: 32px;
         }
         .hp-founder-img {
             width: 200px;
@@ -831,7 +831,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             .hp-features-grid { grid-template-columns: 1fr; }
             .hp-stats-card { grid-template-columns: repeat(2, 1fr); gap: 24px; padding: 28px 24px; }
             .hp-roles-grid { grid-template-columns: 1fr; max-width: 360px; margin-left: auto; margin-right: auto; }
-            .hp-section { padding: 64px 20px; }
+            .hp-section { padding: 48px 16px; }
             .hp-hero-badge { margin-left: auto; margin-right: auto; }
             .hp-footer-grid { grid-template-columns: 1fr; gap: 32px; }
             .hp-footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
