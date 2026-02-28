@@ -1,13 +1,13 @@
 <?php
-session_start();
-
+require_once __DIR__ . '/includes/auth_enhanced.php';
 require_once __DIR__ . '/includes/db_config.php';
 
-$con = getDBConnection();
+configureSession();
 
 $error = "";
 $success = "";
 
+// Check for logout or timeout messages
 if (isset($_GET['logout']) && $_GET['logout'] == 'success') {
     $success = "You have been logged out successfully.";
 }
@@ -16,55 +16,51 @@ if (isset($_GET['timeout']) && $_GET['timeout'] == '1') {
     $error = "Your session has expired. Please login again.";
 }
 
+// Redirect if already logged in
+if (isAuthenticated()) {
+    header("Location: dashboard.php");
+    exit();
+}
+
+// Handle login form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = trim($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
-
-    if (empty($email) || empty($password)) {
-        $error = "Both email and password are required.";
+    // CSRF Protection
+    if (!isset($_POST['csrf_token']) || !verifyCSRFToken($_POST['csrf_token'])) {
+        $error = "Security token mismatch. Please try again.";
     } else {
-        $stmt = $con->prepare("SELECT u.user_id, u.name, u.email, u.password_hash, u.role_id, r.role_name 
-                               FROM users u 
-                               JOIN roles r ON u.role_id = r.role_id 
-                               WHERE u.email = ? AND u.status = 'active'
-                               LIMIT 1");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-
-        $user = null;
-        if (method_exists($stmt, 'get_result')) {
-            $result = $stmt->get_result();
-            $user = $result->fetch_assoc();
+        $email = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
+        
+        // Rate limiting (simple implementation)
+        $max_attempts = 5;
+        $lockout_time = 300; // 5 minutes
+        
+        if (!isset($_SESSION['login_attempts'])) {
+            $_SESSION['login_attempts'] = [];
+        }
+        
+        // Clean old attempts
+        $_SESSION['login_attempts'] = array_filter(
+            $_SESSION['login_attempts'], 
+            fn($time) => (time() - $time) < $lockout_time
+        );
+        
+        if (count($_SESSION['login_attempts']) >= $max_attempts) {
+            $error = "Too many failed attempts. Please try again in 5 minutes.";
         } else {
-            $stmt->bind_result($user_id, $name, $email_db, $password_hash, $role_id, $role_name);
-            if ($stmt->fetch()) {
-                $user = [
-                    'user_id' => $user_id,
-                    'name' => $name,
-                    'email' => $email_db,
-                    'password_hash' => $password_hash,
-                    'role_id' => $role_id,
-                    'role_name' => $role_name
-                ];
+            $result = authenticateUser($email, $password);
+            
+            if ($result['success']) {
+                // Clear failed attempts on success
+                $_SESSION['login_attempts'] = [];
+                header("Location: " . $result['redirect']);
+                exit();
+            } else {
+                // Record failed attempt
+                $_SESSION['login_attempts'][] = time();
+                $error = $result['message'];
             }
         }
-
-        if ($user && password_verify($password, $user['password_hash'])) {
-            $_SESSION['logged_in'] = true;
-            $_SESSION['user_id'] = $user['user_id'];
-            $_SESSION['username'] = $user['name'];
-            $_SESSION['email'] = $user['email'];
-            $_SESSION['role_id'] = $user['role_id'];
-            $_SESSION['role_name'] = $user['role_name'];
-            $_SESSION['last_activity'] = time();
-            
-            header("Location: dashboard.php");
-            exit();
-        } else {
-            $error = "Invalid email or password.";
-        }
-
-        $stmt->close();
     }
 }
 ?>
@@ -571,6 +567,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
 
                     <form method="POST">
+                        <input type="hidden" name="csrf_token" value="<?= generateCSRFToken() ?>">
                         <div class="form-group">
                             <label class="form-label" for="email">Email Address</label>
                             <input 
@@ -579,6 +576,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 name="email" 
                                 class="form-control" 
                                 placeholder="your@email.com"
+                                value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
                                 required
                             >
                         </div>

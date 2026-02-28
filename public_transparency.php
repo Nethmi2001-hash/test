@@ -1,6 +1,6 @@
 <?php
 /**
- * Public Transparency Dashboard
+ * Enhanced Public Transparency Dashboard
  * Shows donation usage and impact to build public trust
  * NO LOGIN REQUIRED - Anyone can view
  */
@@ -30,9 +30,13 @@ $expenses_query = "SELECT
                    AND status = 'paid'";
 $expenses_stats = $con->query($expenses_query)->fetch_assoc();
 
+// Get lifetime statistics
+$lifetime_donations = $con->query("SELECT SUM(amount) as total FROM donations WHERE status IN ('paid', 'verified')")->fetch_assoc()['total'] ?? 0;
+$lifetime_expenses = $con->query("SELECT SUM(amount) as total FROM bills WHERE status = 'paid'")->fetch_assoc()['total'] ?? 0;
+
 // Donations by category
 $donations_by_category = $con->query("
-    SELECT c.name, SUM(d.amount) as total, COUNT(*) as count
+    SELECT c.name, c.target_amount, SUM(d.amount) as total, COUNT(*) as count
     FROM donations d
     JOIN categories c ON d.category_id = c.category_id
     WHERE YEAR(d.created_at) = $current_year
@@ -47,6 +51,79 @@ $expenses_by_category = $con->query("
     FROM bills b
     JOIN categories c ON b.category_id = c.category_id
     WHERE YEAR(b.bill_date) = $current_year
+    AND b.status = 'paid'
+    GROUP BY c.category_id
+    ORDER BY total DESC
+");
+
+// Monthly trend
+$monthly_trend = $con->query("
+    SELECT 
+        MONTH(created_at) as month,
+        MONTHNAME(created_at) as month_name,
+        SUM(amount) as donations
+    FROM donations
+    WHERE YEAR(created_at) = $current_year
+    AND status IN ('paid', 'verified')
+    GROUP BY MONTH(created_at)
+    ORDER BY month
+");
+
+// Get monthly expenses for comparison
+$monthly_expenses = $con->query("
+    SELECT 
+        MONTH(bill_date) as month,
+        SUM(amount) as expenses
+    FROM bills
+    WHERE YEAR(bill_date) = $current_year
+    AND status = 'paid'
+    GROUP BY MONTH(bill_date)
+    ORDER BY month
+");
+
+// Recent activities
+$recent_activities = $con->query("
+    SELECT 'donation' as type, donor_name as name, amount, created_at as date, 'Donation' as activity_type
+    FROM donations
+    WHERE status IN ('paid', 'verified')
+    UNION ALL
+    SELECT 'expense' as type, vendor as name, amount, bill_date as date, 'Expense' as activity_type
+    FROM bills
+    WHERE status = 'paid'
+    ORDER BY date DESC
+    LIMIT 15
+");
+
+// Statistics
+$stats = [
+    'donations' => $donations_stats['total'] ?? 0,
+    'expenses' => $expenses_stats['total'] ?? 0,
+    'balance' => ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0),
+    'donor_count' => $donations_stats['count'] ?? 0,
+    'avg_donation' => $donations_stats['average'] ?? 0,
+    'lifetime_donations' => $lifetime_donations,
+    'lifetime_expenses' => $lifetime_expenses,
+    'lifetime_balance' => $lifetime_donations - $lifetime_expenses
+];
+
+// Prepare chart data
+$monthly_data = [];
+$expense_data = [];
+for ($i = 1; $i <= 12; $i++) {
+    $monthly_data[$i] = 0;
+    $expense_data[$i] = 0;
+}
+
+while ($row = $monthly_trend->fetch_assoc()) {
+    $monthly_data[$row['month']] = $row['donations'];
+}
+
+$monthly_expenses->data_seek(0);
+while ($row = $monthly_expenses->fetch_assoc()) {
+    $expense_data[$row['month']] = $row['expenses'];
+}
+
+$balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
     AND b.status = 'paid'
     GROUP BY c.category_id
     ORDER BY total DESC

@@ -1,33 +1,22 @@
 <?php
 /**
- * Logout Script
- * Destroys session and redirects to login
+ * Enhanced Logout Script
+ * Uses secure logout function from enhanced auth system
  */
 
-// Start session
-session_start();
+require_once __DIR__ . '/includes/auth_enhanced.php';
 
-// Unset all session variables
-$_SESSION = array();
+configureSession();
 
-// Destroy the session cookie
-if (ini_get("session.use_cookies")) {
-    $params = session_get_cookie_params();
-    setcookie(session_name(), '', time() - 42000,
-        $params["path"], $params["domain"],
-        $params["secure"], $params["httponly"]
-    );
-}
-
-// Destroy the session
-session_destroy();
+// Perform secure logout
+logoutUser('manual');
 
 // Clear any authentication headers
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-// Redirect to login page
+// Redirect to login page with success message
 header("Location: login.php?logout=success");
 exit();
 ?>
