@@ -262,19 +262,6 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
         </div>
     </div>
 
-    <!-- PayHere Online Payment Section -->
-    <div class="modern-card mb-4">
-        <div class="card-padding d-flex align-items-center justify-content-between flex-wrap gap-3">
-            <div>
-                <h6 class="mb-1 fw-bold"><i class="bi bi-credit-card"></i> Accept Online Donations</h6>
-                <small class="text-muted">Donors can pay using Credit/Debit Cards, Bank Transfer, or Mobile Wallets via PayHere Payment Gateway (Sandbox Mode)</small>
-            </div>
-            <button class="btn-modern btn-primary-modern btn-lg-modern" data-bs-toggle="modal" data-bs-target="#payhereModal">
-                <i class="bi bi-wallet2"></i> Pay Online (PayHere)
-            </button>
-        </div>
-    </div>
-
     <!-- Donations Table -->
     <div class="modern-table-wrapper">
         <div class="modern-table-header">
