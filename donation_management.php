@@ -345,16 +345,6 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
                                             </button>
                                         </form>
                                     <?php endif; ?>
-                                    <button class="btn-icon" onclick="editDonation(<?= htmlspecialchars(json_encode($donation)) ?>)" title="Edit">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <form method="POST" class="d-inline">
-                                        <input type="hidden" name="form_name" value="delete">
-                                        <input type="hidden" name="donation_id" value="<?= $donation['donation_id'] ?>">
-                                        <button type="submit" class="btn-icon danger" onclick="return confirm('Delete this donation?')" title="Delete">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
                                 </div>
                             </td>
                         </tr>
