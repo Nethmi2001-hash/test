@@ -4,7 +4,7 @@
  * Allows anyone to make donations online
  */
 require_once __DIR__ . '/includes/db_config.php';
-require_once __DIR__ . '/includes/payhere_config.php';
+session_start();
 
 $con = getDBConnection();
 
@@ -46,7 +46,7 @@ $stats = $stats_result->fetch_assoc();
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script type="text/javascript" src="https://www.payhere.lk/lib/payhere.js"></script>
+
     <style>
         *, *::before, *::after { box-sizing: border-box; }
 
@@ -476,6 +476,138 @@ $stats = $stats_result->fetch_assoc();
             color: #fff;
         }
 
+        /* ---- Bank Details Card ---- */
+        .bank-details-card {
+            border: 2px solid var(--primary-200, #bbf7d0);
+            border-radius: var(--border-radius-lg, 16px);
+            overflow: hidden;
+            background: #fff;
+        }
+        .bank-details-header {
+            background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-800) 100%);
+            color: #fff;
+            padding: 14px 20px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .bank-details-body {
+            padding: 20px;
+        }
+        .bank-detail-item {
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: 10px;
+            padding: 12px 16px;
+        }
+        .bank-detail-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--slate-400);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .bank-detail-value {
+            display: block;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--slate-800);
+        }
+
+        /* ---- Form Steps Indicator ---- */
+        .form-steps-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+        }
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--slate-400);
+            padding: 8px 16px;
+            border-radius: 99px;
+            transition: all 0.3s;
+        }
+        .step-item span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--slate-200);
+            color: var(--slate-500);
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .step-item.active {
+            color: var(--primary-700);
+        }
+        .step-item.active span {
+            background: var(--primary-500);
+            color: #fff;
+        }
+        .step-item.completed span {
+            background: var(--primary-500);
+            color: #fff;
+        }
+        .step-item.completed span::after {
+            content: '✓';
+        }
+        .step-divider {
+            width: 32px;
+            height: 2px;
+            background: var(--slate-200);
+            margin: 0 4px;
+        }
+
+        /* ---- Slip Upload Area ---- */
+        .slip-upload-area {
+            border: 2px dashed var(--slate-300);
+            border-radius: var(--border-radius, 12px);
+            padding: 32px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--slate-50);
+        }
+        .slip-upload-area:hover {
+            border-color: var(--primary-400);
+            background: var(--primary-50, #f0fdf4);
+        }
+
+        /* ---- Donation Summary ---- */
+        .donation-summary {
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: var(--border-radius, 12px);
+            padding: 20px;
+        }
+        .donation-summary-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--slate-700);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .donation-summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 0.9rem;
+            color: var(--slate-600);
+        }
+
         /* ---- Responsive ---- */
         @media (max-width: 768px) {
             .hero-section { padding: 60px 16px 70px; }
@@ -491,7 +623,7 @@ $stats = $stats_result->fetch_assoc();
 <!-- Top Navigation -->
 <header class="public-topbar">
     <div class="topbar-inner">
-        <a href="#" class="topbar-brand">
+        <a href="index.php" class="topbar-brand">
             <i class="bi bi-heart-pulse-fill"></i> Seela Suwa Herath
         </a>
         <nav class="topbar-links">
@@ -568,63 +700,258 @@ $stats = $stats_result->fetch_assoc();
             </h2>
             <p class="form-section-desc">Your generosity directly supports monastic healthcare.</p>
 
-            <form id="donationForm">
-                <div class="row mb-3">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label-modern"><i class="bi bi-person"></i> Your Name</label>
-                        <input type="text" id="donor_name" class="form-control form-control-modern" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label-modern"><i class="bi bi-envelope"></i> Email</label>
-                        <input type="email" id="donor_email" class="form-control form-control-modern" required>
-                    </div>
+            <?php if (isset($_GET['success'])): ?>
+            <div class="alert alert-success d-flex align-items-center gap-2 mb-4" style="border-radius:var(--border-radius);font-size:0.95rem;">
+                <i class="bi bi-check-circle-fill fs-4"></i>
+                <div>
+                    <strong>Thank you for your donation!</strong><br>
+                    Your bank slip has been uploaded successfully. Our team will verify your payment within 24-48 hours.
+                    <?php if (isset($_GET['ref'])): ?>
+                    <br>Reference: <strong>#<?= htmlspecialchars($_GET['ref']) ?></strong>
+                    <?php endif; ?>
                 </div>
+            </div>
+            <?php endif; ?>
 
-                <div class="mb-3">
-                    <label class="form-label-modern"><i class="bi bi-telephone"></i> Phone Number</label>
-                    <input type="text" id="donor_phone" class="form-control form-control-modern" placeholder="07XXXXXXXX" required>
+            <?php if (isset($_GET['error'])): ?>
+            <div class="alert alert-danger d-flex align-items-center gap-2 mb-4" style="border-radius:var(--border-radius);font-size:0.95rem;">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span><?= htmlspecialchars($_GET['error']) ?></span>
+            </div>
+            <?php endif; ?>
+
+            <!-- Bank Details Card -->
+            <div class="bank-details-card mb-4">
+                <div class="bank-details-header">
+                    <i class="bi bi-bank2"></i> Bank Transfer Details
                 </div>
-
-                <div class="mb-4">
-                    <label class="form-label-modern"><i class="bi bi-tag"></i> Donation Category</label>
-                    <div class="row g-3 mt-1">
-                        <?php while ($category = $categories->fetch_assoc()): ?>
-                        <div class="col-md-6">
-                            <div class="category-card" onclick="selectCategory(<?= $category['category_id'] ?>, '<?= htmlspecialchars($category['name']) ?>')">
-                                <input type="radio" name="category" value="<?= $category['category_id'] ?>" id="cat_<?= $category['category_id'] ?>" hidden>
-                                <strong><?= htmlspecialchars($category['name']) ?></strong>
-                                <p class="mb-0"><?= htmlspecialchars($category['description']) ?></p>
+                <div class="bank-details-body">
+                    <p style="margin-bottom:16px;color:var(--slate-600);font-size:0.9rem;">Please transfer your donation to the following bank account and upload the payment slip below.</p>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="bank-detail-item">
+                                <span class="bank-detail-label">Bank Name</span>
+                                <select id="bankNameField" style="width:100%;border:none;background:transparent;font-weight:700;font-size:0.95rem;color:var(--slate-800);padding:2px 0;cursor:pointer;outline:none;">
+                                    <option value="Bank of Ceylon">Bank of Ceylon (BOC)</option>
+                                    <option value="People's Bank">People's Bank</option>
+                                    <option value="Commercial Bank">Commercial Bank of Ceylon</option>
+                                    <option value="Hatton National Bank">Hatton National Bank (HNB)</option>
+                                    <option value="Sampath Bank">Sampath Bank</option>
+                                    <option value="Seylan Bank">Seylan Bank</option>
+                                    <option value="Nations Trust Bank">Nations Trust Bank (NTB)</option>
+                                    <option value="DFCC Bank">DFCC Bank</option>
+                                    <option value="National Savings Bank">National Savings Bank (NSB)</option>
+                                    <option value="Pan Asia Banking Corporation">Pan Asia Banking Corporation</option>
+                                    <option value="Union Bank">Union Bank of Colombo</option>
+                                    <option value="Cargills Bank">Cargills Bank</option>
+                                    <option value="Amana Bank">Amana Bank</option>
+                                    <option value="National Development Bank">National Development Bank (NDB)</option>
+                                    <option value="Regional Development Bank">Regional Development Bank (RDB)</option>
+                                    <option value="Sanasa Development Bank">Sanasa Development Bank</option>
+                                    <option value="Housing Development Finance Corporation">HDFC Bank</option>
+                                    <option value="Lanka Puthra Development Bank">Lanka Puthra Development Bank</option>
+                                    <option value="State Mortgage & Investment Bank">State Mortgage & Investment Bank</option>
+                                    <option value="Citibank">Citibank N.A.</option>
+                                    <option value="Standard Chartered Bank">Standard Chartered Bank</option>
+                                    <option value="HSBC">HSBC Sri Lanka</option>
+                                    <option value="Deutsche Bank">Deutsche Bank</option>
+                                    <option value="Indian Bank">Indian Bank</option>
+                                    <option value="Indian Overseas Bank">Indian Overseas Bank</option>
+                                    <option value="State Bank of India">State Bank of India</option>
+                                    <option value="MCB Bank">MCB Bank</option>
+                                    <option value="Public Bank Berhad">Public Bank Berhad</option>
+                                </select>
                             </div>
                         </div>
-                        <?php endwhile; ?>
+                        <div class="col-sm-6">
+                            <div class="bank-detail-item">
+                                <span class="bank-detail-label">Branch</span>
+                                <select id="branchField" style="width:100%;border:none;background:transparent;font-weight:700;font-size:0.95rem;color:var(--slate-800);padding:2px 0;cursor:pointer;outline:none;">
+                                    <option value="Giribawa">Giribawa</option>
+                                    <option value="Colombo">Colombo</option>
+                                    <option value="Colombo Fort">Colombo Fort</option>
+                                    <option value="Kandy">Kandy</option>
+                                    <option value="Galle">Galle</option>
+                                    <option value="Jaffna">Jaffna</option>
+                                    <option value="Matara">Matara</option>
+                                    <option value="Negombo">Negombo</option>
+                                    <option value="Kurunegala">Kurunegala</option>
+                                    <option value="Anuradhapura">Anuradhapura</option>
+                                    <option value="Ratnapura">Ratnapura</option>
+                                    <option value="Badulla">Badulla</option>
+                                    <option value="Trincomalee">Trincomalee</option>
+                                    <option value="Batticaloa">Batticaloa</option>
+                                    <option value="Ampara">Ampara</option>
+                                    <option value="Polonnaruwa">Polonnaruwa</option>
+                                    <option value="Hambantota">Hambantota</option>
+                                    <option value="Monaragala">Monaragala</option>
+                                    <option value="Kegalle">Kegalle</option>
+                                    <option value="Nuwara Eliya">Nuwara Eliya</option>
+                                    <option value="Matale">Matale</option>
+                                    <option value="Kalutara">Kalutara</option>
+                                    <option value="Gampaha">Gampaha</option>
+                                    <option value="Puttalam">Puttalam</option>
+                                    <option value="Chilaw">Chilaw</option>
+                                    <option value="Dambulla">Dambulla</option>
+                                    <option value="Embilipitiya">Embilipitiya</option>
+                                    <option value="Kiribathgoda">Kiribathgoda</option>
+                                    <option value="Kaduwela">Kaduwela</option>
+                                    <option value="Maharagama">Maharagama</option>
+                                    <option value="Nugegoda">Nugegoda</option>
+                                    <option value="Dehiwala">Dehiwala</option>
+                                    <option value="Moratuwa">Moratuwa</option>
+                                    <option value="Panadura">Panadura</option>
+                                    <option value="Horana">Horana</option>
+                                    <option value="Avissawella">Avissawella</option>
+                                    <option value="Wennappuwa">Wennappuwa</option>
+                                    <option value="Kuliyapitiya">Kuliyapitiya</option>
+                                    <option value="Wariyapola">Wariyapola</option>
+                                    <option value="Nikaweratiya">Nikaweratiya</option>
+                                    <option value="Vavuniya">Vavuniya</option>
+                                    <option value="Mannar">Mannar</option>
+                                    <option value="Kilinochchi">Kilinochchi</option>
+                                    <option value="Mullaitivu">Mullaitivu</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 d-flex align-items-center gap-2" style="background:var(--accent-100);padding:10px 14px;border-radius:8px;font-size:0.82rem;color:var(--accent-700,#92400e);">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <span>Online card payment is coming soon. Currently only bank transfers are accepted.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Donation Form -->
+            <form action="process_public_donation.php" method="POST" enctype="multipart/form-data" id="donationForm">
+                <div class="form-steps-indicator mb-4">
+                    <div class="step-item active" id="step1Ind"><span>1</span> Your Info</div>
+                    <div class="step-divider"></div>
+                    <div class="step-item" id="step2Ind"><span>2</span> Donation</div>
+                    <div class="step-divider"></div>
+                    <div class="step-item" id="step3Ind"><span>3</span> Bank Slip</div>
+                </div>
+
+                <!-- Step 1: Personal Info -->
+                <div id="formStep1">
+                    <h6 style="font-weight:700;color:var(--slate-700);margin-bottom:16px;"><i class="bi bi-person-circle" style="color:var(--primary-500);"></i> Step 1: Your Information</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label-modern"><i class="bi bi-person"></i> Your Name <span style="color:#dc2626;">*</span></label>
+                            <input type="text" name="donor_name" id="donor_name" class="form-control form-control-modern" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label-modern"><i class="bi bi-envelope"></i> Email <span style="color:#dc2626;">*</span></label>
+                            <input type="email" name="donor_email" id="donor_email" class="form-control form-control-modern" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label-modern"><i class="bi bi-telephone"></i> Phone Number <span style="color:#dc2626;">*</span></label>
+                        <input type="text" name="donor_phone" id="donor_phone" class="form-control form-control-modern" placeholder="07XXXXXXXX" required>
+                    </div>
+                    <button type="button" class="btn-primary-modern w-100" onclick="goToStep(2)">
+                        Next: Donation Details <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Step 2: Donation Details -->
+                <div id="formStep2" style="display:none;">
+                    <h6 style="font-weight:700;color:var(--slate-700);margin-bottom:16px;"><i class="bi bi-cash-coin" style="color:var(--primary-500);"></i> Step 2: Donation Details</h6>
+                    <div class="mb-4">
+                        <label class="form-label-modern"><i class="bi bi-tag"></i> Donation Category <span style="color:#dc2626;">*</span></label>
+                        <div class="row g-3 mt-1">
+                            <?php while ($category = $categories->fetch_assoc()): ?>
+                            <div class="col-md-6">
+                                <div class="category-card" onclick="selectCategory(<?= $category['category_id'] ?>, '<?= htmlspecialchars($category['name']) ?>')">
+                                    <input type="radio" name="category_id" value="<?= $category['category_id'] ?>" id="cat_<?= $category['category_id'] ?>" hidden required>
+                                    <strong><?= htmlspecialchars($category['name']) ?></strong>
+                                    <p class="mb-0"><?= htmlspecialchars($category['description']) ?></p>
+                                </div>
+                            </div>
+                            <?php endwhile; ?>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label-modern"><i class="bi bi-cash"></i> Donation Amount (Rs.) <span style="color:#dc2626;">*</span></label>
+                        <input type="number" name="amount" id="amount" class="form-control form-control-modern" style="font-size:1.1rem; font-weight:600;" min="100" step="0.01" placeholder="Enter amount" required>
+                        <div class="mt-2 d-flex flex-wrap gap-2">
+                            <button type="button" class="btn-amount" onclick="setAmount(500)">Rs. 500</button>
+                            <button type="button" class="btn-amount" onclick="setAmount(1000)">Rs. 1,000</button>
+                            <button type="button" class="btn-amount" onclick="setAmount(5000)">Rs. 5,000</button>
+                            <button type="button" class="btn-amount" onclick="setAmount(10000)">Rs. 10,000</button>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label-modern"><i class="bi bi-chat-left-text"></i> Message (Optional)</label>
+                        <textarea name="notes" id="notes" class="form-control form-control-modern" rows="2" placeholder="Your message or dedication..."></textarea>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn-outline-modern flex-fill" onclick="goToStep(1)">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <button type="button" class="btn-primary-modern flex-fill" onclick="goToStep(3)">
+                            Next: Upload Slip <i class="bi bi-arrow-right"></i>
+                        </button>
                     </div>
                 </div>
 
-                <div class="mb-4">
-                    <label class="form-label-modern"><i class="bi bi-cash"></i> Donation Amount (Rs.)</label>
-                    <input type="number" id="amount" class="form-control form-control-modern" style="font-size:1.1rem; font-weight:600;" min="100" step="0.01" placeholder="Enter amount" required>
-                    <div class="mt-2 d-flex flex-wrap gap-2">
-                        <button type="button" class="btn-amount" onclick="setAmount(500)">Rs. 500</button>
-                        <button type="button" class="btn-amount" onclick="setAmount(1000)">Rs. 1,000</button>
-                        <button type="button" class="btn-amount" onclick="setAmount(5000)">Rs. 5,000</button>
-                        <button type="button" class="btn-amount" onclick="setAmount(10000)">Rs. 10,000</button>
+                <!-- Step 3: Bank Slip Upload -->
+                <div id="formStep3" style="display:none;">
+                    <h6 style="font-weight:700;color:var(--slate-700);margin-bottom:16px;"><i class="bi bi-cloud-upload" style="color:var(--primary-500);"></i> Step 3: Upload Bank Slip</h6>
+
+                    <div class="mb-3">
+                        <label class="form-label-modern"><i class="bi bi-hash"></i> Bank Reference / Transaction Number</label>
+                        <input type="text" name="bank_reference" id="bank_reference" class="form-control form-control-modern" placeholder="e.g., TXN-12345 or deposit slip number">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label-modern"><i class="bi bi-image"></i> Bank Slip / Receipt Photo <span style="color:#dc2626;">*</span></label>
+                        <div class="slip-upload-area" id="slipUploadArea" onclick="document.getElementById('bank_slip').click()">
+                            <input type="file" name="bank_slip" id="bank_slip" accept="image/*,.pdf" hidden onchange="previewSlip(this)">
+                            <div id="slipPlaceholder">
+                                <i class="bi bi-cloud-arrow-up" style="font-size:2.5rem;color:var(--primary-400);"></i>
+                                <p style="margin:8px 0 4px;font-weight:600;color:var(--slate-700);">Click to upload bank slip</p>
+                                <p style="font-size:0.82rem;color:var(--slate-400);margin:0;">JPG, PNG or PDF (max 5MB)</p>
+                            </div>
+                            <div id="slipPreview" style="display:none;">
+                                <img id="slipPreviewImg" style="max-width:100%;max-height:200px;border-radius:8px;">
+                                <p id="slipFileName" style="margin-top:8px;font-size:0.85rem;color:var(--slate-600);font-weight:500;"></p>
+                                <button type="button" class="btn btn-sm" style="color:var(--danger,#dc2626);font-size:0.82rem;" onclick="event.stopPropagation();clearSlip()">
+                                    <i class="bi bi-x-circle"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary -->
+                    <div class="donation-summary mb-4">
+                        <div class="donation-summary-title"><i class="bi bi-receipt"></i> Donation Summary</div>
+                        <div class="donation-summary-row">
+                            <span>Donor</span>
+                            <span id="sumName">-</span>
+                        </div>
+                        <div class="donation-summary-row">
+                            <span>Category</span>
+                            <span id="sumCategory">-</span>
+                        </div>
+                        <div class="donation-summary-row" style="font-size:1.05rem;font-weight:700;color:var(--primary-700);border-top:2px solid var(--slate-200);padding-top:12px;margin-top:4px;">
+                            <span>Amount</span>
+                            <span id="sumAmount">Rs. 0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn-outline-modern flex-fill" onclick="goToStep(2)">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <button type="submit" class="btn-primary-modern flex-fill" id="submitBtn">
+                            <i class="bi bi-check-circle"></i> Submit Donation
+                        </button>
                     </div>
                 </div>
-
-                <div class="mb-4">
-                    <label class="form-label-modern"><i class="bi bi-chat-left-text"></i> Message (Optional)</label>
-                    <textarea id="notes" class="form-control form-control-modern" rows="3" placeholder="Your message or dedication..."></textarea>
-                </div>
-
-                <div class="alert-modern mb-4">
-                    <strong><i class="bi bi-shield-check"></i> Sandbox Test Mode:</strong><br>
-                    Use test cards: <strong>4111 1111 1111 1111</strong> (Visa) or <strong>5555 5555 5555 4444</strong> (MasterCard)<br>
-                    CVV: Any 3 digits | Expiry: Any future date
-                </div>
-
-                <button type="button" class="btn-primary-modern w-100" onclick="payWithPayHere()">
-                    <i class="bi bi-credit-card"></i> Proceed to Secure Payment
-                </button>
             </form>
         </div>
     </div>
@@ -686,15 +1013,17 @@ $stats = $stats_result->fetch_assoc();
 
 <!-- Footer -->
 <footer class="public-footer">
-    <p class="mb-1">&copy; 2026 <strong>Seela Suwa Herath Bikshu Gilan Arana</strong>. All rights reserved.</p>
-    <p class="mb-0" style="font-size: 0.82rem;">Powered by PayHere Secure Payment Gateway</p>
+    <p class="mb-1">&copy; <?= date('Y') ?> <strong>Seela Suwa Herath Bikshu Gilan Arana</strong>. All rights reserved.</p>
+    <p class="mb-0" style="font-size: 0.82rem;">Bank transfer donations verified within 24-48 hours</p>
 </footer>
 
 <script>
 let selectedCategoryId = null;
+let selectedCategoryName = '';
 
 function selectCategory(categoryId, categoryName) {
     selectedCategoryId = categoryId;
+    selectedCategoryName = categoryName;
     document.querySelectorAll('.category-card').forEach(card => card.classList.remove('selected'));
     event.currentTarget.classList.add('selected');
     document.getElementById('cat_' + categoryId).checked = true;
@@ -704,71 +1033,89 @@ function setAmount(amount) {
     document.getElementById('amount').value = amount;
 }
 
-function payWithPayHere() {
-    // Validation
-    const name = document.getElementById('donor_name').value.trim();
-    const email = document.getElementById('donor_email').value.trim();
-    const phone = document.getElementById('donor_phone').value.trim();
-    const amount = document.getElementById('amount').value;
-    const notes = document.getElementById('notes').value.trim();
-
-    if (!name || !email || !phone || !amount) {
-        alert('Please fill all required fields');
-        return;
+function goToStep(step) {
+    // Validate before moving forward
+    if (step === 2) {
+        const name = document.getElementById('donor_name').value.trim();
+        const email = document.getElementById('donor_email').value.trim();
+        const phone = document.getElementById('donor_phone').value.trim();
+        if (!name || !email || !phone) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+    }
+    if (step === 3) {
+        if (!selectedCategoryId) {
+            alert('Please select a donation category.');
+            return;
+        }
+        const amount = parseFloat(document.getElementById('amount').value);
+        if (!amount || amount < 100) {
+            alert('Please enter a valid amount (minimum Rs. 100).');
+            return;
+        }
+        // Update summary
+        document.getElementById('sumName').textContent = document.getElementById('donor_name').value;
+        document.getElementById('sumCategory').textContent = selectedCategoryName;
+        document.getElementById('sumAmount').textContent = 'Rs. ' + amount.toLocaleString('en-US', {minimumFractionDigits: 2});
     }
 
-    if (!selectedCategoryId) {
-        alert('Please select a donation category');
-        return;
-    }
+    document.getElementById('formStep1').style.display = step === 1 ? 'block' : 'none';
+    document.getElementById('formStep2').style.display = step === 2 ? 'block' : 'none';
+    document.getElementById('formStep3').style.display = step === 3 ? 'block' : 'none';
 
-    if (parseFloat(amount) < 100) {
-        alert('Minimum donation amount is Rs. 100');
-        return;
-    }
-
-    // Generate unique order ID
-    const orderId = 'DON-' + Date.now();
-
-    // PayHere Payment Object
-    const payment = {
-        sandbox: <?= PAYHERE_SANDBOX_MODE ? 'true' : 'false' ?>,
-        merchant_id: "<?= PAYHERE_MERCHANT_ID ?>",
-        return_url: "<?= PAYHERE_RETURN_URL ?>",
-        cancel_url: "<?= PAYHERE_CANCEL_URL ?>",
-        notify_url: "<?= PAYHERE_NOTIFY_URL ?>",
-        order_id: orderId,
-        items: "Donation",
-        amount: parseFloat(amount).toFixed(2),
-        currency: "LKR",
-        first_name: name,
-        last_name: "",
-        email: email,
-        phone: phone,
-        address: "Sri Lanka",
-        city: "Giribawa",
-        country: "Sri Lanka",
-        custom_1: selectedCategoryId,
-        custom_2: notes
-    };
-
-    // Show payment modal
-    payhere.startPayment(payment);
-
-    // Payment callbacks
-    payhere.onCompleted = function onCompleted(orderId) {
-        alert("Payment completed. Order ID: " + orderId);
-        window.location.href = "<?= PAYHERE_RETURN_URL ?>?order_id=" + orderId;
-    };
-
-    payhere.onDismissed = function onDismissed() {
-        alert("Payment dismissed");
-    };
-
-    payhere.onError = function onError(error) {
-        alert("Payment error: " + error);
-    };
+    // Update step indicators
+    document.getElementById('step1Ind').classList.toggle('active', step >= 1);
+    document.getElementById('step1Ind').classList.toggle('completed', step > 1);
+    document.getElementById('step2Ind').classList.toggle('active', step >= 2);
+    document.getElementById('step2Ind').classList.toggle('completed', step > 2);
+    document.getElementById('step3Ind').classList.toggle('active', step >= 3);
 }
+
+function previewSlip(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+        alert('File size exceeds 5MB limit.');
+        input.value = '';
+        return;
+    }
+
+    document.getElementById('slipPlaceholder').style.display = 'none';
+    document.getElementById('slipPreview').style.display = 'block';
+    document.getElementById('slipFileName').textContent = file.name;
+
+    if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            document.getElementById('slipPreviewImg').src = e.target.result;
+            document.getElementById('slipPreviewImg').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        document.getElementById('slipPreviewImg').style.display = 'none';
+        document.getElementById('slipFileName').textContent = '📄 ' + file.name + ' (PDF)';
+    }
+}
+
+function clearSlip() {
+    document.getElementById('bank_slip').value = '';
+    document.getElementById('slipPlaceholder').style.display = 'block';
+    document.getElementById('slipPreview').style.display = 'none';
+}
+
+// Form submit validation
+document.getElementById('donationForm').addEventListener('submit', function(e) {
+    const slip = document.getElementById('bank_slip').files[0];
+    if (!slip) {
+        e.preventDefault();
+        alert('Please upload your bank slip / receipt.');
+        return;
+    }
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').innerHTML = '<span class=\"spinner-border spinner-border-sm me-2\"></span> Submitting...';
+});
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -1061,7 +1408,7 @@ function widgetSend() {
             language: 'auto',
             context: {
                 monastery_name: "Seela Suwa Herath Bikshu Gilan Arana",
-                payment_methods: ["Cash", "Bank Transfer", "Card", "PayHere Online Payment"],
+                payment_methods: ["Bank Transfer", "Cash"],
                 website: "http://localhost/test/"
             }
         })
