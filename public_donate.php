@@ -773,10 +773,343 @@ function payWithPayHere() {
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Chatbot Widget -->
-<a href="chatbot.php" target="_blank" class="chatbot-fab" title="Chat with us">
-    <i class="bi bi-chat-dots"></i>
-</a>
+<!-- Chatbot FAB Button -->
+<button class="chatbot-fab" id="chatFabBtn" title="Chat with us" onclick="toggleChatWidget()">
+    <i class="bi bi-chat-dots" id="chatFabIcon"></i>
+</button>
+
+<!-- Chat Widget Panel -->
+<div class="chat-widget" id="chatWidget">
+    <div class="chat-widget-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+            <div class="chat-widget-avatar"><i class="bi bi-robot"></i></div>
+            <div>
+                <div style="font-weight:700;font-size:14px;">AI Assistant</div>
+                <div style="font-size:11px;opacity:0.8;"><span style="display:inline-block;width:7px;height:7px;background:#4ade80;border-radius:50;margin-right:4px;"></span> Online &middot; English &amp; සිංහල</div>
+            </div>
+        </div>
+        <button class="chat-widget-close" onclick="toggleChatWidget()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="chat-widget-messages" id="widgetChatBox">
+        <div class="cw-msg cw-bot">
+            <div class="cw-avatar">🪷</div>
+            <div class="cw-bubble">
+                <strong>Welcome! ආයුබෝවන්!</strong><br><br>
+                I'm the AI assistant for Seela Suwa Herath. I can help with:<br>
+                • Donation information<br>
+                • Payment methods<br>
+                • Healthcare services<br>
+                • Monastery info<br><br>
+                Ask in <strong>English</strong> or <strong>සිංහල</strong>!
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-widget-quick">
+        <button onclick="widgetQuickQ('How can I make a donation?')">💰 How to donate?</button>
+        <button onclick="widgetQuickQ('What payment methods are available?')">💳 Payment methods</button>
+        <button onclick="widgetQuickQ('පරිත්‍යාග කරන්නේ කෙසේද?')">🇱🇰 සිංහල</button>
+    </div>
+
+    <div class="chat-widget-input">
+        <input type="text" id="widgetInput" placeholder="Type your question..." onkeypress="if(event.key==='Enter')widgetSend()">
+        <button onclick="widgetSend()"><i class="bi bi-send-fill"></i></button>
+    </div>
+
+    <div class="chat-widget-typing" id="widgetTyping">
+        <div class="cw-avatar" style="width:24px;height:24px;font-size:11px;">🪷</div>
+        <div class="cw-typing-dots"><span></span><span></span><span></span></div>
+    </div>
+</div>
+
+<style>
+/* Chat Widget Panel */
+.chat-widget {
+    position: fixed;
+    bottom: 96px;
+    right: 24px;
+    width: 380px;
+    max-height: 540px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.08);
+    z-index: 1001;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.06);
+    animation: chatSlideUp 0.3s cubic-bezier(.4,0,.2,1);
+}
+.chat-widget.open { display: flex; }
+
+@keyframes chatSlideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.chat-widget-header {
+    background: linear-gradient(135deg, #4A6040 0%, #3D5035 100%);
+    color: #fff;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+.chat-widget-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+.chat-widget-close {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 14px;
+}
+.chat-widget-close:hover { background: rgba(255,255,255,0.25); }
+
+.chat-widget-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    max-height: 320px;
+    min-height: 200px;
+    background: #f8faf7;
+}
+
+.cw-msg {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+}
+.cw-msg.cw-user { flex-direction: row-reverse; }
+.cw-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #6E8662, #4A6040);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+.cw-msg.cw-user .cw-avatar { background: linear-gradient(135deg, #64748b, #475569); }
+.cw-bubble {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 13px;
+    line-height: 1.55;
+}
+.cw-msg.cw-bot .cw-bubble {
+    background: #fff;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+    border-top-left-radius: 4px;
+}
+.cw-msg.cw-user .cw-bubble {
+    background: linear-gradient(135deg, #6E8662, #4A6040);
+    color: #fff;
+    border-top-right-radius: 4px;
+}
+
+.chat-widget-quick {
+    padding: 8px 16px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    border-top: 1px solid #f1f5f9;
+    background: #fff;
+}
+.chat-widget-quick button {
+    background: #f0fdf4;
+    border: 1px solid #dcfce7;
+    border-radius: 99px;
+    padding: 5px 12px;
+    font-size: 11.5px;
+    color: #3D5035;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+.chat-widget-quick button:hover {
+    background: #6E8662;
+    color: #fff;
+    border-color: #6E8662;
+}
+
+.chat-widget-input {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+}
+.chat-widget-input input {
+    flex: 1;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.chat-widget-input input:focus { border-color: #6E8662; box-shadow: 0 0 0 3px rgba(110,134,98,0.1); }
+.chat-widget-input button {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #6E8662, #4A6040);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 15px;
+    transition: transform 0.15s;
+    flex-shrink: 0;
+}
+.chat-widget-input button:hover { transform: scale(1.05); }
+
+.chat-widget-typing {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #f8faf7;
+}
+.chat-widget-typing.active { display: flex; }
+.cw-typing-dots { display: flex; gap: 3px; }
+.cw-typing-dots span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #94a3b8;
+    animation: cwDot 1.4s ease-in-out infinite;
+}
+.cw-typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.cw-typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes cwDot {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 480px) {
+    .chat-widget {
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        max-height: 100vh;
+        border-radius: 20px 20px 0 0;
+    }
+}
+</style>
+
+<script>
+// Toggle chat widget
+function toggleChatWidget() {
+    const widget = document.getElementById('chatWidget');
+    const icon = document.getElementById('chatFabIcon');
+    const isOpen = widget.classList.contains('open');
+    
+    if (isOpen) {
+        widget.classList.remove('open');
+        icon.className = 'bi bi-chat-dots';
+    } else {
+        widget.classList.add('open');
+        icon.className = 'bi bi-x-lg';
+        document.getElementById('widgetInput').focus();
+    }
+}
+
+// Send message
+function widgetSend() {
+    const input = document.getElementById('widgetInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+    
+    widgetAddMsg(msg, 'user');
+    input.value = '';
+    
+    // Show typing
+    document.getElementById('widgetTyping').classList.add('active');
+    
+    fetch('chatbot_api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            message: msg,
+            language: 'auto',
+            context: {
+                monastery_name: "Seela Suwa Herath Bikshu Gilan Arana",
+                payment_methods: ["Cash", "Bank Transfer", "Card", "PayHere Online Payment"],
+                website: "http://localhost/test/"
+            }
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById('widgetTyping').classList.remove('active');
+        if (data.success) {
+            widgetAddMsg(data.response, 'bot');
+        } else {
+            widgetAddMsg('Sorry, I encountered an error. Please try again.', 'bot');
+        }
+        // Hide quick questions after first real exchange
+        const quick = document.querySelector('.chat-widget-quick');
+        if (quick) quick.style.display = 'none';
+    })
+    .catch(() => {
+        document.getElementById('widgetTyping').classList.remove('active');
+        widgetAddMsg('Connection error. Please try again.', 'bot');
+    });
+}
+
+function widgetQuickQ(q) {
+    document.getElementById('widgetInput').value = q;
+    widgetSend();
+}
+
+function widgetAddMsg(content, type) {
+    const box = document.getElementById('widgetChatBox');
+    const div = document.createElement('div');
+    div.className = 'cw-msg cw-' + type;
+    
+    const avatar = document.createElement('div');
+    avatar.className = 'cw-avatar';
+    avatar.innerHTML = type === 'bot' ? '🪷' : '👤';
+    
+    const bubble = document.createElement('div');
+    bubble.className = 'cw-bubble';
+    bubble.innerHTML = content
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br>');
+    
+    div.appendChild(avatar);
+    div.appendChild(bubble);
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+}
+</script>
 
 </body>
 </html>

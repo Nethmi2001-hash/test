@@ -57,7 +57,7 @@ $isMonk = ($userRole === 'Monk');
 
 <!-- Sidebar -->
 <aside class="app-sidebar" id="appSidebar">
-  <div class="sidebar-header">
+  <a href="index.php" class="sidebar-header" style="text-decoration:none;color:inherit;">
     <div class="sidebar-logo">
       <i class="bi bi-heart-pulse"></i>
     </div>
@@ -65,7 +65,7 @@ $isMonk = ($userRole === 'Monk');
       Seela Suwa
       <small>Healthcare Management</small>
     </div>
-  </div>
+  </a>
 
   <nav class="sidebar-nav">
     <div class="sidebar-section-label"><?= __('dashboard') ?></div>

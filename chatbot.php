@@ -1,6 +1,12 @@
 <?php
 session_start();
 
+// Require login
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header('Location: login.php');
+    exit;
+}
+
 // Database connection
 $servername = "localhost";
 $username = "root";
