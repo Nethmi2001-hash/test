@@ -425,6 +425,7 @@ $stats = $stats_result->fetch_assoc();
             padding: 64px 24px;
             background: var(--bg-card);
             border-top: 1px solid var(--slate-100);
+            overflow: hidden;
         }
         .section-heading {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -435,22 +436,43 @@ $stats = $stats_result->fetch_assoc();
             margin-bottom: 32px;
         }
         .section-heading i { color: var(--accent-500); }
+        .donor-slider-wrapper {
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+        }
+        .donor-slider-track {
+            display: flex;
+            gap: 16px;
+            width: max-content;
+            animation: donorSlide var(--slide-duration, 20s) linear infinite;
+        }
+        .donor-slider-track:hover {
+            animation-play-state: paused;
+        }
+        @keyframes donorSlide {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-50% - 8px)); }
+        }
         .donation-item {
-            padding: 16px 20px;
+            flex-shrink: 0;
+            padding: 16px 24px;
             background: var(--slate-50);
             border: 1px solid var(--slate-200);
             border-radius: var(--border-radius);
-            margin-bottom: 10px;
             border-left: 4px solid var(--primary-500);
+            min-width: 220px;
+            text-align: center;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .donation-item:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-sm);
         }
-        .donation-item .donor-name { font-weight: 600; color: var(--slate-700); }
+        .donation-item .donor-name { font-weight: 600; color: var(--slate-700); display: block; margin-bottom: 2px; }
         .donation-item .donor-cat  { font-size: 0.82rem; color: var(--slate-500); }
-        .donation-item .don-amount { font-weight: 700; color: var(--primary-600); }
         .donation-item .don-date   { font-size: 0.82rem; color: var(--slate-400); }
 
         /* ---- Contact Section ---- */
@@ -1116,27 +1138,32 @@ $stats = $stats_result->fetch_assoc();
         <h3 class="section-heading">
             <i class="bi bi-heart-fill" style="color: var(--primary-500);"></i> Wall of Generosity
         </h3>
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <?php if ($recent_donations->num_rows > 0): ?>
-                    <?php while ($donation = $recent_donations->fetch_assoc()): ?>
-                    <div class="donation-item">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <span class="donor-name"><?= htmlspecialchars($donation['donor_name']) ?></span>
-                                <span class="donor-cat d-block"><?= htmlspecialchars($donation['category_name']) ?></span>
-                            </div>
-                            <div class="text-end">
-                                <span class="don-amount">Rs. <?= number_format($donation['amount'], 2) ?></span>
-                                <span class="don-date d-block"><?= date('M d, Y', strtotime($donation['created_at'])) ?></span>
-                            </div>
-                        </div>
-                    </div>
-                    <?php endwhile; ?>
-                <?php else: ?>
-                    <p class="text-center" style="color: var(--slate-500);">No donations yet. Be the first to contribute!</p>
-                <?php endif; ?>
-            </div>
+    </div>
+    <div class="donor-slider-wrapper">
+        <div class="donor-slider-track" id="donorSlider">
+            <?php
+            $donor_items = [];
+            if ($recent_donations->num_rows > 0) {
+                while ($donation = $recent_donations->fetch_assoc()) {
+                    $donor_items[] = $donation;
+                }
+            }
+            ?>
+            <?php if (count($donor_items) > 0): ?>
+                <?php
+                // Repeat items enough times to fill the screen for smooth circular slide
+                $repeat = max(2, ceil(12 / count($donor_items)));
+                for ($r = 0; $r < $repeat * 2; $r++):
+                    foreach ($donor_items as $donation):
+                ?>
+                <div class="donation-item">
+                    <span class="donor-name"><?= htmlspecialchars($donation['donor_name']) ?></span>
+                    <span class="donor-cat"><?= htmlspecialchars($donation['category_name']) ?></span>
+                </div>
+                <?php endforeach; endfor; ?>
+            <?php else: ?>
+                <p class="text-center w-100" style="color: var(--slate-500);">No donations yet. Be the first to contribute!</p>
+            <?php endif; ?>
         </div>
     </div>
 </section>
@@ -1609,6 +1636,19 @@ function widgetAddMsg(content, type) {
     box.appendChild(div);
     box.scrollTop = box.scrollHeight;
 }
+</script>
+
+<script>
+// Seamless circular slider - adjust speed based on content width
+document.addEventListener('DOMContentLoaded', function() {
+    const slider = document.getElementById('donorSlider');
+    if (slider && slider.children.length > 0) {
+        const totalWidth = slider.scrollWidth / 2;
+        const speed = 50; // pixels per second
+        const duration = totalWidth / speed;
+        slider.style.setProperty('--slide-duration', duration + 's');
+    }
+});
 </script>
 
 </body>
