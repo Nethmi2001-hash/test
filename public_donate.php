@@ -107,22 +107,22 @@ $stats = $stats_result->fetch_assoc();
             color: var(--primary-700);
         }
         .topbar-links .btn-login {
-            background: var(--primary-600);
-            color: #fff;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1a3a2a;
             padding: 8px 20px;
             border-radius: var(--border-radius-full);
-            font-weight: 600;
+            font-weight: 700;
         }
         .topbar-links .btn-login:hover {
-            background: var(--primary-700);
-            color: #fff;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #1a3a2a;
         }
 
         /* ---- Hero Section ---- */
         .hero-section {
-            background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-900) 60%, #022c22 100%);
+            background: linear-gradient(160deg, #1a3a2a 0%, #0f3d1e 30%, #1a4a2a 60%, #0d2818 100%);
             color: #fff;
-            padding: 80px 24px 90px;
+            padding: 100px 24px 110px;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -131,71 +131,110 @@ $stats = $stats_result->fetch_assoc();
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at 20% 80%, rgba(52, 211, 153, 0.15) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(251, 191, 36, 0.10) 0%, transparent 50%);
+            background:
+                radial-gradient(ellipse at 25% 0%, rgba(251, 191, 36, 0.14) 0%, transparent 55%),
+                radial-gradient(ellipse at 75% 100%, rgba(52, 211, 153, 0.10) 0%, transparent 55%),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.02) 0%, transparent 70%);
             pointer-events: none;
+        }
+        .hero-section::after {
+            content: '\1FAB7';
+            position: absolute;
+            font-size: 14rem;
+            opacity: 0.035;
+            top: -30px;
+            right: -40px;
+            pointer-events: none;
+            transform: rotate(-15deg);
         }
         .hero-section .badge-pill {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(251, 191, 36, 0.14);
+            border: 1px solid rgba(251, 191, 36, 0.30);
             border-radius: var(--border-radius-full);
-            padding: 8px 20px;
+            padding: 8px 22px;
             font-size: 0.88rem;
-            font-weight: 500;
-            margin-bottom: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
             backdrop-filter: blur(6px);
+            color: #fcd34d;
         }
         .hero-section h1 {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 2.75rem;
+            font-size: 3.1rem;
             font-weight: 800;
-            max-width: 700px;
-            margin: 0 auto 16px;
-            line-height: 1.15;
+            max-width: 750px;
+            margin: 0 auto 18px;
+            line-height: 1.18;
+            text-shadow: 0 2px 24px rgba(0,0,0,0.18);
+        }
+        .hero-section h1 .hero-highlight {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         .hero-section .hero-desc {
-            font-size: 1.1rem;
+            font-size: 1.12rem;
             font-weight: 400;
-            color: rgba(255,255,255,0.82);
-            max-width: 600px;
-            margin: 0 auto 32px;
-            line-height: 1.6;
+            color: rgba(255,255,255,0.78);
+            max-width: 620px;
+            margin: 0 auto 36px;
+            line-height: 1.65;
         }
         .hero-section .btn-hero {
-            background: #fff;
-            color: var(--primary-700);
-            font-weight: 700;
-            padding: 14px 36px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1a3a2a;
+            font-weight: 800;
+            padding: 16px 40px;
             border-radius: var(--border-radius-full);
-            font-size: 1.05rem;
+            font-size: 1.08rem;
             border: none;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.30);
         }
         .hero-section .btn-hero:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px rgba(251, 191, 36, 0.40);
+            color: #1a3a2a;
         }
+        .hero-trust {
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+        .hero-trust span {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.60);
+        }
+        .hero-trust span i { color: rgba(251, 191, 36, 0.70); font-size: 0.92rem; }
 
         /* ---- Founder Highlight ---- */
         .founder-card {
             background: var(--bg-card);
             border-radius: var(--border-radius-xl);
-            padding: 24px 28px;
-            margin-top: -48px;
+            padding: 28px 32px;
+            margin-top: -52px;
             position: relative;
             z-index: 5;
-            box-shadow: var(--shadow-lg);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.05);
             border: 1px solid var(--slate-200);
             max-width: 800px;
             margin-left: auto;
             margin-right: auto;
+            border-left: 4px solid #fbbf24;
         }
         .founder-photo {
             width: 80px;
@@ -211,6 +250,15 @@ $stats = $stats_result->fetch_assoc();
             background: var(--bg-card);
             border-bottom: 1px solid var(--slate-100);
         }
+        .stats-section-label {
+            text-align: center;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: var(--slate-800);
+            margin-bottom: 28px;
+        }
+        .stats-section-label i { color: var(--accent-500, #f59e0b); }
         .stat-card {
             background: var(--slate-50);
             border: 1px solid var(--slate-200);
@@ -250,7 +298,6 @@ $stats = $stats_result->fetch_assoc();
         }
 
         /* ---- Donation Form ---- */
-        .donate-section { padding: 64px 24px; }
         .donation-form-card {
             background: var(--bg-card);
             border-radius: var(--border-radius-xl);
@@ -608,13 +655,82 @@ $stats = $stats_result->fetch_assoc();
             color: var(--slate-600);
         }
 
+        /* ---- Impact Section ---- */
+        .impact-section {
+            padding: 60px 24px;
+            background: linear-gradient(180deg, #fff 0%, var(--slate-50) 100%);
+        }
+        .impact-heading {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 1.55rem;
+            color: var(--slate-800);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .impact-desc {
+            text-align: center;
+            color: var(--slate-500);
+            font-size: 0.95rem;
+            margin-bottom: 40px;
+            max-width: 520px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .impact-card {
+            background: #fff;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--border-radius-lg, 16px);
+            padding: 32px 24px;
+            text-align: center;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            height: 100%;
+        }
+        .impact-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+        }
+        .impact-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.7rem;
+            margin-bottom: 18px;
+        }
+        .impact-card h5 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--slate-800);
+            margin-bottom: 8px;
+        }
+        .impact-card p {
+            color: var(--slate-500);
+            font-size: 0.88rem;
+            margin-bottom: 0;
+            line-height: 1.55;
+        }
+
+        /* ---- Donate Section Enhancement ---- */
+        .donate-section {
+            padding: 64px 24px;
+            background: linear-gradient(180deg, var(--slate-50) 0%, #f0fdf4 50%, var(--slate-50) 100%);
+        }
+
         /* ---- Responsive ---- */
         @media (max-width: 768px) {
-            .hero-section { padding: 60px 16px 70px; }
-            .hero-section h1 { font-size: 2rem; }
+            .hero-section { padding: 70px 16px 80px; }
+            .hero-section h1 { font-size: 2.1rem; }
+            .hero-trust { gap: 16px; }
+            .hero-trust span { font-size: 0.78rem; }
             .donation-form-card { padding: 28px 20px; }
             .founder-card { margin-top: -36px; padding: 20px; }
             .topbar-links a:not(.btn-login) { display: none; }
+            .impact-section { padding: 48px 16px; }
+            .impact-card { padding: 24px 18px; }
         }
     </style>
 </head>
@@ -637,12 +753,17 @@ $stats = $stats_result->fetch_assoc();
 
 <!-- Hero Section -->
 <section class="hero-section">
-    <div class="badge-pill"><i class="bi bi-heart-pulse"></i> Monastery Healthcare &amp; Donation Platform</div>
-    <h1><i class="bi bi-person-hearts"></i> Helping Hands for Monastic Care</h1>
-    <p class="hero-desc">This platform funds medical treatment, medicines, and wellness support for monks at Seela Suwa Herath Bikshu Gilan Arana.</p>
+    <div class="badge-pill"><i class="bi bi-shield-check"></i> Trusted Monastery Healthcare Platform</div>
+    <h1>Every Gift Brings<br><span class="hero-highlight">Hope &amp; Healing</span></h1>
+    <p class="hero-desc">Your generosity funds medical treatment, essential medicines, and wellness programs for Buddhist monks at Seela Suwa Herath Bikshu Gilan Arana.</p>
     <a href="#donate" class="btn-hero">
-        <i class="bi bi-hand-thumbs-up"></i> Offer Support
+        <i class="bi bi-heart-fill"></i> Donate Now
     </a>
+    <div class="hero-trust">
+        <span><i class="bi bi-shield-lock-fill"></i> Secure Donations</span>
+        <span><i class="bi bi-check-circle-fill"></i> Verified &amp; Transparent</span>
+        <span><i class="bi bi-clock-fill"></i> 24-48hr Verification</span>
+    </div>
 </section>
 
 <!-- Founder Highlight -->
@@ -665,6 +786,7 @@ $stats = $stats_result->fetch_assoc();
 <!-- Stats Section -->
 <section class="stats-section">
     <div class="container">
+        <div class="stats-section-label"><i class="bi bi-bar-chart-fill"></i> Our Collective Impact</div>
         <div class="row g-4">
             <div class="col-md-4">
                 <div class="stat-card">
@@ -691,14 +813,45 @@ $stats = $stats_result->fetch_assoc();
     </div>
 </section>
 
+<!-- Impact Section -->
+<section class="impact-section">
+    <div class="container">
+        <h3 class="impact-heading"><i class="bi bi-diagram-3" style="color: var(--primary-500);"></i> Where Your Donation Goes</h3>
+        <p class="impact-desc">Every rupee is directed towards improving the health and wellbeing of our monastic community</p>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="impact-card">
+                    <div class="impact-icon" style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #16a34a;"><i class="bi bi-hospital"></i></div>
+                    <h5>Medical Treatment</h5>
+                    <p>Consultations, surgeries, and ongoing medical care for monks in need of specialist attention</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="impact-card">
+                    <div class="impact-icon" style="background: linear-gradient(135deg, #fef3c7, #fde68a); color: #d97706;"><i class="bi bi-capsule"></i></div>
+                    <h5>Medicine &amp; Supplies</h5>
+                    <p>Essential medications, medical equipment, and healthcare supplies for daily monastic care</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="impact-card">
+                    <div class="impact-icon" style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #2563eb;"><i class="bi bi-heart-pulse"></i></div>
+                    <h5>Wellness Programs</h5>
+                    <p>Preventive care, nutrition, and holistic wellbeing programs for the monastic community</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Donation Form Section -->
 <section id="donate" class="donate-section">
     <div class="container">
         <div class="donation-form-card">
             <h2 class="form-section-title">
-                <i class="bi bi-person-hearts" style="color: var(--primary-500);"></i> Offer a Helping Hand
+                <i class="bi bi-gift" style="color: var(--primary-500);"></i> Make Your Donation
             </h2>
-            <p class="form-section-desc">Your generosity directly supports monastic healthcare.</p>
+            <p class="form-section-desc">Complete the steps below — every contribution makes a real difference.</p>
 
             <?php if (isset($_GET['success'])): ?>
             <div class="alert alert-success d-flex align-items-center gap-2 mb-4" style="border-radius:var(--border-radius);font-size:0.95rem;">
@@ -961,7 +1114,7 @@ $stats = $stats_result->fetch_assoc();
 <section id="recent" class="recent-section">
     <div class="container">
         <h3 class="section-heading">
-            <i class="bi bi-stars"></i> Recent Helping-Hand Donations
+            <i class="bi bi-heart-fill" style="color: var(--primary-500);"></i> Wall of Generosity
         </h3>
         <div class="row">
             <div class="col-lg-8 mx-auto">
@@ -1014,7 +1167,7 @@ $stats = $stats_result->fetch_assoc();
 <!-- Footer -->
 <footer class="public-footer">
     <p class="mb-1">&copy; <?= date('Y') ?> <strong>Seela Suwa Herath Bikshu Gilan Arana</strong>. All rights reserved.</p>
-    <p class="mb-0" style="font-size: 0.82rem;">Bank transfer donations verified within 24-48 hours</p>
+    <p class="mb-0" style="font-size: 0.82rem;"><i class="bi bi-shield-check" style="color: #fbbf24;"></i> All donations are transparently managed &amp; verified within 24-48 hours</p>
 </footer>
 
 <script>
