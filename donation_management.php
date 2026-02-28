@@ -344,6 +344,10 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
                                                 <i class="bi bi-check-circle"></i>
                                             </button>
                                         </form>
+                                    <?php else: ?>
+                                        <button class="btn-icon" disabled style="opacity:0.4;cursor:not-allowed;" title="Already Verified">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                        </button>
                                     <?php endif; ?>
                                 </div>
                             </td>
