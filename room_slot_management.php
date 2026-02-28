@@ -1,6 +1,5 @@
 <?php
 session_start();
-include 'navbar.php';
 
 $servername = "localhost";
 $dbusername = "root";
@@ -89,258 +88,207 @@ while ($r = $rooms_res->fetch_assoc()) {
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Room Slot Management - Seela Suwa Herath Bikshu Gilan Arana</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Slot Management - Sacred Care</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
-    <link rel="stylesheet" href="assets/css/monastery-theme.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <style>
-        body { background: linear-gradient(135deg, var(--bg-main) 0%, #efe6d8 100%); }
-        .page-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: #fff;
-            padding: 1.8rem;
-            border-radius: 14px;
-            margin-bottom: 2rem;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        }
-        .slot-card {
-            transition: transform 0.2s;
-            border-left: 4px solid var(--primary);
-            background: #fff;
-        }
-        .slot-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14);
-        }
-        .time-badge {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: #fff;
-            padding: 0.3rem 0.7rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            border: none;
-        }
-    </style>
 </head>
 <body>
-<div class="container mt-4 mb-5">
-    <div class="page-header">
-        <div class="row align-items-center">
-            <div class="col">
-                <h2 class="mb-0"><i class="bi bi-calendar-range"></i> Room Slot Management</h2>
-                <p class="mb-0 mt-1 opacity-75">Manage time slots for room bookings</p>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addModal">
-                    <i class="bi bi-plus-circle"></i> Add Time Slot
-                </button>
-            </div>
-        </div>
-    </div>
-    <div class="identity-strip interactive-lift mb-4">
-        <img src="images/img1.jpeg" alt="Founder - Ven. Solewewa Chandrasiri Thero" class="identity-photo">
-        <div>
-            <div class="identity-title"><i class="bi bi-calendar-check"></i> Care Schedule Reliability</div>
-            <div class="identity-text">Reliable slot planning helps monks receive timely care with minimal waiting and better coordination.</div>
-        </div>
-    </div>
 
-    <div class="alert" style="background: linear-gradient(135deg, rgba(110, 134, 98, 0.08) 0%, rgba(79, 102, 69, 0.05) 100%); border-left: 3px solid var(--primary); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-        <img src="images/img1.jpeg" alt="Founder" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
-        <div style="font-size: 0.875rem; line-height: 1.4;">
-            <div style="font-weight: 600; color: var(--primary);">Seela Suwa Herath Bikshu Gilan Arana</div>
-            <div style="opacity: 0.75; font-size: 0.8rem;">Founded by Ven. Solewewa Chandrasiri Thero</div>
-        </div>
-    </div>
+<?php include 'navbar.php'; ?>
 
+    <!-- Alerts -->
     <?php if($error): ?>
-        <div class="alert alert-danger alert-dismissible fade show">
-            <i class="bi bi-exclamation-triangle"></i> <?= htmlspecialchars($error) ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert-modern alert-danger-modern">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span><?= htmlspecialchars($error) ?></span>
         </div>
     <?php endif; ?>
 
     <?php if($success): ?>
-        <div class="alert alert-success alert-dismissible fade show">
-            <i class="bi bi-check-circle"></i> <?= htmlspecialchars($success) ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert-modern alert-success-modern">
+            <i class="bi bi-check-circle"></i>
+            <span><?= htmlspecialchars($success) ?></span>
         </div>
     <?php endif; ?>
 
-    <!-- Room Slots Grid -->
-    <div class="row">
-        <?php if ($slots_res->num_rows == 0): ?>
-            <div class="col-12">
-                <div class="alert alert-info text-center">
-                    <i class="bi bi-info-circle"></i> No room slots found. Click "Add Time Slot" to create one.
-                </div>
-            </div>
-        <?php endif; ?>
+    <!-- Room Slots Table -->
+    <div class="modern-table-wrapper">
+        <div class="modern-table-header">
+            <h5><i class="bi bi-calendar-range me-2"></i>Room Slot Management</h5>
+            <button class="btn-modern btn-primary-modern" data-bs-toggle="modal" data-bs-target="#addModal">
+                <i class="bi bi-plus-circle"></i> Add Time Slot
+            </button>
+        </div>
+        <div class="table-responsive-modern">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Room</th>
+                        <th>Day</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if ($slots_res->num_rows == 0): ?>
+                        <tr>
+                            <td colspan="5" style="text-align:center;padding:2rem;">
+                                <i class="bi bi-info-circle me-1"></i> No room slots found. Click "Add Time Slot" to create one.
+                            </td>
+                        </tr>
+                    <?php endif; ?>
 
-        <?php 
-        $current_room = null;
-        while($row = $slots_res->fetch_assoc()): 
-            if ($current_room !== $row['room_id']) {
-                if ($current_room !== null) {
-                    echo '</div></div></div>'; // Close previous room card
-                }
-                $current_room = $row['room_id'];
-        ?>
-            <div class="col-md-6 mb-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="bi bi-door-open"></i> <?= htmlspecialchars($row['room_name']) ?></h5>
-                        <small class="opacity-75"><?= htmlspecialchars($row['type']) ?></small>
-                    </div>
-                    <div class="card-body">
-        <?php } ?>
-                        <div class="slot-card card mb-2">
-                            <div class="card-body py-2">
-                                <div class="row align-items-center">
-                                    <div class="col-md-3">
-                                        <span class="badge bg-primary"><?= $days_map[$row['day_of_week']] ?></span>
-                                    </div>
-                                    <div class="col-md-5">
-                                        <span class="time-badge">
-                                            <i class="bi bi-clock"></i> 
-                                            <?= date('g:i A', strtotime($row['start_time'])) ?> - 
-                                            <?= date('g:i A', strtotime($row['end_time'])) ?>
-                                        </span>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <?php if($row['is_active']): ?>
-                                            <span class="badge bg-success">Active</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-secondary">Inactive</span>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div class="col-md-2 text-end">
-                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal<?= $row['room_slot_id'] ?>" title="Edit">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?= $row['room_slot_id'] ?>" title="Delete">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                    <?php 
+                    $current_room = null;
+                    while($row = $slots_res->fetch_assoc()): 
+                        if ($current_room !== $row['room_id']) {
+                            $current_room = $row['room_id'];
+                        }
+                    ?>
+                    <tr>
+                        <td>
+                            <div style="font-weight:600;"><i class="bi bi-door-open me-1" style="color:var(--primary-500);"></i><?= htmlspecialchars($row['room_name']) ?></div>
+                            <small style="color:var(--text-secondary);"><?= htmlspecialchars($row['type']) ?></small>
+                        </td>
+                        <td><span class="badge-modern badge-primary"><?= $days_map[$row['day_of_week']] ?></span></td>
+                        <td>
+                            <i class="bi bi-clock me-1"></i>
+                            <?= date('g:i A', strtotime($row['start_time'])) ?> - 
+                            <?= date('g:i A', strtotime($row['end_time'])) ?>
+                        </td>
+                        <td>
+                            <?php if($row['is_active']): ?>
+                                <span class="badge-modern badge-success badge-dot">Active</span>
+                            <?php else: ?>
+                                <span class="badge-modern badge-secondary badge-dot">Inactive</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <div style="display:flex;gap:6px;">
+                                <button class="btn-icon" data-bs-toggle="modal" data-bs-target="#editModal<?= $row['room_slot_id'] ?>" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn-icon danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?= $row['room_slot_id'] ?>" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
                             </div>
-                        </div>
+                        </td>
+                    </tr>
 
-                        <!-- Edit Modal -->
-                        <div class="modal fade" id="editModal<?= $row['room_slot_id'] ?>" tabindex="-1">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <form method="post">
-                                        <div class="modal-header bg-primary text-white">
-                                            <h5 class="modal-title"><i class="bi bi-pencil-square"></i> Edit Room Slot</h5>
-                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <!-- Edit Modal -->
+                    <div class="modal fade" id="editModal<?= $row['room_slot_id'] ?>" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="post">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Edit Room Slot</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <input type="hidden" name="form_name" value="update">
+                                        <input type="hidden" name="room_slot_id" value="<?= $row['room_slot_id'] ?>">
+                                        
+                                        <div class="form-group-modern">
+                                            <label class="form-label-modern">Room</label>
+                                            <select name="room_id" class="form-select-modern" required>
+                                                <?php foreach($rooms as $room): ?>
+                                                    <option value="<?= $room['room_id'] ?>" <?= $room['room_id'] == $row['room_id'] ? 'selected' : '' ?>>
+                                                        <?= htmlspecialchars($room['name']) ?> - <?= $room['type'] ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
                                         </div>
-                                        <div class="modal-body">
-                                            <input type="hidden" name="form_name" value="update">
-                                            <input type="hidden" name="room_slot_id" value="<?= $row['room_slot_id'] ?>">
-                                            
-                                            <div class="mb-3">
-                                                <label class="form-label">Room</label>
-                                                <select name="room_id" class="form-select" required>
-                                                    <?php foreach($rooms as $room): ?>
-                                                        <option value="<?= $room['room_id'] ?>" <?= $room['room_id'] == $row['room_id'] ? 'selected' : '' ?>>
-                                                            <?= htmlspecialchars($room['name']) ?> - <?= $room['type'] ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
 
-                                            <div class="mb-3">
-                                                <label class="form-label">Day of Week</label>
-                                                <select name="day_of_week" class="form-select" required>
-                                                    <?php foreach($days_map as $idx => $day_name): ?>
-                                                        <option value="<?= $idx ?>" <?= $idx == $row['day_of_week'] ? 'selected' : '' ?>><?= $day_name ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
+                                        <div class="form-group-modern">
+                                            <label class="form-label-modern">Day of Week</label>
+                                            <select name="day_of_week" class="form-select-modern" required>
+                                                <?php foreach($days_map as $idx => $day_name): ?>
+                                                    <option value="<?= $idx ?>" <?= $idx == $row['day_of_week'] ? 'selected' : '' ?>><?= $day_name ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
 
-                                            <div class="row">
-                                                <div class="col-md-6 mb-3">
-                                                    <label class="form-label">Start Time</label>
-                                                    <input type="time" name="start_time" class="form-control" value="<?= $row['start_time'] ?>" required>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group-modern">
+                                                    <label class="form-label-modern">Start Time</label>
+                                                    <input type="time" name="start_time" class="form-control-modern" value="<?= $row['start_time'] ?>" required>
                                                 </div>
-                                                <div class="col-md-6 mb-3">
-                                                    <label class="form-label">End Time</label>
-                                                    <input type="time" name="end_time" class="form-control" value="<?= $row['end_time'] ?>" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group-modern">
+                                                    <label class="form-label-modern">End Time</label>
+                                                    <input type="time" name="end_time" class="form-control-modern" value="<?= $row['end_time'] ?>" required>
                                                 </div>
                                             </div>
+                                        </div>
 
-                                            <div class="form-check">
-                                                <input type="checkbox" name="is_active" class="form-check-input" id="active<?= $row['room_slot_id'] ?>" <?= $row['is_active'] ? 'checked' : '' ?>>
-                                                <label class="form-check-label" for="active<?= $row['room_slot_id'] ?>">Active</label>
-                                            </div>
+                                        <div class="form-check" style="margin-top:8px;">
+                                            <input type="checkbox" name="is_active" class="form-check-input" id="active<?= $row['room_slot_id'] ?>" <?= $row['is_active'] ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="active<?= $row['room_slot_id'] ?>">Active</label>
                                         </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                            <button type="submit" class="btn btn-primary">Save Changes</button>
-                                        </div>
-                                    </form>
-                                </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn-modern btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn-modern btn-primary-modern"><i class="bi bi-save"></i> Save Changes</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
-
-                        <!-- Delete Modal -->
-                        <div class="modal fade" id="deleteModal<?= $row['room_slot_id'] ?>" tabindex="-1">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <form method="post">
-                                        <div class="modal-header bg-danger text-white">
-                                            <h5 class="modal-title"><i class="bi bi-trash"></i> Confirm Delete</h5>
-                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p>Are you sure you want to delete this room slot?</p>
-                                            <p><strong><?= htmlspecialchars($row['room_name']) ?></strong> - 
-                                            <?= $days_map[$row['day_of_week']] ?> 
-                                            (<?= date('g:i A', strtotime($row['start_time'])) ?> - <?= date('g:i A', strtotime($row['end_time'])) ?>)</p>
-                                            <input type="hidden" name="form_name" value="delete">
-                                            <input type="hidden" name="room_slot_id" value="<?= $row['room_slot_id'] ?>">
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                            <button type="submit" class="btn btn-danger">Yes, Delete</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-        <?php endwhile; ?>
-        <?php if ($current_room !== null): ?>
                     </div>
-                </div>
-            </div>
-        <?php endif; ?>
+
+                    <!-- Delete Modal -->
+                    <div class="modal fade" id="deleteModal<?= $row['room_slot_id'] ?>" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="post">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title"><i class="bi bi-trash me-2"></i>Confirm Delete</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to delete this room slot?</p>
+                                        <p><strong><?= htmlspecialchars($row['room_name']) ?></strong> - 
+                                        <?= $days_map[$row['day_of_week']] ?> 
+                                        (<?= date('g:i A', strtotime($row['start_time'])) ?> - <?= date('g:i A', strtotime($row['end_time'])) ?>)</p>
+                                        <input type="hidden" name="form_name" value="delete">
+                                        <input type="hidden" name="room_slot_id" value="<?= $row['room_slot_id'] ?>">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn-modern btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn-modern btn-danger-modern"><i class="bi bi-trash"></i> Delete</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 
 <!-- Add New Slot Modal -->
 <div class="modal fade" id="addModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Add New Room Slot</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add New Room Slot</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="form_name" value="create">
                     
-                    <div class="mb-3">
-                        <label class="form-label">Room</label>
-                        <select name="room_id" class="form-select" required>
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Room</label>
+                        <select name="room_id" class="form-select-modern" required>
                             <option value="">-- Select Room --</option>
                             <?php foreach($rooms as $room): ?>
                                 <option value="<?= $room['room_id'] ?>">
@@ -350,9 +298,9 @@ while ($r = $rooms_res->fetch_assoc()) {
                         </select>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Day of Week</label>
-                        <select name="day_of_week" class="form-select" required>
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Day of Week</label>
+                        <select name="day_of_week" class="form-select-modern" required>
                             <option value="">-- Select Day --</option>
                             <?php foreach($days_map as $idx => $day_name): ?>
                                 <option value="<?= $idx ?>"><?= $day_name ?></option>
@@ -361,28 +309,36 @@ while ($r = $rooms_res->fetch_assoc()) {
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Start Time</label>
-                            <input type="time" name="start_time" class="form-control" required>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Start Time</label>
+                                <input type="time" name="start_time" class="form-control-modern" required>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">End Time</label>
-                            <input type="time" name="end_time" class="form-control" required>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">End Time</label>
+                                <input type="time" name="end_time" class="form-control-modern" required>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> <small>Slot will be set as active by default.</small>
+                    <div class="alert-modern alert-info-modern" style="margin-top:12px;">
+                        <i class="bi bi-info-circle"></i>
+                        <span>Slot will be set as active by default.</span>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success">Add Slot</button>
+                    <button type="button" class="btn-modern btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-modern btn-primary-modern"><i class="bi bi-plus-circle"></i> Add Slot</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+<?php include 'includes/footer.php'; ?>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

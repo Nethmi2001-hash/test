@@ -42,272 +42,517 @@ $stats = $stats_result->fetch_assoc();
     <title>Donate - Seela Suwa Herath Bikshu Gilan Arana</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
-    <link rel="stylesheet" href="assets/css/monastery-theme.css">
+    <link rel="stylesheet" href="assets/css/modern-design.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script type="text/javascript" src="https://www.payhere.lk/lib/payhere.js"></script>
     <style>
-        :root {
-            --monastery-green: #A67C52;
-            --monastery-dark-green: #8D6844;
-            --monastery-gold: #A67C52;
-            --monastery-cream: #FAF8F3;
-            --monastery-soft: #F5EFE6;
-            --monastery-accent: #7A1E1E;
-        }
-        
+        *, *::before, *::after { box-sizing: border-box; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--monastery-cream) 0%, #eee3cc 100%);
+            font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+            background: var(--slate-50);
+            color: var(--slate-800);
+            margin: 0;
         }
 
+        /* ---- Top Navigation ---- */
+        .public-topbar {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--slate-200);
+            box-shadow: var(--shadow-xs);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .public-topbar .topbar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 24px;
+        }
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--primary-700);
+            font-weight: 700;
+            font-size: 1.15rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .topbar-brand i {
+            font-size: 1.5rem;
+            color: var(--primary-500);
+        }
+        .topbar-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .topbar-links a {
+            text-decoration: none;
+            color: var(--slate-600);
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: var(--border-radius-full);
+            transition: all 0.2s ease;
+        }
+        .topbar-links a:hover {
+            background: var(--primary-50);
+            color: var(--primary-700);
+        }
+        .topbar-links .btn-login {
+            background: var(--primary-600);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: var(--border-radius-full);
+            font-weight: 600;
+        }
+        .topbar-links .btn-login:hover {
+            background: var(--primary-700);
+            color: #fff;
+        }
+
+        /* ---- Hero Section ---- */
         .hero-section {
-            background: linear-gradient(135deg, rgba(64, 83, 56, 0.92) 0%, rgba(42, 58, 36, 0.92) 100%),
-                        url('images/img6.jpeg') center/cover;
-            color: white;
-            padding: 80px 0;
+            background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-900) 60%, #022c22 100%);
+            color: #fff;
+            padding: 80px 24px 90px;
             text-align: center;
             position: relative;
             overflow: hidden;
         }
-
         .hero-section::before {
-            content: '\f4ce';
-            font-family: 'bootstrap-icons';
+            content: '';
             position: absolute;
-            font-size: 140px;
-            opacity: 0.12;
-            top: -50px;
-            right: -50px;
-            animation: float 6s ease-in-out infinite;
+            inset: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(52, 211, 153, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(251, 191, 36, 0.10) 0%, transparent 50%);
+            pointer-events: none;
         }
-
-        .mission-badge {
+        .hero-section .badge-pill {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(255, 255, 255, 0.16);
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            border-radius: 999px;
-            padding: 6px 16px;
-            font-size: 0.92rem;
-            margin-bottom: 14px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: var(--border-radius-full);
+            padding: 8px 20px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            backdrop-filter: blur(6px);
         }
-
-        .founder-highlight {
-            background: #fff;
-            border-radius: 18px;
-            padding: 20px;
-            margin-top: -34px;
-            position: relative;
-            z-index: 5;
-            box-shadow: 0 14px 30px rgba(32, 42, 29, 0.14);
-            border: 1px solid rgba(110, 134, 98, 0.15);
-        }
-
-        .founder-photo {
-            width: 92px;
-            height: 92px;
-            object-fit: cover;
-            border-radius: 14px;
-            border: 3px solid #ECE5D8;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
         .hero-section h1 {
-            font-size: 3rem;
-            font-weight: bold;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 2.75rem;
+            font-weight: 800;
+            max-width: 700px;
+            margin: 0 auto 16px;
+            line-height: 1.15;
         }
-
-        .stats-card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
+        .hero-section .hero-desc {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: rgba(255,255,255,0.82);
+            max-width: 600px;
+            margin: 0 auto 32px;
+            line-height: 1.6;
         }
-
-        .stats-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stats-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--primary);
-        }
-
-        .donation-form {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        }
-
-        .btn-donate {
-            background: linear-gradient(135deg, var(--monastery-green) 0%, var(--monastery-dark-green) 100%);
+        .hero-section .btn-hero {
+            background: #fff;
+            color: var(--primary-700);
+            font-weight: 700;
+            padding: 14px 36px;
+            border-radius: var(--border-radius-full);
+            font-size: 1.05rem;
             border: none;
-            color: white;
-            padding: 15px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .btn-donate:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(45, 80, 22, 0.35);
-            color: white;
-        }
-
-        .recent-donation-item {
-            padding: 15px;
-            background: var(--monastery-soft);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            border-left: 4px solid var(--monastery-green);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-
-        .recent-donation-item:hover {
+        .hero-section .btn-hero:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(32, 42, 29, 0.12);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
         }
 
-        .category-card {
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
+        /* ---- Founder Highlight ---- */
+        .founder-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius-xl);
+            padding: 24px 28px;
+            margin-top: -48px;
+            position: relative;
+            z-index: 5;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--slate-200);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .founder-photo {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: var(--border-radius);
+            border: 3px solid var(--primary-100);
         }
 
-        .category-card:hover, .category-card.selected {
-            border-color: var(--monastery-green);
-            background: var(--monastery-soft);
+        /* ---- Stats Section ---- */
+        .stats-section {
+            padding: 60px 24px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--slate-100);
         }
-
-        .category-card.selected {
-            background: var(--monastery-soft);
-            box-shadow: 0 3px 10px rgba(45, 80, 22, 0.2);
+        .stat-card {
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: var(--border-radius-lg);
+            padding: 28px 20px;
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-
-        .navbar-custom {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
         }
-
-        .nav-link {
-            color: #333 !important;
-            font-weight: 500;
-        }
-
-        .nav-link:hover {
-            color: var(--monastery-accent) !important;
-        }
-
-        .btn-outline-secondary:hover,
-        .btn-outline-secondary:focus {
-            background: var(--monastery-accent);
-            border-color: var(--monastery-accent);
-        }
-
-        .section-title {
-            color: var(--monastery-accent);
-            font-weight: 700;
-        }
-
         .stat-icon {
-            font-size: 2.5rem;
+            width: 52px;
+            height: 52px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius);
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+        .stat-icon.green  { background: var(--primary-100); color: var(--primary-600); }
+        .stat-icon.amber  { background: var(--accent-100);  color: var(--accent-600);  }
+        .stat-icon.blue   { background: var(--info-light);   color: var(--info);        }
+        .stat-number {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--slate-800);
+        }
+        .stat-label {
+            color: var(--slate-500);
+            font-size: 0.88rem;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        /* ---- Donation Form ---- */
+        .donate-section { padding: 64px 24px; }
+        .donation-form-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--slate-200);
+            padding: 40px 36px;
+            max-width: 780px;
+            margin: 0 auto;
+        }
+        .form-section-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: var(--slate-800);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .form-section-desc {
+            text-align: center;
+            color: var(--slate-500);
+            margin-bottom: 32px;
+            font-size: 0.95rem;
+        }
+        .form-control-modern {
+            border: 1.5px solid var(--slate-200);
+            border-radius: var(--border-radius-sm);
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            color: var(--slate-800);
+            background: var(--slate-50);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .form-control-modern:focus {
+            border-color: var(--primary-400);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+            background: #fff;
+            outline: none;
+        }
+        .form-control-modern::placeholder { color: var(--slate-400); }
+        .form-label-modern {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--slate-700);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .form-label-modern i { color: var(--primary-500); font-size: 0.95rem; }
+
+        /* Category Cards */
+        .category-card {
+            border: 2px solid var(--slate-200);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--slate-50);
+        }
+        .category-card:hover {
+            border-color: var(--primary-300);
+            background: var(--primary-50);
+        }
+        .category-card.selected {
+            border-color: var(--primary-500);
+            background: var(--primary-50);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+        }
+        .category-card strong { color: var(--slate-700); font-size: 0.92rem; }
+        .category-card p { color: var(--slate-500); font-size: 0.82rem; }
+
+        /* Quick Amount Buttons */
+        .btn-amount {
+            border: 1.5px solid var(--slate-200);
+            border-radius: var(--border-radius-full);
+            padding: 6px 18px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--slate-600);
+            background: var(--slate-50);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-amount:hover {
+            border-color: var(--primary-400);
+            color: var(--primary-700);
+            background: var(--primary-50);
+        }
+
+        /* Primary Button */
+        .btn-primary-modern {
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.05rem;
+            padding: 14px 24px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(5, 150, 105, 0.3);
+            color: #fff;
+        }
+
+        /* Info Alert */
+        .alert-modern {
+            background: var(--info-light);
+            border: 1px solid rgba(2, 132, 199, 0.2);
+            border-radius: var(--border-radius);
+            padding: 16px 20px;
+            font-size: 0.88rem;
+            color: var(--slate-700);
+        }
+        .alert-modern strong { color: var(--info); }
+
+        /* ---- Recent Donations ---- */
+        .recent-section {
+            padding: 64px 24px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--slate-100);
+        }
+        .section-heading {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--slate-800);
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .section-heading i { color: var(--accent-500); }
+        .donation-item {
+            padding: 16px 20px;
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
+            border-left: 4px solid var(--primary-500);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .donation-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+        .donation-item .donor-name { font-weight: 600; color: var(--slate-700); }
+        .donation-item .donor-cat  { font-size: 0.82rem; color: var(--slate-500); }
+        .donation-item .don-amount { font-weight: 700; color: var(--primary-600); }
+        .donation-item .don-date   { font-size: 0.82rem; color: var(--slate-400); }
+
+        /* ---- Contact Section ---- */
+        .contact-section {
+            padding: 64px 24px;
+            background: var(--slate-100);
+            border-top: 1px solid var(--slate-200);
+        }
+        .contact-heading {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--primary-700);
+            margin-bottom: 16px;
+        }
+        .contact-info { color: var(--slate-600); line-height: 2; }
+        .contact-info i { color: var(--primary-500); margin-right: 6px; }
+        .btn-outline-modern {
+            border: 1.5px solid var(--slate-300);
+            color: var(--slate-600);
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: var(--border-radius-full);
+            background: transparent;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+        .btn-outline-modern:hover {
+            border-color: var(--primary-500);
+            color: var(--primary-700);
+            background: var(--primary-50);
+        }
+
+        /* ---- Footer ---- */
+        .public-footer {
+            background: var(--slate-900);
+            color: rgba(255,255,255,0.7);
+            padding: 28px 24px;
+            text-align: center;
+            font-size: 0.88rem;
+        }
+        .public-footer strong { color: rgba(255,255,255,0.9); }
+
+        /* ---- Chatbot Widget ---- */
+        .chatbot-fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
+            color: #fff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35);
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .chatbot-fab:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 28px rgba(5, 150, 105, 0.45);
+            color: #fff;
+        }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 768px) {
+            .hero-section { padding: 60px 16px 70px; }
+            .hero-section h1 { font-size: 2rem; }
+            .donation-form-card { padding: 28px 20px; }
+            .founder-card { margin-top: -36px; padding: 20px; }
+            .topbar-links a:not(.btn-login) { display: none; }
         }
     </style>
 </head>
 <body>
 
-<!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-custom">
-    <div class="container">
-        <a class="navbar-brand" href="#" style="color: var(--monastery-green); font-weight: bold;">
-            <i class="bi bi-person-hearts"></i> Seela Suwa Herath
+<!-- Top Navigation -->
+<header class="public-topbar">
+    <div class="topbar-inner">
+        <a href="#" class="topbar-brand">
+            <i class="bi bi-heart-pulse-fill"></i> Seela Suwa Herath
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#donate">Donate</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#recent">Recent Donations</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#contact">Contact</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="login.php">
-                        <i class="bi bi-box-arrow-in-right"></i> Staff Login
-                    </a>
-                </li>
-            </ul>
-        </div>
+        <nav class="topbar-links">
+            <a href="#donate">Donate</a>
+            <a href="#recent">Recent</a>
+            <a href="#contact">Contact</a>
+            <a href="login.php" class="btn-login"><i class="bi bi-box-arrow-in-right"></i> Back to Login</a>
+        </nav>
     </div>
-</nav>
+</header>
 
 <!-- Hero Section -->
 <section class="hero-section">
-    <div class="container">
-        <div class="mission-badge"><i class="bi bi-heart-pulse"></i> Monastery Healthcare & Donation Platform</div>
-        <h1 class="mb-3"><i class="bi bi-person-hearts"></i> Helping Hands for Monastic Care</h1>
-        <p class="lead mb-4">This platform funds medical treatment, medicines, and wellness support for monks at Seela Suwa Herath Bikshu Gilan Arana.</p>
-        <a href="#donate" class="btn btn-light btn-lg px-5">
-            <i class="bi bi-hand-thumbs-up"></i> Offer Support
-        </a>
-    </div>
+    <div class="badge-pill"><i class="bi bi-heart-pulse"></i> Monastery Healthcare &amp; Donation Platform</div>
+    <h1><i class="bi bi-person-hearts"></i> Helping Hands for Monastic Care</h1>
+    <p class="hero-desc">This platform funds medical treatment, medicines, and wellness support for monks at Seela Suwa Herath Bikshu Gilan Arana.</p>
+    <a href="#donate" class="btn-hero">
+        <i class="bi bi-hand-thumbs-up"></i> Offer Support
+    </a>
 </section>
 
-<section class="container">
-    <div class="founder-highlight interactive-lift">
+<!-- Founder Highlight -->
+<section class="container" style="position: relative;">
+    <div class="founder-card">
         <div class="row align-items-center g-3">
             <div class="col-auto">
                 <img src="images/img1.jpeg" alt="Solewewa Chandrasiri Thero - Founder" class="founder-photo">
             </div>
             <div class="col">
-                <h5 class="mb-1 section-title"><i class="bi bi-award"></i> Founder: Ven. Solewewa Chandrasiri Thero</h5>
-                <p class="mb-0 text-muted">Seela Suwa Herath Bikshu Gilan Arana was founded to provide compassionate healthcare for monks, supported by transparent public donations.</p>
+                <h5 style="margin-bottom: 4px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; color: var(--primary-700);">
+                    <i class="bi bi-award-fill"></i> Founder: Ven. Solewewa Chandrasiri Thero
+                </h5>
+                <p style="margin-bottom: 0; color: var(--slate-500); font-size: 0.92rem;">Seela Suwa Herath Bikshu Gilan Arana was founded to provide compassionate healthcare for monks, supported by transparent public donations.</p>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Stats Section -->
-<section class="py-5" style="background: white;">
+<section class="stats-section">
     <div class="container">
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="stats-card">
-                    <i class="bi bi-people-fill stat-icon icon-tone-primary"></i>
-                    <div class="stats-number mt-3"><?= number_format($stats['unique_donors'] ?? 0) ?></div>
-                    <div class="text-muted">Generous Donors</div>
+                <div class="stat-card">
+                    <div class="stat-icon green"><i class="bi bi-people-fill"></i></div>
+                    <div class="stat-number"><?= number_format($stats['unique_donors'] ?? 0) ?></div>
+                    <div class="stat-label">Generous Donors</div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="stats-card">
-                    <i class="bi bi-cash-coin stat-icon icon-tone-primary"></i>
-                    <div class="stats-number mt-3">Rs. <?= number_format($stats['total_amount'] ?? 0, 0) ?></div>
-                    <div class="text-muted">Total Donations</div>
+                <div class="stat-card">
+                    <div class="stat-icon amber"><i class="bi bi-cash-coin"></i></div>
+                    <div class="stat-number">Rs. <?= number_format($stats['total_amount'] ?? 0, 0) ?></div>
+                    <div class="stat-label">Total Donations</div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="stats-card">
-                    <i class="bi bi-person-hearts stat-icon icon-tone-accent"></i>
-                    <div class="stats-number mt-3"><?= number_format($stats['total_donations'] ?? 0) ?></div>
-                    <div class="text-muted">Total Contributions</div>
+                <div class="stat-card">
+                    <div class="stat-icon blue"><i class="bi bi-person-hearts"></i></div>
+                    <div class="stat-number"><?= number_format($stats['total_donations'] ?? 0) ?></div>
+                    <div class="stat-label">Total Contributions</div>
                 </div>
             </div>
         </div>
@@ -315,106 +560,101 @@ $stats = $stats_result->fetch_assoc();
 </section>
 
 <!-- Donation Form Section -->
-<section id="donate" class="py-5">
+<section id="donate" class="donate-section">
     <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <div class="donation-form">
-                    <h2 class="text-center mb-4 section-title">
-                        <i class="bi bi-person-hearts"></i> Offer a Helping Hand
-                    </h2>
+        <div class="donation-form-card">
+            <h2 class="form-section-title">
+                <i class="bi bi-person-hearts" style="color: var(--primary-500);"></i> Offer a Helping Hand
+            </h2>
+            <p class="form-section-desc">Your generosity directly supports monastic healthcare.</p>
 
-                    <form id="donationForm">
-                        <div class="row mb-4">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label"><i class="bi bi-person"></i> Your Name</label>
-                                <input type="text" id="donor_name" class="form-control" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label"><i class="bi bi-envelope"></i> Email</label>
-                                <input type="email" id="donor_email" class="form-control" required>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label"><i class="bi bi-telephone"></i> Phone Number</label>
-                            <input type="text" id="donor_phone" class="form-control" placeholder="07XXXXXXXX" required>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label"><i class="bi bi-tag"></i> Donation Category</label>
-                            <div class="row g-3">
-                                <?php while ($category = $categories->fetch_assoc()): ?>
-                                <div class="col-md-6">
-                                    <div class="category-card" onclick="selectCategory(<?= $category['category_id'] ?>, '<?= htmlspecialchars($category['name']) ?>')">
-                                        <input type="radio" name="category" value="<?= $category['category_id'] ?>" id="cat_<?= $category['category_id'] ?>" hidden>
-                                        <strong><?= htmlspecialchars($category['name']) ?></strong>
-                                        <p class="mb-0 text-muted small"><?= htmlspecialchars($category['description']) ?></p>
-                                    </div>
-                                </div>
-                                <?php endwhile; ?>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label"><i class="bi bi-cash"></i> Donation Amount (Rs.)</label>
-                            <input type="number" id="amount" class="form-control form-control-lg" min="100" step="0.01" placeholder="Enter amount" required>
-                            <div class="mt-2">
-                                <button type="button" class="btn btn-outline-secondary btn-sm me-2" onclick="setAmount(500)">Rs. 500</button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm me-2" onclick="setAmount(1000)">Rs. 1,000</button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm me-2" onclick="setAmount(5000)">Rs. 5,000</button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setAmount(10000)">Rs. 10,000</button>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label"><i class="bi bi-chat-left-text"></i> Message (Optional)</label>
-                            <textarea id="notes" class="form-control" rows="3" placeholder="Your message or dedication..."></textarea>
-                        </div>
-
-                        <div class="alert alert-info">
-                            <small>
-                                <strong><i class="bi bi-shield-check"></i> Sandbox Test Mode:</strong><br>
-                                Use test cards: <strong>4111 1111 1111 1111</strong> (Visa) or <strong>5555 5555 5555 4444</strong> (MasterCard)<br>
-                                CVV: Any 3 digits | Expiry: Any future date
-                            </small>
-                        </div>
-
-                        <button type="button" class="btn btn-donate w-100" onclick="payWithPayHere()">
-                            <i class="bi bi-credit-card"></i> Proceed to Secure Payment
-                        </button>
-                    </form>
+            <form id="donationForm">
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label-modern"><i class="bi bi-person"></i> Your Name</label>
+                        <input type="text" id="donor_name" class="form-control form-control-modern" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label-modern"><i class="bi bi-envelope"></i> Email</label>
+                        <input type="email" id="donor_email" class="form-control form-control-modern" required>
+                    </div>
                 </div>
-            </div>
+
+                <div class="mb-3">
+                    <label class="form-label-modern"><i class="bi bi-telephone"></i> Phone Number</label>
+                    <input type="text" id="donor_phone" class="form-control form-control-modern" placeholder="07XXXXXXXX" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label-modern"><i class="bi bi-tag"></i> Donation Category</label>
+                    <div class="row g-3 mt-1">
+                        <?php while ($category = $categories->fetch_assoc()): ?>
+                        <div class="col-md-6">
+                            <div class="category-card" onclick="selectCategory(<?= $category['category_id'] ?>, '<?= htmlspecialchars($category['name']) ?>')">
+                                <input type="radio" name="category" value="<?= $category['category_id'] ?>" id="cat_<?= $category['category_id'] ?>" hidden>
+                                <strong><?= htmlspecialchars($category['name']) ?></strong>
+                                <p class="mb-0"><?= htmlspecialchars($category['description']) ?></p>
+                            </div>
+                        </div>
+                        <?php endwhile; ?>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label-modern"><i class="bi bi-cash"></i> Donation Amount (Rs.)</label>
+                    <input type="number" id="amount" class="form-control form-control-modern" style="font-size:1.1rem; font-weight:600;" min="100" step="0.01" placeholder="Enter amount" required>
+                    <div class="mt-2 d-flex flex-wrap gap-2">
+                        <button type="button" class="btn-amount" onclick="setAmount(500)">Rs. 500</button>
+                        <button type="button" class="btn-amount" onclick="setAmount(1000)">Rs. 1,000</button>
+                        <button type="button" class="btn-amount" onclick="setAmount(5000)">Rs. 5,000</button>
+                        <button type="button" class="btn-amount" onclick="setAmount(10000)">Rs. 10,000</button>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label-modern"><i class="bi bi-chat-left-text"></i> Message (Optional)</label>
+                    <textarea id="notes" class="form-control form-control-modern" rows="3" placeholder="Your message or dedication..."></textarea>
+                </div>
+
+                <div class="alert-modern mb-4">
+                    <strong><i class="bi bi-shield-check"></i> Sandbox Test Mode:</strong><br>
+                    Use test cards: <strong>4111 1111 1111 1111</strong> (Visa) or <strong>5555 5555 5555 4444</strong> (MasterCard)<br>
+                    CVV: Any 3 digits | Expiry: Any future date
+                </div>
+
+                <button type="button" class="btn-primary-modern w-100" onclick="payWithPayHere()">
+                    <i class="bi bi-credit-card"></i> Proceed to Secure Payment
+                </button>
+            </form>
         </div>
     </div>
 </section>
 
 <!-- Recent Donations Section -->
-<section id="recent" class="py-5" style="background: white;">
+<section id="recent" class="recent-section">
     <div class="container">
-        <h3 class="text-center mb-4 section-title">
+        <h3 class="section-heading">
             <i class="bi bi-stars"></i> Recent Helping-Hand Donations
         </h3>
         <div class="row">
             <div class="col-lg-8 mx-auto">
                 <?php if ($recent_donations->num_rows > 0): ?>
                     <?php while ($donation = $recent_donations->fetch_assoc()): ?>
-                    <div class="recent-donation-item">
+                    <div class="donation-item">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <strong><?= htmlspecialchars($donation['donor_name']) ?></strong>
-                                <small class="text-muted d-block"><?= htmlspecialchars($donation['category_name']) ?></small>
+                                <span class="donor-name"><?= htmlspecialchars($donation['donor_name']) ?></span>
+                                <span class="donor-cat d-block"><?= htmlspecialchars($donation['category_name']) ?></span>
                             </div>
                             <div class="text-end">
-                                <strong style="color: var(--monastery-green);">Rs. <?= number_format($donation['amount'], 2) ?></strong>
-                                <small class="text-muted d-block"><?= date('M d, Y', strtotime($donation['created_at'])) ?></small>
+                                <span class="don-amount">Rs. <?= number_format($donation['amount'], 2) ?></span>
+                                <span class="don-date d-block"><?= date('M d, Y', strtotime($donation['created_at'])) ?></span>
                             </div>
                         </div>
                     </div>
                     <?php endwhile; ?>
                 <?php else: ?>
-                    <p class="text-center text-muted">No donations yet. Be the first to contribute!</p>
+                    <p class="text-center" style="color: var(--slate-500);">No donations yet. Be the first to contribute!</p>
                 <?php endif; ?>
             </div>
         </div>
@@ -422,20 +662,20 @@ $stats = $stats_result->fetch_assoc();
 </section>
 
 <!-- Contact Section -->
-<section id="contact" class="py-5" style="background: var(--monastery-soft);">
+<section id="contact" class="contact-section">
     <div class="container">
         <div class="row">
             <div class="col-lg-6 mx-auto text-center">
-                <h3 style="color: var(--monastery-green);">
-                    <i class="bi bi-envelope"></i> Get in Touch
+                <h3 class="contact-heading">
+                    <i class="bi bi-envelope-fill"></i> Get in Touch
                 </h3>
-                <p class="mt-3">
-                    <i class="bi bi-geo-alt"></i> Giribawa, Sri Lanka<br>
-                    <i class="bi bi-telephone"></i> +94 XX XXX XXXX<br>
-                    <i class="bi bi-envelope"></i> admin@monastery.lk
+                <p class="contact-info">
+                    <i class="bi bi-geo-alt-fill"></i> Giribawa, Sri Lanka<br>
+                    <i class="bi bi-telephone-fill"></i> +94 XX XXX XXXX<br>
+                    <i class="bi bi-envelope-fill"></i> admin@monastery.lk
                 </p>
                 <div class="mt-4">
-                    <a href="login.php" class="btn btn-outline-secondary">
+                    <a href="login.php" class="btn-outline-modern">
                         <i class="bi bi-box-arrow-in-right"></i> Staff Login
                     </a>
                 </div>
@@ -445,9 +685,9 @@ $stats = $stats_result->fetch_assoc();
 </section>
 
 <!-- Footer -->
-<footer class="py-4 text-center" style="background: #333; color: white;">
-    <p class="mb-0">&copy; 2026 Seela Suwa Herath Bikshu Gilan Arana. All rights reserved.</p>
-    <p class="mb-0 small">Powered by PayHere Secure Payment Gateway</p>
+<footer class="public-footer">
+    <p class="mb-1">&copy; 2026 <strong>Seela Suwa Herath Bikshu Gilan Arana</strong>. All rights reserved.</p>
+    <p class="mb-0" style="font-size: 0.82rem;">Powered by PayHere Secure Payment Gateway</p>
 </footer>
 
 <script>
@@ -532,14 +772,11 @@ function payWithPayHere() {
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="assets/js/ui-interactions.js"></script>
 
 <!-- Chatbot Widget -->
-<div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
-    <a href="chatbot.php" target="_blank" class="btn btn-donate rounded-circle" style="width: 60px; height: 60px; padding: 0; display: flex; align-items: center; justify-content: center;">
-        <i class="bi bi-chat-dots" style="font-size: 1.5rem;"></i>
-    </a>
-</div>
+<a href="chatbot.php" target="_blank" class="chatbot-fab" title="Chat with us">
+    <i class="bi bi-chat-dots"></i>
+</a>
 
 </body>
 </html>
