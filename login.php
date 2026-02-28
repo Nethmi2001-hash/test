@@ -80,6 +80,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="assets/css/modern-design.css">
 </head>
 <body>
+    <!-- Navbar -->
+    <nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);box-shadow:0 1px 3px rgba(0,0,0,0.06),0 8px 24px rgba(0,0,0,0.04);padding:10px 0;">
+        <div style="max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;">
+            <a href="index.php" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:#4A6040;">
+                <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#6E8662,#3D5035);display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;box-shadow:0 2px 8px rgba(110,134,98,0.3);">
+                    <i class="bi bi-heart-pulse"></i>
+                </div>
+                <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:17px;letter-spacing:-0.5px;line-height:1.2;color:#4A6040;">
+                    Seela Suwa Herath
+                    <small style="display:block;font-weight:500;font-size:11px;opacity:0.6;letter-spacing:0;">Bikshu Gilan Arana</small>
+                </div>
+            </a>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <a href="index.php" style="font-size:13.5px;font-weight:600;color:#475569;text-decoration:none;padding:8px 16px;border-radius:10px;transition:all 0.2s;">Home</a>
+                <a href="public_donate.php" style="font-size:13.5px;font-weight:600;color:#475569;text-decoration:none;padding:8px 16px;border-radius:10px;transition:all 0.2s;">Donate</a>
+                <a href="public_transparency.php" style="font-size:13.5px;font-weight:600;color:#475569;text-decoration:none;padding:8px 16px;border-radius:10px;transition:all 0.2s;">Transparency</a>
+                <a href="register.php" style="font-size:13.5px;font-weight:600;color:#fff;text-decoration:none;padding:8px 16px;border-radius:10px;background:#5C7350;border:1.5px solid #5C7350;">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <div style="padding-top:70px;"></div>
+
     <div class="auth-page">
         <!-- Hero Section -->
         <div class="auth-hero">
@@ -199,5 +222,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/modern-app.js"></script>
+
+    <!-- Footer -->
+    <footer style="background:linear-gradient(165deg,#1a2e1a 0%,#2d4a2d 50%,#3d2b1f 100%);color:rgba(255,255,255,0.75);padding:48px 24px 24px;">
+        <div style="max-width:1200px;margin:0 auto;">
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;margin-bottom:32px;">
+                <div>
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                        <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#6E8662,#3D5035);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;"><i class="bi bi-heart-pulse"></i></div>
+                        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:16px;color:#fff;">Seela Suwa Herath</div>
+                    </div>
+                    <p style="font-size:13px;line-height:1.7;opacity:0.65;max-width:320px;">Comprehensive healthcare coordination and donation management system for monastic communities across Sri Lanka.</p>
+                </div>
+                <div>
+                    <div style="font-weight:700;font-size:13px;color:#fff;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">Quick Links</div>
+                    <ul style="list-style:none;padding:0;margin:0;">
+                        <li style="margin-bottom:10px;"><a href="index.php" style="color:rgba(255,255,255,0.6);text-decoration:none;font-size:13.5px;">Home</a></li>
+                        <li style="margin-bottom:10px;"><a href="register.php" style="color:rgba(255,255,255,0.6);text-decoration:none;font-size:13.5px;">Register</a></li>
+                        <li style="margin-bottom:10px;"><a href="public_donate.php" style="color:rgba(255,255,255,0.6);text-decoration:none;font-size:13.5px;">Donate</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <div style="font-weight:700;font-size:13px;color:#fff;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">Contact</div>
+                    <ul style="list-style:none;padding:0;margin:0;">
+                        <li style="margin-bottom:10px;"><a href="mailto:info@seelasuwherath.lk" style="color:rgba(255,255,255,0.6);text-decoration:none;font-size:13.5px;"><i class="bi bi-envelope me-2"></i>info@seelasuwherath.lk</a></li>
+                        <li style="margin-bottom:10px;"><a href="tel:+94112345678" style="color:rgba(255,255,255,0.6);text-decoration:none;font-size:13.5px;"><i class="bi bi-telephone me-2"></i>+94 11 234 5678</a></li>
+                        <li style="margin-bottom:10px;"><a href="#" style="color:rgba(255,255,255,0.6);text-decoration:none;font-size:13.5px;"><i class="bi bi-geo-alt me-2"></i>Colombo, Sri Lanka</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:20px;display:flex;justify-content:space-between;align-items:center;font-size:12px;opacity:0.5;">
+                <span>&copy; <?= date('Y') ?> Seela Suwa Herath Bikshu Gilan Arana. All rights reserved.</span>
+                <span>Built with <i class="bi bi-heart-fill" style="color:#dc2626;font-size:11px;"></i> for the Sangha</span>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
