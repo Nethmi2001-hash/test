@@ -334,7 +334,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
         .hp-hero-card-stack {
             position: relative;
             width: 420px;
-            height: 520px;
+            height: 480px;
         }
         .hp-float-card {
             position: absolute;
@@ -343,7 +343,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255,255,255,0.18);
             border-radius: 20px;
-            padding: 24px;
+            padding: 20px;
             color: #fff;
             box-shadow: 0 20px 40px rgba(0,0,0,0.15);
             animation: cardFloat 6s ease-in-out infinite;
@@ -351,20 +351,20 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
         .hp-float-card:nth-child(1) {
             top: 0;
             left: 0;
-            width: 260px;
+            width: 240px;
             z-index: 3;
         }
         .hp-float-card:nth-child(2) {
-            top: 160px;
+            top: 170px;
             right: 0;
-            width: 240px;
+            width: 230px;
             z-index: 2;
             animation-delay: -2s;
         }
         .hp-float-card:nth-child(3) {
             bottom: 0;
-            left: 20px;
-            width: 280px;
+            left: 30px;
+            width: 270px;
             z-index: 1;
             animation-delay: -4s;
         }
