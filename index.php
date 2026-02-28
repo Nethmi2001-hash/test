@@ -39,28 +39,28 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --green-50: #f0fdf4;
-            --green-100: #dcfce7;
-            --green-200: #bbf7d0;
-            --green-400: #4ade80;
-            --green-500: #6E8662;
-            --green-600: #5C7350;
-            --green-700: #4A6040;
-            --green-800: #3D5035;
-            --green-900: #2D3B27;
+            --green-50: #fff7ed;
+            --green-100: #ffedd5;
+            --green-200: #fed7aa;
+            --green-400: #fb923c;
+            --green-500: #f97316;
+            --green-600: #ea580c;
+            --green-700: #c2410c;
+            --green-800: #9a3412;
+            --green-900: #7c2d12;
             --amber-400: #fbbf24;
             --amber-500: #f59e0b;
             --amber-600: #d97706;
-            --slate-50: #f8fafc;
-            --slate-100: #f1f5f9;
-            --slate-200: #e2e8f0;
-            --slate-300: #cbd5e1;
-            --slate-400: #94a3b8;
-            --slate-500: #64748b;
-            --slate-600: #475569;
-            --slate-700: #334155;
-            --slate-800: #1e293b;
-            --slate-900: #0f172a;
+            --slate-50: #fefcfb;
+            --slate-100: #fef7f2;
+            --slate-200: #fde8d8;
+            --slate-300: #f5cdb4;
+            --slate-400: #b08968;
+            --slate-500: #7c6354;
+            --slate-600: #5c4a40;
+            --slate-700: #4a3c34;
+            --slate-800: #3d302a;
+            --slate-900: #2d2118;
         }
 
         html { scroll-behavior: smooth; }
@@ -106,19 +106,19 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             color: #fff;
             transition: color 0.3s;
         }
-        .hp-nav.scrolled .hp-brand { color: var(--green-700); }
+        .hp-nav.scrolled .hp-brand { color: #ea580c; }
         .hp-brand-icon {
             width: 42px;
             height: 42px;
             border-radius: 12px;
-            background: linear-gradient(135deg, var(--green-500), var(--green-800));
+            background: linear-gradient(135deg, #f97316, #ea580c);
             display: flex;
             align-items: center;
             justify-content: center;
             color: #fff;
             font-size: 20px;
             flex-shrink: 0;
-            box-shadow: 0 2px 8px rgba(110,134,98,0.3);
+            box-shadow: 0 2px 8px rgba(249,115,22,0.3);
         }
         .hp-brand-text {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -152,17 +152,17 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
         .hp-nav-links a:hover { background: rgba(255,255,255,0.15); color: #fff; }
         .hp-nav.scrolled .hp-nav-links a:hover { background: var(--slate-100); color: var(--slate-800); }
         .hp-nav-cta {
-            background: rgba(255,255,255,0.18) !important;
-            border: 1.5px solid rgba(255,255,255,0.35) !important;
-            color: #fff !important;
+            background: #fff !important;
+            border: 1.5px solid #fff !important;
+            color: #ea580c !important;
         }
         .hp-nav.scrolled .hp-nav-cta {
-            background: var(--green-600) !important;
-            border-color: var(--green-600) !important;
+            background: #f97316 !important;
+            border-color: #f97316 !important;
             color: #fff !important;
         }
-        .hp-nav-cta:hover { background: rgba(255,255,255,0.28) !important; }
-        .hp-nav.scrolled .hp-nav-cta:hover { background: var(--green-700) !important; }
+        .hp-nav-cta:hover { background: #ffedd5 !important; color: #c2410c !important; }
+        .hp-nav.scrolled .hp-nav-cta:hover { background: #ea580c !important; }
 
         /* Mobile nav */
         .hp-menu-btn {
@@ -182,7 +182,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             min-height: 100vh;
             display: flex;
             align-items: center;
-            background: linear-gradient(165deg, var(--green-900) 0%, var(--green-700) 35%, #5C4033 70%, #3D2B1F 100%);
+            background: linear-gradient(165deg, #fb923c 0%, #f97316 35%, #ea580c 70%, #f59e0b 100%);
             overflow: hidden;
         }
         .hp-hero::before {
@@ -190,9 +190,9 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             position: absolute;
             inset: 0;
             background: 
-                radial-gradient(ellipse at 20% 20%, rgba(245,158,11,0.12) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(110,134,98,0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.2) 0%, transparent 70%);
+                radial-gradient(ellipse at 20% 20%, rgba(255,255,255,0.2) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(251,191,36,0.2) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.05) 0%, transparent 70%);
         }
         .hp-hero-grid {
             position: absolute;
@@ -207,7 +207,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             width: 500px;
             height: 500px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(245,158,11,0.08), transparent 70%);
+            background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 70%);
             top: -100px;
             right: -100px;
             animation: float 8s ease-in-out infinite;
@@ -232,9 +232,9 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(245,158,11,0.12);
-            border: 1px solid rgba(245,158,11,0.25);
-            color: var(--amber-400);
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.35);
+            color: #fff;
             padding: 7px 16px;
             border-radius: 999px;
             font-size: 12.5px;
@@ -253,7 +253,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             margin-bottom: 20px;
         }
         .hp-hero-title .highlight {
-            background: linear-gradient(135deg, var(--amber-400), #fcd34d);
+            background: linear-gradient(135deg, #fff, #ffedd5);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -284,43 +284,43 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             cursor: pointer;
         }
         .hp-btn-primary {
-            background: linear-gradient(135deg, var(--green-500), var(--green-700));
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(110,134,98,0.4), 0 0 0 0 rgba(110,134,98,0);
+            background: #fff;
+            color: #ea580c;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
         }
         .hp-btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(110,134,98,0.5), 0 0 0 4px rgba(110,134,98,0.1);
-            color: #fff;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            color: #c2410c;
         }
         .hp-btn-secondary {
-            background: rgba(255,255,255,0.08);
+            background: transparent;
             color: #fff;
-            border: 1.5px solid rgba(255,255,255,0.2);
+            border: 2px solid #fff;
         }
         .hp-btn-secondary:hover {
-            background: rgba(255,255,255,0.15);
-            border-color: rgba(255,255,255,0.4);
+            background: #fff;
+            color: #ea580c;
+            border-color: #fff;
             transform: translateY(-2px);
-            color: #fff;
         }
         .hp-btn-accent {
-            background: linear-gradient(135deg, var(--amber-500), var(--amber-600));
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(245,158,11,0.35);
+            background: #fff;
+            color: #ea580c;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
         }
         .hp-btn-accent:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(245,158,11,0.45);
-            color: #fff;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            color: #c2410c;
         }
         .hp-btn-outline {
             background: transparent;
-            color: var(--green-600);
-            border: 2px solid var(--green-500);
+            color: #f97316;
+            border: 2px solid #f97316;
         }
         .hp-btn-outline:hover {
-            background: var(--green-600);
+            background: #f97316;
             color: #fff;
             transform: translateY(-2px);
         }
@@ -338,14 +338,9 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
         }
         .hp-float-card {
             position: absolute;
-            background: rgba(255,255,255,0.12);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.18);
             border-radius: 20px;
             padding: 20px;
-            color: #fff;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
             animation: cardFloat 6s ease-in-out infinite;
         }
         .hp-float-card:nth-child(1) {
@@ -353,6 +348,9 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             left: 0;
             width: 240px;
             z-index: 3;
+            background: #fff;
+            color: #3d302a;
+            border: 1px solid rgba(0,0,0,0.06);
         }
         .hp-float-card:nth-child(2) {
             top: 170px;
@@ -360,6 +358,9 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             width: 230px;
             z-index: 2;
             animation-delay: -2s;
+            background: #fff;
+            color: #3d302a;
+            border: 1px solid rgba(0,0,0,0.06);
         }
         .hp-float-card:nth-child(3) {
             bottom: 0;
@@ -367,6 +368,9 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             width: 270px;
             z-index: 1;
             animation-delay: -4s;
+            background: #fff;
+            color: #3d302a;
+            border: 1px solid rgba(0,0,0,0.06);
         }
         @keyframes cardFloat {
             0%, 100% { transform: translateY(0); }
@@ -390,7 +394,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
         }
         .hp-fc-desc {
             font-size: 12.5px;
-            opacity: 0.75;
+            opacity: 0.65;
             line-height: 1.5;
         }
         .hp-fc-stat {
@@ -435,7 +439,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             font-family: 'Plus Jakarta Sans', sans-serif;
             font-weight: 900;
             font-size: 36px;
-            color: var(--green-700);
+            color: #f97316;
             letter-spacing: -1px;
             line-height: 1;
             margin-bottom: 6px;
@@ -458,8 +462,8 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: var(--green-50);
-            color: var(--green-600);
+            background: #fff7ed;
+            color: #f97316;
             padding: 6px 14px;
             border-radius: 8px;
             font-size: 12px;
@@ -507,7 +511,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(90deg, var(--green-500), var(--amber-500));
+            background: linear-gradient(90deg, #f97316, #fb923c);
             opacity: 0;
             transition: opacity 0.3s;
         }
@@ -602,7 +606,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
 
         /* ========== DONATE CTA ========== */
         .hp-donate-section {
-            background: linear-gradient(165deg, var(--green-800) 0%, var(--green-700) 40%, #5C4033 100%);
+            background: linear-gradient(165deg, #fb923c 0%, #f97316 40%, #ea580c 100%);
             position: relative;
             overflow: hidden;
         }
@@ -610,7 +614,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(ellipse at 30% 50%, rgba(245,158,11,0.1), transparent 60%);
+            background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.15), transparent 60%);
         }
         .hp-donate-inner {
             position: relative;
@@ -620,9 +624,9 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             margin: 0 auto;
         }
         .hp-donate-inner .hp-section-badge {
-            background: rgba(245,158,11,0.15);
-            color: var(--amber-400);
-            border: 1px solid rgba(245,158,11,0.25);
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.3);
         }
         .hp-donate-inner .hp-section-title {
             color: #fff;
@@ -652,7 +656,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
         .hp-role-card:hover {
             transform: translateY(-6px);
             box-shadow: 0 16px 40px rgba(0,0,0,0.08);
-            border-color: var(--green-400);
+            border-color: #f97316;
             color: inherit;
         }
         .hp-role-icon {
@@ -709,7 +713,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
         }
         .hp-founder-role {
             font-size: 14px;
-            color: var(--green-600);
+            color: #ea580c;
             font-weight: 600;
             margin-bottom: 16px;
         }
@@ -720,12 +724,12 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             font-style: italic;
             position: relative;
             padding-left: 20px;
-            border-left: 3px solid var(--amber-400);
+            border-left: 3px solid #f97316;
         }
 
         /* ========== FOOTER ========== */
         .hp-footer {
-            background: var(--slate-900);
+            background: #3d302a;
             color: rgba(255,255,255,0.7);
             padding: 64px 24px 32px;
         }
@@ -749,7 +753,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             width: 40px;
             height: 40px;
             border-radius: 10px;
-            background: linear-gradient(135deg, var(--green-500), var(--green-700));
+            background: linear-gradient(135deg, #f97316, #ea580c);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -786,7 +790,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             font-size: 13.5px;
             transition: color 0.2s;
         }
-        .hp-footer-links a:hover { color: var(--amber-400); }
+        .hp-footer-links a:hover { color: #f97316; }
         .hp-footer-bottom {
             border-top: 1px solid rgba(255,255,255,0.08);
             padding-top: 24px;
@@ -885,7 +889,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
         }
         .hp-mobile-nav a:hover { background: var(--slate-100); }
         .hp-mobile-nav .mob-cta {
-            background: var(--green-600);
+            background: #f97316;
             color: #fff;
             text-align: center;
             margin-top: 8px;
@@ -983,7 +987,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             <div class="hp-hero-card-stack">
                 <!-- Floating Card 1 -->
                 <div class="hp-float-card">
-                    <div class="hp-fc-icon" style="background:rgba(245,158,11,0.2);color:var(--amber-400);">
+                    <div class="hp-fc-icon" style="background:#fff7ed;color:#f97316;">
                         <i class="bi bi-calendar2-check"></i>
                     </div>
                     <div class="hp-fc-title">Smart Scheduling</div>
@@ -991,7 +995,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
                 </div>
                 <!-- Floating Card 2 -->
                 <div class="hp-float-card">
-                    <div class="hp-fc-icon" style="background:rgba(74,222,128,0.2);color:var(--green-400);">
+                    <div class="hp-fc-icon" style="background:rgba(249,115,22,0.2);color:#fb923c;">
                         <i class="bi bi-shield-check"></i>
                     </div>
                     <div class="hp-fc-title">Full Transparency</div>
@@ -1007,8 +1011,8 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
                         <div class="hp-fc-stat" style="font-size:24px;"><?= number_format($totalDoctors) ?></div>
                         <div class="hp-fc-label">Active Doctors</div>
                     </div>
-                    <div style="margin-top:12px;height:4px;background:rgba(255,255,255,0.1);border-radius:99px;">
-                        <div style="height:100%;width:75%;background:linear-gradient(90deg,var(--amber-400),var(--green-400));border-radius:99px;"></div>
+                    <div style="margin-top:12px;height:4px;background:rgba(255,255,255,0.15);border-radius:99px;">
+                        <div style="height:100%;width:75%;background:linear-gradient(90deg,#fb923c,#fbbf24);border-radius:99px;"></div>
                     </div>
                 </div>
             </div>
@@ -1051,7 +1055,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
 
         <div class="hp-features-grid">
             <div class="hp-feature-card reveal reveal-delay-1">
-                <div class="hp-feature-icon" style="background:#ecfdf5;color:#059669;">
+                <div class="hp-feature-icon" style="background:#fff7ed;color:#f97316;">
                     <i class="bi bi-calendar2-check"></i>
                 </div>
                 <div class="hp-feature-title">Appointment Management</div>
@@ -1091,7 +1095,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             </div>
 
             <div class="hp-feature-card reveal reveal-delay-3">
-                <div class="hp-feature-icon" style="background:#ecfdf5;color:#059669;">
+                <div class="hp-feature-icon" style="background:#fff7ed;color:#f97316;">
                     <i class="bi bi-shield-check"></i>
                 </div>
                 <div class="hp-feature-title">Public Transparency</div>
@@ -1127,7 +1131,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
                 </p>
 
                 <div class="hp-value-item">
-                    <div class="hp-value-icon" style="background:#ecfdf5;color:#059669;">
+                    <div class="hp-value-icon" style="background:#fff7ed;color:#f97316;">
                         <i class="bi bi-heart-pulse"></i>
                     </div>
                     <div>
@@ -1171,7 +1175,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
 
         <div class="hp-roles-grid">
             <a href="register.php" class="hp-role-card reveal reveal-delay-1">
-                <div class="hp-role-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-shield-lock"></i></div>
+                <div class="hp-role-icon" style="background:#fff7ed;color:#f97316;"><i class="bi bi-shield-lock"></i></div>
                 <div class="hp-role-title">Admin</div>
                 <div class="hp-role-desc">Full system control — manage monks, doctors, appointments, donations, users, and reports.</div>
             </a>
