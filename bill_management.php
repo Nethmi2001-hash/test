@@ -1,6 +1,5 @@
 <?php
 session_start();
-include 'navbar.php';
 
 // Access control
 if (empty($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
@@ -170,319 +169,269 @@ if ($result) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bills & Expenses - Seela Suwa Herath Bikshu Gilan Arana</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/css/premium-theme.css">
-    <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
-    <link rel="stylesheet" href="assets/css/monastery-theme.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body { background: linear-gradient(135deg, var(--bg-main) 0%, #efe6d8 100%); }
-        .page-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: #fff;
-            padding: 1.8rem;
-            border-radius: 14px;
-            margin-bottom: 2rem;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        }
-        .stat-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
-            border-left: 4px solid var(--primary);
-            margin-bottom: 20px;
-        }
-        .stat-card h3 {
-            color: var(--accent);
-            font-size: 1.8rem;
-            margin: 10px 0 5px 0;
-        }
-        .stat-card p {
-            color: #666;
-            margin: 0;
-            font-size: 0.9rem;
-        }
-        .bill-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-            border-left: 4px solid var(--accent);
-            transition: all 0.2s;
-        }
-        .bill-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14);
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            border: none;
-        }
-        .btn-primary:hover {
-            opacity: 0.9;
-        }
-        .chart-container {
-            background: #fff;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
-            margin-bottom: 20px;
-        }
-    </style>
 </head>
 <body>
 
-<div class="container mt-4 mb-5">
+<?php include 'navbar.php'; ?>
+
     <!-- Page Header -->
-    <div class="page-header">
-        <div class="row align-items-center">
-            <div class="col">
-                <h2 class="mb-0"><i class="bi bi-receipt"></i> Bills & Expenses Management</h2>
-                <p class="mb-0 mt-1 opacity-75">Track monastery expenses and bills</p>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addModal">
-                    <i class="bi bi-plus-circle"></i> Add Expense
-                </button>
-            </div>
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h1 class="page-title"><i class="bi bi-receipt"></i> Bills & Expenses Management</h1>
+            <p class="page-subtitle">Track monastery expenses and bills</p>
         </div>
-    </div>
-    <div class="alert" style="background: linear-gradient(135deg, rgba(110, 134, 98, 0.08) 0%, rgba(79, 102, 69, 0.05) 100%); border-left: 3px solid var(--primary); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-        <img src="images/img1.jpeg" alt="Founder" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
-        <div style="font-size: 0.875rem; line-height: 1.4;">
-            <div style="font-weight: 600; color: var(--primary);">Seela Suwa Herath Bikshu Gilan Arana</div>
-            <div style="opacity: 0.75; font-size: 0.8rem;">Founded by Ven. Solewewa Chandrasiri Thero</div>
+        <div class="page-header-actions">
+            <button class="btn-modern btn-primary-modern" data-bs-toggle="modal" data-bs-target="#addModal">
+                <i class="bi bi-plus-circle"></i> Add Expense
+            </button>
         </div>
     </div>
 
     <!-- Alerts -->
     <?php if ($error): ?>
-        <div class="alert alert-danger alert-dismissible fade show">
-            <i class="bi bi-exclamation-triangle"></i> <?= htmlspecialchars($error) ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert-modern alert-danger-modern">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span><?= htmlspecialchars($error) ?></span>
         </div>
     <?php endif; ?>
 
     <?php if ($success): ?>
-        <div class="alert alert-success alert-dismissible fade show">
-            <i class="bi bi-check-circle"></i> <?= htmlspecialchars($success) ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert-modern alert-success-modern">
+            <i class="bi bi-check-circle"></i>
+            <span><?= htmlspecialchars($success) ?></span>
         </div>
     <?php endif; ?>
 
     <!-- Statistics -->
-    <div class="row mb-4">
-        <div class="col-md-3">
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
             <div class="stat-card">
-                <div class="d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        <p class="mb-1">Total Bills</p>
-                        <h3><?= $stats['total_bills'] ?></h3>
-                    </div>
-                    <i class="bi bi-receipt-cutoff icon-tone-danger" style="font-size: 2.5rem; opacity: 0.35;"></i>
+                <div class="stat-icon rose">
+                    <i class="bi bi-receipt-cutoff"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-label">Total Bills</div>
+                    <div class="stat-value"><?= $stats['total_bills'] ?></div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 col-sm-6">
             <div class="stat-card">
-                <div class="d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        <p class="mb-1">Pending Approval</p>
-                        <h3>Rs. <?= number_format($stats['pending_amount'], 2) ?></h3>
-                    </div>
-                    <i class="bi bi-clock-history icon-tone-accent" style="font-size: 2.5rem; opacity: 0.35;"></i>
+                <div class="stat-icon amber">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-label">Pending Approval</div>
+                    <div class="stat-value">Rs. <?= number_format($stats['pending_amount'], 2) ?></div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 col-sm-6">
             <div class="stat-card">
-                <div class="d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        <p class="mb-1">Approved Expenses</p>
-                        <h3>Rs. <?= number_format($stats['approved_amount'], 2) ?></h3>
-                    </div>
-                    <i class="bi bi-check-circle icon-tone-success" style="font-size: 2.5rem; opacity: 0.35;"></i>
+                <div class="stat-icon emerald">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-label">Approved Expenses</div>
+                    <div class="stat-value">Rs. <?= number_format($stats['approved_amount'], 2) ?></div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 col-sm-6">
             <div class="stat-card">
-                <div class="d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        <p class="mb-1">This Month</p>
-                        <h3>Rs. <?= number_format($stats['this_month'], 2) ?></h3>
-                    </div>
-                    <i class="bi bi-calendar-month icon-tone-primary" style="font-size: 2.5rem; opacity: 0.35;"></i>
+                <div class="stat-icon purple">
+                    <i class="bi bi-calendar-month"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-label">This Month</div>
+                    <div class="stat-value">Rs. <?= number_format($stats['this_month'], 2) ?></div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Category-wise Expenses Chart -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="chart-container">
-                <h5 style="color: var(--monastery-dark); margin-bottom: 20px;">
-                    <i class="bi bi-pie-chart"></i> Category-wise Expenses (This Month)
-                </h5>
-                <canvas id="categoryChart" height="80"></canvas>
-            </div>
+    <div class="modern-table-wrapper mb-4">
+        <div class="modern-table-header">
+            <h5><i class="bi bi-pie-chart me-2"></i>Category-wise Expenses (This Month)</h5>
+        </div>
+        <div class="p-4">
+            <canvas id="categoryChart" height="80"></canvas>
         </div>
     </div>
 
-    <!-- Bills List -->
-    <div class="card shadow-sm">
-        <div class="card-header" style="background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%); color: white;">
-            <h5 class="mb-0"><i class="bi bi-list-ul"></i> Recent Bills & Expenses</h5>
+    <!-- Bills Table -->
+    <div class="modern-table-wrapper">
+        <div class="modern-table-header">
+            <h5><i class="bi bi-list-ul me-2"></i>Recent Bills & Expenses</h5>
         </div>
-        <div class="card-body">
+        <div class="table-responsive-modern">
             <?php if (count($bills) > 0): ?>
-                <?php foreach ($bills as $bill): ?>
-                    <div class="bill-card">
-                        <div class="row align-items-center">
-                            <div class="col-md-4">
-                                <strong class="text-danger"><?= htmlspecialchars($bill['description']) ?></strong><br>
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Invoice</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($bills as $bill): ?>
+                        <tr>
+                            <td>
+                                <strong><?= htmlspecialchars($bill['description']) ?></strong><br>
                                 <small class="text-muted">
                                     <i class="bi bi-tag"></i> <?= htmlspecialchars($bill['category_name']) ?>
                                     <?php if ($bill['vendor']): ?>
-                                        <br><i class="bi bi-shop"></i> <?= htmlspecialchars($bill['vendor']) ?>
+                                        &middot; <i class="bi bi-shop"></i> <?= htmlspecialchars($bill['vendor']) ?>
                                     <?php endif; ?>
                                 </small>
-                            </div>
-                            <div class="col-md-2">
-                                <h5 class="mb-0 text-danger">Rs. <?= number_format($bill['amount'], 2) ?></h5>
-                                <small class="text-muted"><?= date('M d, Y', strtotime($bill['bill_date'])) ?></small>
-                            </div>
-                            <div class="col-md-2">
-                                <?php if ($bill['invoice_number']): ?>
-                                    <small class="text-muted">Invoice: <?= htmlspecialchars($bill['invoice_number']) ?></small>
+                                <?php if ($bill['notes']): ?>
+                                    <br><small class="text-muted"><i class="bi bi-sticky"></i> <?= htmlspecialchars($bill['notes']) ?></small>
                                 <?php endif; ?>
-                            </div>
-                            <div class="col-md-2">
+                            </td>
+                            <td>
+                                <strong>Rs. <?= number_format($bill['amount'], 2) ?></strong><br>
+                                <small class="text-muted"><?= date('M d, Y', strtotime($bill['bill_date'])) ?></small>
+                            </td>
+                            <td>
+                                <?php if ($bill['invoice_number']): ?>
+                                    <small><?= htmlspecialchars($bill['invoice_number']) ?></small>
+                                <?php else: ?>
+                                    <small class="text-muted">—</small>
+                                <?php endif; ?>
+                            </td>
+                            <td>
                                 <?php
-                                $status_colors = [
-                                    'pending' => 'warning',
-                                    'approved' => 'success',
-                                    'rejected' => 'danger'
+                                $status_badges = [
+                                    'pending' => 'badge-warning',
+                                    'approved' => 'badge-success',
+                                    'rejected' => 'badge-danger'
                                 ];
-                                $status_color = $status_colors[$bill['status']] ?? 'secondary';
+                                $badge_class = $status_badges[$bill['status']] ?? 'badge-neutral';
                                 ?>
-                                <span class="badge bg-<?= $status_color ?>">
-                                    <?= strtoupper($bill['status']) ?>
-                                </span>
-                            </div>
-                            <div class="col-md-2 text-end">
-                                <?php if ($bill['status'] == 'pending'): ?>
-                                    <form method="POST" style="display: inline;">
-                                        <input type="hidden" name="form_name" value="approve">
+                                <span class="badge-modern <?= $badge_class ?> badge-dot"><?= ucfirst($bill['status']) ?></span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1 align-items-center">
+                                    <?php if ($bill['status'] == 'pending'): ?>
+                                        <form method="POST" class="d-inline">
+                                            <input type="hidden" name="form_name" value="approve">
+                                            <input type="hidden" name="bill_id" value="<?= $bill['bill_id'] ?>">
+                                            <button type="submit" class="btn-icon" onclick="return confirm('Approve this expense?')" title="Approve">
+                                                <i class="bi bi-check-circle"></i>
+                                            </button>
+                                        </form>
+                                    <?php endif; ?>
+                                    <button class="btn-icon" onclick="editBill(<?= htmlspecialchars(json_encode($bill)) ?>)" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <form method="POST" class="d-inline">
+                                        <input type="hidden" name="form_name" value="delete">
                                         <input type="hidden" name="bill_id" value="<?= $bill['bill_id'] ?>">
-                                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Approve this expense?')">
-                                            <i class="bi bi-check-circle"></i> Approve
+                                        <button type="submit" class="btn-icon danger" onclick="return confirm('Delete this expense?')" title="Delete">
+                                            <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
-                                <?php endif; ?>
-                                <button class="btn btn-sm btn-primary" onclick="editBill(<?= htmlspecialchars(json_encode($bill)) ?>)">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <form method="POST" style="display: inline;">
-                                    <input type="hidden" name="form_name" value="delete">
-                                    <input type="hidden" name="bill_id" value="<?= $bill['bill_id'] ?>">
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this expense?')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                        <?php if ($bill['notes']): ?>
-                            <div class="mt-2">
-                                <small><i class="bi bi-sticky"></i> <strong>Notes:</strong> <?= htmlspecialchars($bill['notes']) ?></small>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                <?php endforeach; ?>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
             <?php else: ?>
                 <div class="text-center text-muted py-5">
-                    <i class="bi bi-inbox" style="font-size: 4rem; opacity: 0.3;"></i>
+                    <i class="bi bi-inbox" style="font-size: 3rem; opacity: 0.3;"></i>
                     <p class="mt-3">No bills/expenses recorded yet</p>
                 </div>
             <?php endif; ?>
         </div>
     </div>
-</div>
 
 <!-- Add Bill Modal -->
 <div class="modal fade" id="addModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%); color: white;">
+            <div class="modal-header">
                 <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Add New Bill/Expense</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST">
                 <div class="modal-body">
                     <input type="hidden" name="form_name" value="create">
                     
                     <div class="row">
-                        <div class="col-md-8 mb-3">
-                            <label class="form-label">Description <span class="text-danger">*</span></label>
-                            <input type="text" name="description" class="form-control" placeholder="e.g., Electricity Bill, Medicine Purchase" required>
+                        <div class="col-md-8">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Description <span class="required">*</span></label>
+                                <input type="text" name="description" class="form-control-modern" placeholder="e.g., Electricity Bill, Medicine Purchase" required>
+                            </div>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Amount (Rs.) <span class="text-danger">*</span></label>
-                            <input type="number" name="amount" class="form-control" step="0.01" min="0" required>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Category <span class="text-danger">*</span></label>
-                            <select name="category_id" class="form-select" required>
-                                <option value="">-- Select Category --</option>
-                                <?php foreach ($categories as $cat): ?>
-                                    <option value="<?= $cat['category_id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Bill Date <span class="text-danger">*</span></label>
-                            <input type="date" name="bill_date" class="form-control" value="<?= date('Y-m-d') ?>" required>
+                        <div class="col-md-4">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Amount (Rs.) <span class="required">*</span></label>
+                                <input type="number" name="amount" class="form-control-modern" step="0.01" min="0" required>
+                            </div>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Vendor/Supplier</label>
-                            <input type="text" name="vendor" class="form-control" placeholder="Company/Shop name">
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Category <span class="required">*</span></label>
+                                <select name="category_id" class="form-select-modern" required>
+                                    <option value="">-- Select Category --</option>
+                                    <?php foreach ($categories as $cat): ?>
+                                        <option value="<?= $cat['category_id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Invoice Number</label>
-                            <input type="text" name="invoice_number" class="form-control" placeholder="Invoice/Receipt #">
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Bill Date <span class="required">*</span></label>
+                                <input type="date" name="bill_date" class="form-control-modern" value="<?= date('Y-m-d') ?>" required>
+                            </div>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label">Status</label>
-                            <select name="status" class="form-select">
-                                <option value="pending">Pending Approval</option>
-                                <option value="approved">Approved</option>
-                            </select>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Vendor/Supplier</label>
+                                <input type="text" name="vendor" class="form-control-modern" placeholder="Company/Shop name">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Invoice Number</label>
+                                <input type="text" name="invoice_number" class="form-control-modern" placeholder="Invoice/Receipt #">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Notes</label>
-                        <textarea name="notes" class="form-control" rows="3"></textarea>
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Status</label>
+                        <select name="status" class="form-select-modern">
+                            <option value="pending">Pending Approval</option>
+                            <option value="approved">Approved</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Notes</label>
+                        <textarea name="notes" class="form-control-modern" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="button" class="btn-modern btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-modern btn-primary-modern">
                         <i class="bi bi-save"></i> Save Expense
                     </button>
                 </div>
@@ -495,9 +444,9 @@ if ($result) {
 <div class="modal fade" id="editModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%); color: white;">
+            <div class="modal-header">
                 <h5 class="modal-title"><i class="bi bi-pencil"></i> Edit Bill/Expense</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST">
                 <div class="modal-body">
@@ -505,61 +454,71 @@ if ($result) {
                     <input type="hidden" name="bill_id" id="edit_bill_id">
                     
                     <div class="row">
-                        <div class="col-md-8 mb-3">
-                            <label class="form-label">Description <span class="text-danger">*</span></label>
-                            <input type="text" name="description" id="edit_description" class="form-control" required>
+                        <div class="col-md-8">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Description <span class="required">*</span></label>
+                                <input type="text" name="description" id="edit_description" class="form-control-modern" required>
+                            </div>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Amount (Rs.) <span class="text-danger">*</span></label>
-                            <input type="number" name="amount" id="edit_amount" class="form-control" step="0.01" min="0" required>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Category <span class="text-danger">*</span></label>
-                            <select name="category_id" id="edit_category_id" class="form-select" required>
-                                <?php foreach ($categories as $cat): ?>
-                                    <option value="<?= $cat['category_id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Bill Date <span class="text-danger">*</span></label>
-                            <input type="date" name="bill_date" id="edit_bill_date" class="form-control" required>
+                        <div class="col-md-4">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Amount (Rs.) <span class="required">*</span></label>
+                                <input type="number" name="amount" id="edit_amount" class="form-control-modern" step="0.01" min="0" required>
+                            </div>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Vendor/Supplier</label>
-                            <input type="text" name="vendor" id="edit_vendor" class="form-control">
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Category <span class="required">*</span></label>
+                                <select name="category_id" id="edit_category_id" class="form-select-modern" required>
+                                    <?php foreach ($categories as $cat): ?>
+                                        <option value="<?= $cat['category_id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Invoice Number</label>
-                            <input type="text" name="invoice_number" id="edit_invoice_number" class="form-control">
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Bill Date <span class="required">*</span></label>
+                                <input type="date" name="bill_date" id="edit_bill_date" class="form-control-modern" required>
+                            </div>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label">Status</label>
-                            <select name="status" id="edit_status" class="form-select">
-                                <option value="pending">Pending Approval</option>
-                                <option value="approved">Approved</option>
-                                <option value="rejected">Rejected</option>
-                            </select>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Vendor/Supplier</label>
+                                <input type="text" name="vendor" id="edit_vendor" class="form-control-modern">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Invoice Number</label>
+                                <input type="text" name="invoice_number" id="edit_invoice_number" class="form-control-modern">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Notes</label>
-                        <textarea name="notes" id="edit_notes" class="form-control" rows="3"></textarea>
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Status</label>
+                        <select name="status" id="edit_status" class="form-select-modern">
+                            <option value="pending">Pending Approval</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Notes</label>
+                        <textarea name="notes" id="edit_notes" class="form-control-modern" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="button" class="btn-modern btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-modern btn-primary-modern">
                         <i class="bi bi-save"></i> Update Expense
                     </button>
                 </div>
@@ -568,6 +527,10 @@ if ($result) {
     </div>
 </div>
 
+<?php include 'includes/footer.php'; ?>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 function editBill(bill) {
     document.getElementById('edit_bill_id').value = bill.bill_id;

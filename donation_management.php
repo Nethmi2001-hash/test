@@ -1,6 +1,5 @@
 <?php
 session_start();
-include 'navbar.php';
 
 // Access control
 if (empty($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
@@ -180,371 +179,285 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
 <head>
     <meta charset="UTF-8">
     <title>Donation Management - Seela Suwa Herath Bikshu Gilan Arana</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/css/premium-theme.css">
-    <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
-    <link rel="stylesheet" href="assets/css/monastery-theme.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <style>
-        body { background: linear-gradient(135deg, var(--bg-main) 0%, #efe6d8 100%); }
-        .page-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: #fff;
-            padding: 1.8rem;
-            border-radius: 14px;
-            margin-bottom: 2rem;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        }
-        .stat-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
-            border-left: 4px solid var(--primary);
-            margin-bottom: 20px;
-        }
-        .stat-card h3 {
-            color: var(--accent);
-            font-size: 1.8rem;
-            margin: 10px 0 5px 0;
-        }
-        .stat-card p {
-            color: #666;
-            margin: 0;
-            font-size: 0.9rem;
-        }
-        .donation-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-            border-left: 4px solid var(--primary);
-            transition: all 0.2s;
-        }
-        .donation-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14);
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            border: none;
-        }
-        .btn-primary:hover {
-            opacity: 0.9;
-        }
-        .payment-method-badge {
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-        .badge.bg-warning {
-            background: #ffc107 !important;
-        }
-        .badge.bg-success {
-            background: #28a745 !important;
-        }
-        .badge.bg-danger {
-            background: #dc3545 !important;
-        }
-        .payhere-section {
-            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 25px;
-            border: 2px dashed var(--primary);
-        }
-    </style>
 </head>
 <body>
 
-<div class="container mt-4 mb-5">
+<?php include 'navbar.php'; ?>
+
     <!-- Page Header -->
-    <div class="page-header">
-        <div class="row align-items-center">
-            <div class="col">
-                <h2 class="mb-0"><i class="bi bi-cash-coin"></i> Donation Management</h2>
-                <p class="mb-0 mt-1 opacity-75">Track and manage monastery donations</p>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addModal">
-                    <i class="bi bi-plus-circle"></i> Record Donation
-                </button>
-            </div>
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h1 class="page-title"><i class="bi bi-cash-coin"></i> Donation Management</h1>
+            <p class="page-subtitle">Track and manage monastery donations</p>
         </div>
-    </div>
-    <div class="alert" style="background: linear-gradient(135deg, rgba(110, 134, 98, 0.08) 0%, rgba(79, 102, 69, 0.05) 100%); border-left: 3px solid var(--primary); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-        <img src="images/img1.jpeg" alt="Founder" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
-        <div style="font-size: 0.875rem; line-height: 1.4;">
-            <div style="font-weight: 600; color: var(--primary);">Seela Suwa Herath Bikshu Gilan Arana</div>
-            <div style="opacity: 0.75; font-size: 0.8rem;">Founded by Ven. Solewewa Chandrasiri Thero</div>
+        <div class="page-header-actions">
+            <button class="btn-modern btn-primary-modern" data-bs-toggle="modal" data-bs-target="#addModal">
+                <i class="bi bi-plus-circle"></i> Record Donation
+            </button>
         </div>
     </div>
 
     <!-- Alerts -->
     <?php if ($error): ?>
-        <div class="alert alert-danger alert-dismissible fade show">
-            <i class="bi bi-exclamation-triangle"></i> <?= htmlspecialchars($error) ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert-modern alert-danger-modern">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span><?= htmlspecialchars($error) ?></span>
         </div>
     <?php endif; ?>
 
     <?php if ($success): ?>
-        <div class="alert alert-success alert-dismissible fade show">
-            <i class="bi bi-check-circle"></i> <?= htmlspecialchars($success) ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert-modern alert-success-modern">
+            <i class="bi bi-check-circle"></i>
+            <span><?= htmlspecialchars($success) ?></span>
         </div>
     <?php endif; ?>
 
     <!-- Statistics -->
-    <div class="row mb-4">
-        <div class="col-md-3">
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
             <div class="stat-card">
-                <div class="d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        <p class="mb-1">Total Donations</p>
-                        <h3><?= $stats['total_donations'] ?></h3>
-                    </div>
-                    <i class="bi bi-gift icon-tone-primary" style="font-size: 2.5rem; opacity: 0.35;"></i>
+                <div class="stat-icon emerald">
+                    <i class="bi bi-gift"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-label">Total Donations</div>
+                    <div class="stat-value"><?= $stats['total_donations'] ?></div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 col-sm-6">
             <div class="stat-card">
-                <div class="d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        <p class="mb-1">Pending Verification</p>
-                        <h3>Rs. <?= number_format($stats['pending_amount'], 2) ?></h3>
-                    </div>
-                    <i class="bi bi-clock-history icon-tone-accent" style="font-size: 2.5rem; opacity: 0.35;"></i>
+                <div class="stat-icon amber">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-label">Pending Verification</div>
+                    <div class="stat-value">Rs. <?= number_format($stats['pending_amount'], 2) ?></div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 col-sm-6">
             <div class="stat-card">
-                <div class="d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        <p class="mb-1">Verified Donations</p>
-                        <h3>Rs. <?= number_format($stats['verified_amount'], 2) ?></h3>
-                    </div>
-                    <i class="bi bi-check-circle icon-tone-success" style="font-size: 2.5rem; opacity: 0.35;"></i>
+                <div class="stat-icon blue">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-label">Verified Donations</div>
+                    <div class="stat-value">Rs. <?= number_format($stats['verified_amount'], 2) ?></div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 col-sm-6">
             <div class="stat-card">
-                <div class="d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        <p class="mb-1">This Month</p>
-                        <h3>Rs. <?= number_format($stats['this_month'], 2) ?></h3>
-                    </div>
-                    <i class="bi bi-calendar-check icon-tone-primary" style="font-size: 2.5rem; opacity: 0.35;"></i>
+                <div class="stat-icon purple">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-label">This Month</div>
+                    <div class="stat-value">Rs. <?= number_format($stats['this_month'], 2) ?></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- PayHere Online Payment Section -->
-    <div class="payhere-section">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h5 class="mb-2"><i class="bi bi-credit-card"></i> Accept Online Donations</h5>
-                <p class="mb-0 text-muted">
-                    <small>Donors can pay using Credit/Debit Cards, Bank Transfer, or Mobile Wallets via PayHere Payment Gateway (Sandbox Mode)</small>
-                </p>
-            </div>
-            <div class="col-md-4 text-end">
-                <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#payhereModal">
-                    <i class="bi bi-wallet2"></i> Pay Online (PayHere)
-                </button>
-            </div>
+    <!-- Donations Table -->
+    <div class="modern-table-wrapper">
+        <div class="modern-table-header">
+            <h5><i class="bi bi-list-ul"></i> Recent Donations</h5>
         </div>
-    </div>
 
-    <!-- Donations List -->
-    <div class="card shadow-sm">
-        <div class="card-header" style="background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%); color: white;">
-            <h5 class="mb-0"><i class="bi bi-list-ul"></i> Recent Donations</h5>
-        </div>
-        <div class="card-body">
-            <!-- Advanced Search Section -->
-            <div id="advanced-search" data-type="donations" class="mb-4"></div>
-            
+        <!-- Advanced Search Section -->
+        <div id="advanced-search" data-type="donations" class="px-3 pt-3"></div>
+
+        <div class="table-responsive-modern">
             <div id="donations-list">
             <?php if (count($donations) > 0): ?>
-                <?php foreach ($donations as $donation): ?>
-                    <div class="donation-card">
-                        <div class="row align-items-center">
-                            <div class="col-md-3">
-                                <strong class="text-primary"><?= htmlspecialchars($donation['donor_name']) ?></strong><br>
-                                <small class="text-muted">
-                                    <?php if ($donation['donor_email']): ?>
-                                        <i class="bi bi-envelope"></i> <?= htmlspecialchars($donation['donor_email']) ?><br>
-                                    <?php endif; ?>
-                                    <?php if ($donation['donor_phone']): ?>
-                                        <i class="bi bi-telephone"></i> <?= htmlspecialchars($donation['donor_phone']) ?>
-                                    <?php endif; ?>
-                                </small>
-                            </div>
-                            <div class="col-md-2">
-                                <h5 class="mb-0" style="color: var(--monastery-dark);">Rs. <?= number_format($donation['amount'], 2) ?></h5>
-                                <small class="text-muted"><?= htmlspecialchars($donation['category_name']) ?></small>
-                            </div>
-                            <div class="col-md-2">
-                                <?php
-                                $method_colors = [
-                                    'cash' => 'success',
-                                    'bank_transfer' => 'primary',
-                                    'card' => 'info',
-                                    'payhere' => 'warning'
-                                ];
-                                $color = $method_colors[$donation['payment_method']] ?? 'secondary';
-                                ?>
-                                <span class="payment-method-badge bg-<?= $color ?> text-white">
-                                    <?= strtoupper(str_replace('_', ' ', $donation['payment_method'])) ?>
-                                </span>
-                                <?php if ($donation['reference_number']): ?>
-                                    <br><small class="text-muted">Ref: <?= htmlspecialchars($donation['reference_number']) ?></small>
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Donor</th>
+                            <th>Amount</th>
+                            <th>Receipt</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($donations as $donation): ?>
+                        <tr>
+                            <td>
+                                <strong><?= htmlspecialchars($donation['donor_name']) ?></strong>
+                                <?php if ($donation['donor_email']): ?>
+                                    <br><small class="text-muted"><i class="bi bi-envelope"></i> <?= htmlspecialchars($donation['donor_email']) ?></small>
                                 <?php endif; ?>
-                            </div>
-                            <div class="col-md-2">
-                                <?php
-                                $status_colors = [
-                                    'pending' => 'warning',
-                                    'verified' => 'success',
-                                    'rejected' => 'danger'
-                                ];
-                                $status_color = $status_colors[$donation['status']] ?? 'secondary';
-                                ?>
-                                <span class="badge bg-<?= $status_color ?>">
-                                    <?= strtoupper($donation['status']) ?>
-                                </span><br>
-                                <small class="text-muted"><?= date('M d, Y', strtotime($donation['created_at'])) ?></small>
-                            </div>
-                            <div class="col-md-3 text-end">
-                                <?php if ($donation['status'] == 'verified'): ?>
-                                    <a href="generate_receipt.php?id=<?= $donation['donation_id'] ?>" class="btn btn-sm btn-success" target="_blank">
-                                        <i class="bi bi-file-pdf"></i> Receipt
+                                <?php if ($donation['donor_phone']): ?>
+                                    <br><small class="text-muted"><i class="bi bi-telephone"></i> <?= htmlspecialchars($donation['donor_phone']) ?></small>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <strong>Rs. <?= number_format($donation['amount'], 2) ?></strong>
+                                <br><small class="text-muted"><?= htmlspecialchars($donation['category_name']) ?></small>
+                            </td>
+                            <td>
+                                <?php if (!empty($donation['slip_path'])): ?>
+                                    <a href="#" class="btn-modern btn-primary-modern btn-sm-modern" onclick="viewSlip('<?= htmlspecialchars($donation['slip_path']) ?>', '<?= htmlspecialchars($donation['donor_name']) ?>')" title="View Uploaded Bank Slip">
+                                        <i class="bi bi-image"></i> View Slip
                                     </a>
+                                <?php else: ?>
+                                    <span class="text-muted"><i class="bi bi-dash-circle"></i> No Slip</span>
                                 <?php endif; ?>
-                                <?php if ($donation['status'] == 'pending'): ?>
-                                    <form method="POST" style="display: inline;">
-                                        <input type="hidden" name="form_name" value="verify">
-                                        <input type="hidden" name="donation_id" value="<?= $donation['donation_id'] ?>">
-                                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Verify this donation?')">
-                                            <i class="bi bi-check-circle"></i> Verify
+                            </td>
+                            <td>
+                                <?php
+                                $status_badges = [
+                                    'pending' => 'badge-warning',
+                                    'verified' => 'badge-success',
+                                    'rejected' => 'badge-danger'
+                                ];
+                                $s_badge = $status_badges[$donation['status']] ?? 'badge-neutral';
+                                ?>
+                                <span class="badge-modern badge-dot <?= $s_badge ?>">
+                                    <?= ucfirst($donation['status']) ?>
+                                </span>
+                            </td>
+                            <td>
+                                <?= date('M d, Y', strtotime($donation['created_at'])) ?>
+                                <?php if ($donation['notes']): ?>
+                                    <br><small class="text-muted"><i class="bi bi-sticky"></i> <?= htmlspecialchars($donation['notes']) ?></small>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1 align-items-center">
+                                    <?php if ($donation['status'] == 'verified'): ?>
+                                        <a href="generate_receipt.php?id=<?= $donation['donation_id'] ?>" class="btn-icon" target="_blank" title="Receipt">
+                                            <i class="bi bi-file-pdf"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if ($donation['status'] == 'pending'): ?>
+                                        <form method="POST" class="d-inline">
+                                            <input type="hidden" name="form_name" value="verify">
+                                            <input type="hidden" name="donation_id" value="<?= $donation['donation_id'] ?>">
+                                            <button type="submit" class="btn-icon" onclick="return confirm('Verify this donation?')" title="Verify">
+                                                <i class="bi bi-check-circle"></i>
+                                            </button>
+                                        </form>
+                                    <?php else: ?>
+                                        <button class="btn-icon" disabled style="opacity:0.4;cursor:not-allowed;" title="Already Verified">
+                                            <i class="bi bi-check-circle-fill"></i>
                                         </button>
-                                    </form>
-                                <?php endif; ?>
-                                <button class="btn btn-sm btn-primary" onclick="editDonation(<?= htmlspecialchars(json_encode($donation)) ?>)">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <form method="POST" style="display: inline;">
-                                    <input type="hidden" name="form_name" value="delete">
-                                    <input type="hidden" name="donation_id" value="<?= $donation['donation_id'] ?>">
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this donation?')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                        <?php if ($donation['notes']): ?>
-                            <div class="mt-2">
-                                <small><i class="bi bi-sticky"></i> <strong>Notes:</strong> <?= htmlspecialchars($donation['notes']) ?></small>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
             <?php else: ?>
                 <div class="text-center text-muted py-5">
-                    <i class="bi bi-inbox" style="font-size: 4rem; opacity: 0.3;"></i>
+                    <i class="bi bi-inbox" style="font-size: 3rem; opacity: 0.3;"></i>
                     <p class="mt-3">No donations recorded yet</p>
                 </div>
             <?php endif; ?>
             </div><!-- END donations-list -->
         </div>
     </div>
-</div>
 
 <!-- Add Donation Modal -->
 <div class="modal fade" id="addModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%); color: white;">
+            <div class="modal-header">
                 <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Record New Donation</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST">
                 <div class="modal-body">
                     <input type="hidden" name="form_name" value="create">
                     
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Donor Name <span class="text-danger">*</span></label>
-                            <input type="text" name="donor_name" class="form-control" required>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Donor Name <span class="required">*</span></label>
+                                <input type="text" name="donor_name" class="form-control-modern" required>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Donor Email</label>
-                            <input type="email" name="donor_email" class="form-control">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Donor Phone</label>
-                            <input type="text" name="donor_phone" class="form-control">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Amount (Rs.) <span class="text-danger">*</span></label>
-                            <input type="number" name="amount" class="form-control" step="0.01" min="0" required>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Donor Email</label>
+                                <input type="email" name="donor_email" class="form-control-modern">
+                            </div>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Category <span class="text-danger">*</span></label>
-                            <select name="category_id" class="form-select" required>
-                                <option value="">-- Select Category --</option>
-                                <?php foreach ($categories as $cat): ?>
-                                    <option value="<?= $cat['category_id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Donor Phone</label>
+                                <input type="text" name="donor_phone" class="form-control-modern">
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Payment Method <span class="text-danger">*</span></label>
-                            <select name="payment_method" class="form-select" required>
-                                <option value="cash">Cash</option>
-                                <option value="bank_transfer">Bank Transfer</option>
-                                <option value="card">Card</option>
-                                <option value="payhere">PayHere (Online)</option>
-                            </select>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Amount (Rs.) <span class="required">*</span></label>
+                                <input type="number" name="amount" class="form-control-modern" step="0.01" min="0" required>
+                            </div>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Reference Number</label>
-                            <input type="text" name="reference_number" class="form-control" placeholder="Bank ref, transaction ID, etc.">
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Category <span class="required">*</span></label>
+                                <select name="category_id" class="form-select-modern" required>
+                                    <option value="">-- Select Category --</option>
+                                    <?php foreach ($categories as $cat): ?>
+                                        <option value="<?= $cat['category_id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Status</label>
-                            <select name="status" class="form-select">
-                                <option value="pending">Pending Verification</option>
-                                <option value="verified">Verified</option>
-                            </select>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Payment Method <span class="required">*</span></label>
+                                <select name="payment_method" class="form-select-modern" required>
+                                    <option value="cash">Cash</option>
+                                    <option value="bank_transfer">Bank Transfer</option>
+                                    <option value="card">Card</option>
+                                    <option value="payhere">PayHere (Online)</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Notes</label>
-                        <textarea name="notes" class="form-control" rows="3"></textarea>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Reference Number</label>
+                                <input type="text" name="reference_number" class="form-control-modern" placeholder="Bank ref, transaction ID, etc.">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Status</label>
+                                <select name="status" class="form-select-modern">
+                                    <option value="pending">Pending Verification</option>
+                                    <option value="verified">Verified</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Notes</label>
+                        <textarea name="notes" class="form-control-modern" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn-modern btn-primary-modern">
                         <i class="bi bi-save"></i> Save Donation
                     </button>
                 </div>
@@ -557,9 +470,9 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
 <div class="modal fade" id="editModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%); color: white;">
+            <div class="modal-header">
                 <h5 class="modal-title"><i class="bi bi-pencil"></i> Edit Donation</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST">
                 <div class="modal-body">
@@ -567,70 +480,86 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
                     <input type="hidden" name="donation_id" id="edit_donation_id">
                     
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Donor Name <span class="text-danger">*</span></label>
-                            <input type="text" name="donor_name" id="edit_donor_name" class="form-control" required>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Donor Name <span class="required">*</span></label>
+                                <input type="text" name="donor_name" id="edit_donor_name" class="form-control-modern" required>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Donor Email</label>
-                            <input type="email" name="donor_email" id="edit_donor_email" class="form-control">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Donor Phone</label>
-                            <input type="text" name="donor_phone" id="edit_donor_phone" class="form-control">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Amount (Rs.) <span class="text-danger">*</span></label>
-                            <input type="number" name="amount" id="edit_amount" class="form-control" step="0.01" min="0" required>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Donor Email</label>
+                                <input type="email" name="donor_email" id="edit_donor_email" class="form-control-modern">
+                            </div>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Category <span class="text-danger">*</span></label>
-                            <select name="category_id" id="edit_category_id" class="form-select" required>
-                                <?php foreach ($categories as $cat): ?>
-                                    <option value="<?= $cat['category_id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Donor Phone</label>
+                                <input type="text" name="donor_phone" id="edit_donor_phone" class="form-control-modern">
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Payment Method <span class="text-danger">*</span></label>
-                            <select name="payment_method" id="edit_payment_method" class="form-select" required>
-                                <option value="cash">Cash</option>
-                                <option value="bank_transfer">Bank Transfer</option>
-                                <option value="card">Card</option>
-                                <option value="payhere">PayHere (Online)</option>
-                            </select>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Amount (Rs.) <span class="required">*</span></label>
+                                <input type="number" name="amount" id="edit_amount" class="form-control-modern" step="0.01" min="0" required>
+                            </div>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Reference Number</label>
-                            <input type="text" name="reference_number" id="edit_reference_number" class="form-control">
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Category <span class="required">*</span></label>
+                                <select name="category_id" id="edit_category_id" class="form-select-modern" required>
+                                    <?php foreach ($categories as $cat): ?>
+                                        <option value="<?= $cat['category_id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Status</label>
-                            <select name="status" id="edit_status" class="form-select">
-                                <option value="pending">Pending Verification</option>
-                                <option value="verified">Verified</option>
-                                <option value="rejected">Rejected</option>
-                            </select>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Payment Method <span class="required">*</span></label>
+                                <select name="payment_method" id="edit_payment_method" class="form-select-modern" required>
+                                    <option value="cash">Cash</option>
+                                    <option value="bank_transfer">Bank Transfer</option>
+                                    <option value="card">Card</option>
+                                    <option value="payhere">PayHere (Online)</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Notes</label>
-                        <textarea name="notes" id="edit_notes" class="form-control" rows="3"></textarea>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Reference Number</label>
+                                <input type="text" name="reference_number" id="edit_reference_number" class="form-control-modern">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Status</label>
+                                <select name="status" id="edit_status" class="form-select-modern">
+                                    <option value="pending">Pending Verification</option>
+                                    <option value="verified">Verified</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Notes</label>
+                        <textarea name="notes" id="edit_notes" class="form-control-modern" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn-modern btn-primary-modern">
                         <i class="bi bi-save"></i> Update Donation
                     </button>
                 </div>
@@ -643,41 +572,50 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
 <div class="modal fade" id="payhereModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #FFB800 0%, #FF8000 100%); color: white;">
+            <div class="modal-header">
                 <h5 class="modal-title"><i class="bi bi-credit-card"></i> PayHere Online Payment (Sandbox)</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle"></i> <strong>Test Mode:</strong> This is PayHere SANDBOX for testing. No real money will be charged.
+                <div class="alert-modern alert-warning-modern mb-3">
+                    <i class="bi bi-info-circle"></i>
+                    <span><strong>Test Mode:</strong> This is PayHere SANDBOX for testing. No real money will be charged.</span>
                 </div>
 
                 <form id="payhereForm">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Your Name <span class="text-danger">*</span></label>
-                            <input type="text" id="ph_donor_name" class="form-control" required>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Your Name <span class="required">*</span></label>
+                                <input type="text" id="ph_donor_name" class="form-control-modern" required>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Your Email <span class="text-danger">*</span></label>
-                            <input type="email" id="ph_donor_email" class="form-control" required>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Your Email <span class="required">*</span></label>
+                                <input type="email" id="ph_donor_email" class="form-control-modern" required>
+                            </div>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-                            <input type="text" id="ph_donor_phone" class="form-control" required>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Phone Number <span class="required">*</span></label>
+                                <input type="text" id="ph_donor_phone" class="form-control-modern" required>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Donation Amount (Rs.) <span class="text-danger">*</span></label>
-                            <input type="number" id="ph_amount" class="form-control" step="0.01" min="100" required>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Donation Amount (Rs.) <span class="required">*</span></label>
+                                <input type="number" id="ph_amount" class="form-control-modern" step="0.01" min="100" required>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Donation Category <span class="text-danger">*</span></label>
-                        <select id="ph_category" class="form-select" required>
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Donation Category <span class="required">*</span></label>
+                        <select id="ph_category" class="form-select-modern" required>
                             <option value="">-- Select Category --</option>
                             <?php foreach ($categories as $cat): ?>
                                 <option value="<?= $cat['category_id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
@@ -685,21 +623,24 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
                         </select>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Message/Purpose (Optional)</label>
-                        <textarea id="ph_notes" class="form-control" rows="2"></textarea>
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Message/Purpose (Optional)</label>
+                        <textarea id="ph_notes" class="form-control-modern" rows="2"></textarea>
                     </div>
 
-                    <div class="alert alert-warning">
-                        <strong>Sandbox Test Cards:</strong><br>
-                        <small>
-                            • Visa: 4111 1111 1111 1111 (CVV: any 3 digits, Expiry: any future date)<br>
-                            • MasterCard: 5555 5555 5555 4444<br>
-                            • Any name can be used
-                        </small>
+                    <div class="alert-modern alert-warning-modern mb-3">
+                        <i class="bi bi-credit-card"></i>
+                        <div>
+                            <strong>Sandbox Test Cards:</strong><br>
+                            <small>
+                                &bull; Visa: 4111 1111 1111 1111 (CVV: any 3 digits, Expiry: any future date)<br>
+                                &bull; MasterCard: 5555 5555 5555 4444<br>
+                                &bull; Any name can be used
+                            </small>
+                        </div>
                     </div>
 
-                    <button type="button" class="btn btn-primary btn-lg w-100" onclick="initiatePayHere()">
+                    <button type="button" class="btn-modern btn-primary-modern btn-lg-modern w-100" onclick="initiatePayHere()">
                         <i class="bi bi-credit-card"></i> Proceed to Payment
                     </button>
                 </form>
@@ -708,6 +649,31 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
     </div>
 </div>
 
+<?php include 'includes/footer.php'; ?>
+
+<!-- Bank Slip Viewer Modal -->
+<div class="modal fade" id="slipViewerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius:16px;overflow:hidden;">
+            <div class="modal-header" style="background:linear-gradient(135deg,#065f46,#059669);color:#fff;border:none;">
+                <h5 class="modal-title"><i class="bi bi-image"></i> <span id="slipModalTitle">Bank Slip</span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center p-4" style="background:#f8fafc;">
+                <img id="slipImage" src="" alt="Bank Slip" style="max-width:100%;max-height:70vh;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.12);cursor:zoom-in;" onclick="window.open(this.src,'_blank')">
+                <p class="text-muted mt-3 mb-0"><small><i class="bi bi-zoom-in"></i> Click image to open full size in new tab</small></p>
+            </div>
+            <div class="modal-footer" style="border:none;justify-content:center;">
+                <a id="slipDownloadLink" href="#" download class="btn-modern btn-primary-modern btn-sm-modern">
+                    <i class="bi bi-download"></i> Download Slip
+                </a>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 function editDonation(donation) {
     document.getElementById('edit_donation_id').value = donation.donation_id;
@@ -767,6 +733,13 @@ function initiatePayHere() {
 window.addEventListener('load', function() {
     new AdvancedSearch('donations');
 });
+
+function viewSlip(slipPath, donorName) {
+    document.getElementById('slipImage').src = slipPath;
+    document.getElementById('slipDownloadLink').href = slipPath;
+    document.getElementById('slipModalTitle').textContent = 'Bank Slip - ' + donorName;
+    new bootstrap.Modal(document.getElementById('slipViewerModal')).show();
+}
 </script>
 
 <!-- Advanced Search System -->

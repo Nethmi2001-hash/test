@@ -7,8 +7,6 @@ if (empty($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
-include 'navbar.php';
-
 // Database connection
 $servername  = "localhost";
 $db_username = "root";
@@ -105,178 +103,149 @@ $result = $con->query("SELECT * FROM titles ORDER BY title_id DESC");
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title Management - Seela Suwa Herath Bikshu Gilan Arana</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title Management - Sacred Care</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/css/premium-theme.css">
-    <link rel="stylesheet" href="assets/css/monastery-theme.css">
-    <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
 
-<div class="container mt-4 mb-5">
-    <div class="page-header">
-        <div class="row align-items-center">
-            <div class="col">
-                <h2 class="mb-0"><i class="bi bi-award"></i> Title Management</h2>
-                <p class="mb-0 mt-1 opacity-75">Manage honorific titles for monks</p>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addModal">
-                    <i class="bi bi-plus-circle"></i> Add Title
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Founder Identity Strip -->
-    <div class="alert" style="background: linear-gradient(135deg, rgba(110, 134, 98, 0.08) 0%, rgba(79, 102, 69, 0.05) 100%); border-left: 3px solid var(--primary); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-        <img src="images/img1.jpeg" alt="Founder" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
-        <div style="font-size: 0.875rem; line-height: 1.4;">
-            <div style="font-weight: 600; color: var(--primary);">Seela Suwa Herath Bikshu Gilan Arana</div>
-            <div style="opacity: 0.75; font-size: 0.8rem;">Founded by Ven. Solewewa Chandrasiri Thero</div>
-        </div>
-    </div>
+<?php include 'navbar.php'; ?>
 
     <!-- Alerts -->
     <?php if ($error): ?>
-        <div class="alert alert-danger alert-dismissible fade show">
-            <i class="bi bi-exclamation-triangle"></i> <?= $error ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert-modern alert-danger-modern">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span><?= $error ?></span>
         </div>
     <?php endif; ?>
-
     <?php if ($success): ?>
-        <div class="alert alert-success alert-dismissible fade show">
-            <i class="bi bi-check-circle"></i> <?= $success ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert-modern alert-success-modern">
+            <i class="bi bi-check-circle"></i>
+            <span><?= $success ?></span>
         </div>
     <?php endif; ?>
 
-    <!-- Titles table -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="bi bi-list-ul"></i> All Titles</h5>
+    <!-- Titles Table -->
+    <div class="modern-table-wrapper">
+        <div class="modern-table-header">
+            <h5><i class="bi bi-award me-2"></i>Monk Titles</h5>
+            <button class="btn-modern btn-primary-modern btn-sm-modern" data-bs-toggle="modal" data-bs-target="#addModal">
+                <i class="bi bi-plus-circle"></i> Add Title
+            </button>
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>Title Name</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php while ($row = $result->fetch_assoc()): ?>
-                        <tr>
-                            <td><strong>#<?= $row['title_id'] ?></strong></td>
-                            <td><i class="bi bi-award-fill text-primary"></i> <?= htmlspecialchars($row['title_name']) ?></td>
-                            <td>
-                                <!-- Edit button -->
-                                <button type="button" class="btn btn-sm btn-outline-primary"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#editModal<?= $row['title_id'] ?>">
-                                    <i class="bi bi-pencil"></i> Edit
+        <div class="table-responsive-modern">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Title Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?= $row['title_id'] ?></td>
+                        <td><div style="font-weight:600;"><i class="bi bi-award-fill me-1" style="color:var(--primary-500);"></i><?= htmlspecialchars($row['title_name']) ?></div></td>
+                        <td>
+                            <div style="display:flex;gap:6px;">
+                                <button class="btn-icon" data-bs-toggle="modal" data-bs-target="#editModal<?= $row['title_id'] ?>" title="Edit">
+                                    <i class="bi bi-pencil"></i>
                                 </button>
-
-                                        <!-- Delete button -->
-                                <button type="button" class="btn btn-sm btn-outline-danger"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteModal<?= $row['title_id'] ?>">
-                                    <i class="bi bi-trash"></i> Delete
+                                <button class="btn-icon danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?= $row['title_id'] ?>" title="Delete">
+                                    <i class="bi bi-trash"></i>
                                 </button>
-                            </td>
-                        </tr>
-
-                        <!-- Edit Modal -->
-                        <div class="modal fade" id="editModal<?= $row['title_id'] ?>" tabindex="-1" aria-hidden="true">
-                          <div class="modal-dialog">
-                            <div class="modal-content">
-                              <form method="post">
-                                <div class="modal-header bg-primary text-white">
-                                  <h5 class="modal-title"><i class="bi bi-pencil-square"></i> Edit Title</h5>
-                                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body">
-                                  <input type="hidden" name="form_name" value="update">
-                                  <input type="hidden" name="id" value="<?= $row['title_id'] ?>">
-                                  <div class="mb-3">
-                                      <label class="form-label">Title Name</label>
-                                      <input type="text" name="user_title" class="form-control" 
-                                             value="<?= htmlspecialchars($row['title_name']) ?>" required>
-                                  </div>
-                                </div>
-                                <div class="modal-footer">
-                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                  <button type="submit" class="btn btn-primary">Save Changes</button>
-                                </div>
-                              </form>
                             </div>
-                          </div>
-                        </div>
+                        </td>
+                    </tr>
 
-                        <!-- Delete Modal -->
-                        <div class="modal fade" id="deleteModal<?= $row['title_id'] ?>" tabindex="-1" aria-hidden="true">
-                          <div class="modal-dialog">
-                            <div class="modal-content">
-                              <div class="modal-header bg-danger text-white">
-                                <h5 class="modal-title"><i class="bi bi-trash"></i> Confirm Delete</h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                              </div>
-                              <div class="modal-body">
-                                Are you sure you want to delete title
-                                <strong><?= htmlspecialchars($row['title_name']) ?></strong>?<br>
-                                <small class="text-muted">This action cannot be undone.</small>
-                              </div>
-                              <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <form method="post" class="d-inline">
-                                    <input type="hidden" name="id" value="<?= $row['title_id'] ?>">
-                                    <input type="hidden" name="form_name" value="delete">
-                                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
-                                </form>
+                    <!-- Edit Modal -->
+                    <div class="modal fade" id="editModal<?= $row['title_id'] ?>" tabindex="-1">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <form method="post">
+                            <div class="modal-header">
+                              <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Edit Title</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                              <input type="hidden" name="form_name" value="update">
+                              <input type="hidden" name="id" value="<?= $row['title_id'] ?>">
+                              <div class="form-group-modern">
+                                  <label class="form-label-modern">Title Name</label>
+                                  <input type="text" name="user_title" class="form-control-modern" value="<?= htmlspecialchars($row['title_name']) ?>" required>
                               </div>
                             </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn-modern btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                              <button type="submit" class="btn-modern btn-primary-modern"><i class="bi bi-save"></i> Save Changes</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Delete Modal -->
+                    <div class="modal fade" id="deleteModal<?= $row['title_id'] ?>" tabindex="-1">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title"><i class="bi bi-trash me-2"></i>Confirm Delete</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                          </div>
+                          <div class="modal-body">
+                            Are you sure you want to delete title <strong><?= htmlspecialchars($row['title_name']) ?></strong>?<br>
+                            <small style="color:var(--text-secondary);">This action cannot be undone.</small>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn-modern btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                            <form method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="<?= $row['title_id'] ?>">
+                                <input type="hidden" name="form_name" value="delete">
+                                <button type="submit" class="btn-modern btn-danger-modern"><i class="bi bi-trash"></i> Delete</button>
+                            </form>
                           </div>
                         </div>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
+                      </div>
+                    </div>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Title Modal -->
+    <div class="modal fade" id="addModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add New Title</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="form_name" value="create">
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Title Name</label>
+                            <input type="text" name="user_title" class="form-control-modern" placeholder="e.g., Ven., Rev., Most Ven." required>
+                        </div>
+                        <div class="alert-modern alert-info-modern" style="margin-top:12px;">
+                            <i class="bi bi-info-circle"></i>
+                            <span>Title will be used as honorific prefix for monks.</span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-modern btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn-modern btn-primary-modern"><i class="bi bi-plus-circle"></i> Add Title</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Add New Title Modal -->
-<div class="modal fade" id="addModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="post">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Add New Title</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" name="form_name" value="create">
-                    <div class="mb-3">
-                        <label class="form-label">Title Name</label>
-                        <input type="text" name="user_title" class="form-control" placeholder="e.g., Ven., Rev., Most Ven." required>
-                    </div>
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> <small>Title will be used as honorific prefix for monks.</small>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success">Add Title</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+<?php include 'includes/footer.php'; ?>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,6 +1,5 @@
 <?php
 session_start();
-include 'navbar.php';
 
 // Access control
 if (empty($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
@@ -126,212 +125,180 @@ $stats['inactive'] = $conn->query("SELECT COUNT(*) as count FROM monks WHERE sta
 
 $conn->close();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monk Management - Monastery System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/css/premium-theme.css">
-    <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
-    <link rel="stylesheet" href="assets/css/monastery-theme.css">
-    <style>
-        body {
-            background: linear-gradient(135deg, var(--bg-main) 0%, #efe6d8 100%);
-            padding-top: 20px;
-        }
-        .stat-card {
-            border-left: 4px solid var(--primary);
-            transition: transform 0.2s;
-        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        .monk-card {
-            border-left: 3px solid var(--primary);
-            padding: 15px;
-            margin-bottom: 15px;
-            background: #fff;
-            border-radius: 5px;
-            transition: all 0.3s;
-        }
-        .monk-card:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-left-color: var(--accent);
-        }
-        .medical-info {
-            background: #f5efe6;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            font-size: 0.9em;
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <?php if ($error): ?>
-            <div class="alert alert-danger alert-dismissible fade show">
-                <i class="bi bi-exclamation-triangle"></i> <?= $error ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endif; ?>
 
-        <?php if ($success): ?>
-            <div class="alert alert-success alert-dismissible fade show">
-                <i class="bi bi-check-circle"></i> <?= $success ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endif; ?>
+<?php include 'navbar.php'; ?>
 
-        <div class="alert" style="background: linear-gradient(135deg, rgba(110, 134, 98, 0.08) 0%, rgba(79, 102, 69, 0.05) 100%); border-left: 3px solid var(--primary); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-            <img src="images/img1.jpeg" alt="Founder" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
-            <div style="font-size: 0.875rem; line-height: 1.4;">
-                <div style="font-weight: 600; color: var(--primary);">Seela Suwa Herath Bikshu Gilan Arana</div>
-                <div style="opacity: 0.75; font-size: 0.8rem;">Founded by Ven. Solewewa Chandrasiri Thero</div>
-            </div>
+    <!-- Alerts -->
+    <?php if ($error): ?>
+        <div class="alert-modern alert-danger-modern">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span><?= $error ?></span>
         </div>
+    <?php endif; ?>
 
-        <!-- Statistics Cards -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="card stat-card shadow-sm">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-muted mb-1">Total Monks</h6>
-                                <h3 class="mb-0" style="color: var(--monastery-saffron);"><?= $stats['total'] ?></h3>
-                            </div>
-                            <div class="fs-1" style="color: var(--monastery-light);">
-                                🙏
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card stat-card shadow-sm">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-muted mb-1">Active Monks</h6>
-                                <h3 class="mb-0 text-success"><?= $stats['active'] ?></h3>
-                            </div>
-                            <div class="fs-1 text-success">
-                                <i class="bi bi-check-circle"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card stat-card shadow-sm">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-muted mb-1">Inactive Monks</h6>
-                                <h3 class="mb-0 text-secondary"><?= $stats['inactive'] ?></h3>
-                            </div>
-                            <div class="fs-1 text-secondary">
-                                <i class="bi bi-pause-circle"></i>
-                            </div>
-                        </div>
-                    </div>
+    <?php if ($success): ?>
+        <div class="alert-modern alert-success-modern">
+            <i class="bi bi-check-circle"></i>
+            <span><?= $success ?></span>
+        </div>
+    <?php endif; ?>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-4 col-md-6">
+            <div class="stat-card" style="--stat-color: var(--primary-500);">
+                <div class="stat-icon emerald"><i class="bi bi-people-fill"></i></div>
+                <div class="stat-info">
+                    <div class="stat-label">Total Monks</div>
+                    <div class="stat-value"><?= $stats['total'] ?></div>
                 </div>
             </div>
         </div>
-
-        <!-- Monks List -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header" style="background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%); color: white;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">🪷 Monk Management & Medical Records</h5>
-                    <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addModal">
-                        <i class="bi bi-plus-circle"></i> Add New Monk
-                    </button>
+        <div class="col-xl-4 col-md-6">
+            <div class="stat-card" style="--stat-color: #059669;">
+                <div class="stat-icon blue"><i class="bi bi-check-circle-fill"></i></div>
+                <div class="stat-info">
+                    <div class="stat-label">Active Monks</div>
+                    <div class="stat-value"><?= $stats['active'] ?></div>
                 </div>
             </div>
-            <div class="card-body">
-                <!-- Advanced Search Section -->
-                <div id="advanced-search" data-type="monks" class="mb-4"></div>
-                
-                <div id="monks-list">
-                <?php if (count($monks) > 0): ?>
-                    <?php foreach ($monks as $monk): ?>
-                        <div class="monk-card">
-                            <div class="row align-items-center">
-                                <div class="col-md-4">
-                                    <h6 class="mb-1" style="color: var(--monastery-dark);">
+        </div>
+        <div class="col-xl-4 col-md-6">
+            <div class="stat-card" style="--stat-color: #64748b;">
+                <div class="stat-icon slate"><i class="bi bi-pause-circle-fill"></i></div>
+                <div class="stat-info">
+                    <div class="stat-label">Inactive Monks</div>
+                    <div class="stat-value"><?= $stats['inactive'] ?></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monks Table -->
+    <div class="modern-table-wrapper">
+        <div class="modern-table-header">
+            <h5><i class="bi bi-person-hearts me-2"></i>Monk Records</h5>
+            <div style="display:flex;gap:10px;align-items:center;">
+                <button class="btn-modern btn-primary-modern btn-sm-modern" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <i class="bi bi-plus-circle"></i> Add Monk
+                </button>
+            </div>
+        </div>
+
+        <!-- Advanced Search Section -->
+        <div id="advanced-search" data-type="monks" style="padding:0 24px;"></div>
+
+        <div class="table-responsive-modern">
+            <table class="modern-table" id="monks-list">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Contact</th>
+                        <th>Ordination</th>
+                        <th>Blood Group</th>
+                        <th>Medical Info</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (count($monks) > 0): ?>
+                        <?php foreach ($monks as $monk): ?>
+                            <tr>
+                                <td><?= $monk['monk_id'] ?></td>
+                                <td>
+                                    <div style="font-weight:600;">
                                         <?php if ($monk['title_name']): ?>
-                                            <span class="badge" style="background: var(--monastery-pale); color: var(--monastery-dark);">
-                                                <?= htmlspecialchars($monk['title_name']) ?>
-                                            </span>
+                                            <span class="badge-modern badge-primary"><?= htmlspecialchars($monk['title_name']) ?></span>
                                         <?php endif; ?>
                                         <?= htmlspecialchars($monk['full_name']) ?>
-                                    </h6>
-                                    <small class="text-muted">Monk ID: #<?= $monk['monk_id'] ?></small>
-                                </div>
-                                <div class="col-md-3">
+                                    </div>
+                                </td>
+                                <td>
                                     <?php if ($monk['phone']): ?>
-                                        <small><i class="bi bi-telephone"></i> <?= htmlspecialchars($monk['phone']) ?></small><br>
+                                        <div style="font-size:13px;"><i class="bi bi-telephone me-1"></i><?= htmlspecialchars($monk['phone']) ?></div>
                                     <?php endif; ?>
+                                    <?php if (!empty($monk['emergency_contact'])): ?>
+                                        <div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px;"><i class="bi bi-shield-plus me-1"></i><?= htmlspecialchars($monk['emergency_contact']) ?></div>
+                                    <?php endif; ?>
+                                    <?php if (empty($monk['phone']) && empty($monk['emergency_contact'])): ?>
+                                        <span style="color:var(--text-secondary);">—</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
                                     <?php if (!empty($monk['ordination_date'])): ?>
-                                        <small><i class="bi bi-calendar3"></i> Ordained: <?= date('M Y', strtotime($monk['ordination_date'])) ?></small>
+                                        <?= date('M d, Y', strtotime($monk['ordination_date'])) ?>
+                                    <?php else: ?>
+                                        <span style="color:var(--text-secondary);">—</span>
                                     <?php endif; ?>
-                                </div>
-                                <div class="col-md-3">
+                                </td>
+                                <td>
                                     <?php if ($monk['blood_group']): ?>
-                                        <span class="badge bg-danger"><?= htmlspecialchars($monk['blood_group']) ?></span>
+                                        <span class="badge-modern badge-danger badge-dot"><?= htmlspecialchars($monk['blood_group']) ?></span>
+                                    <?php else: ?>
+                                        <span style="color:var(--text-secondary);">—</span>
                                     <?php endif; ?>
+                                </td>
+                                <td>
                                     <?php
-                                    $status_class = $monk['status'] == 'active' ? 'success' : 'secondary';
+                                    $has_medical = !empty($monk['allergies']) || !empty($monk['chronic_conditions']) || !empty($monk['current_medications']);
+                                    if ($has_medical):
+                                        $medical_parts = [];
+                                        if (!empty($monk['allergies'])) $medical_parts[] = '<b>Allergies:</b> ' . htmlspecialchars($monk['allergies']);
+                                        if (!empty($monk['chronic_conditions'])) $medical_parts[] = '<b>Conditions:</b> ' . htmlspecialchars($monk['chronic_conditions']);
+                                        if (!empty($monk['current_medications'])) $medical_parts[] = '<b>Medications:</b> ' . htmlspecialchars($monk['current_medications']);
+                                        $medical_html = implode('<br>', $medical_parts);
                                     ?>
-                                    <span class="badge bg-<?= $status_class ?>">
-                                        <?= strtoupper($monk['status']) ?>
-                                    </span>
-                                </div>
-                                <div class="col-md-2 text-end">
-                                    <button class="btn btn-sm btn-primary" onclick="editMonk(<?= htmlspecialchars(json_encode($monk)) ?>)">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <form method="POST" style="display: inline;" onsubmit="return confirm('Delete this monk record?')">
-                                        <input type="hidden" name="form_name" value="delete">
-                                        <input type="hidden" name="monk_id" value="<?= $monk['monk_id'] ?>">
-                                        <button type="submit" class="btn btn-sm btn-danger">
-                                            <i class="bi bi-trash"></i>
+                                        <button type="button" class="btn-icon" data-bs-toggle="popover" data-bs-html="true" data-bs-trigger="hover focus" title="Medical Information" data-bs-content="<?= htmlspecialchars($medical_html) ?>">
+                                            <i class="bi bi-heart-pulse" style="color:var(--danger);"></i>
                                         </button>
-                                    </form>
+                                    <?php else: ?>
+                                        <span style="color:var(--text-secondary);">—</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php $status_badge = $monk['status'] == 'active' ? 'badge-success' : 'badge-neutral'; ?>
+                                    <span class="badge-modern <?= $status_badge ?> badge-dot"><?= ucfirst($monk['status']) ?></span>
+                                </td>
+                                <td>
+                                    <div class="table-actions" style="display:flex;gap:6px;">
+                                        <button class="btn-icon" onclick="editMonk(<?= htmlspecialchars(json_encode($monk)) ?>)" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this monk record?')">
+                                            <input type="hidden" name="form_name" value="delete">
+                                            <input type="hidden" name="monk_id" value="<?= $monk['monk_id'] ?>">
+                                            <button type="submit" class="btn-icon danger" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="8" style="text-align:center;padding:48px 20px;">
+                                <div style="color:var(--text-secondary);">
+                                    <i class="bi bi-person-hearts" style="font-size:36px;display:block;margin-bottom:12px;opacity:0.4;"></i>
+                                    No monk records found. Click "Add Monk" to get started.
                                 </div>
-                            </div>
-                            
-                            <!-- Medical Information -->
-                            <?php if (!empty($monk['allergies']) || !empty($monk['chronic_conditions']) || !empty($monk['current_medications'])): ?>
-                                <div class="medical-info">
-                                    <strong><i class="bi bi-heart-pulse"></i> Medical Information:</strong>
-                                    <?php if (!empty($monk['allergies'])): ?>
-                                        <div><strong>Allergies:</strong> <?= htmlspecialchars($monk['allergies']) ?></div>
-                                    <?php endif; ?>
-                                    <?php if (!empty($monk['chronic_conditions'])): ?>
-                                        <div><strong>Chronic Conditions:</strong> <?= htmlspecialchars($monk['chronic_conditions']) ?></div>
-                                    <?php endif; ?>
-                                    <?php if (!empty($monk['current_medications'])): ?>
-                                        <div><strong>Current Medications:</strong> <?= htmlspecialchars($monk['current_medications']) ?></div>
-                                    <?php endif; ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <div class="text-center py-5">
-                        <div class="fs-1">🙏</div>
-                        <p class="text-muted">No monk records found. Click "Add New Monk" to get started.</p>
-                    </div>
-                <?php endif; ?>
-                </div><!-- END monks-list -->
-            </div>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -339,101 +306,117 @@ $conn->close();
     <div class="modal fade" id="addModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%); color: white;">
-                    <h5 class="modal-title"><i class="bi bi-person-plus"></i> Add New Monk</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Add New Monk</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form method="POST">
                     <div class="modal-body">
                         <input type="hidden" name="form_name" value="create">
-                        
-                        <h6 class="text-muted mb-3">Basic Information</h6>
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Title</label>
-                                <select name="title_id" class="form-select">
-                                    <option value="">-- No Title --</option>
-                                    <?php foreach ($titles as $title): ?>
-                                        <option value="<?= $title['title_id'] ?>"><?= htmlspecialchars($title['title_name']) ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            <div class="col-md-8 mb-3">
-                                <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                                <input type="text" name="full_name" class="form-control" placeholder="Enter monk's full name" required>
-                            </div>
-                        </div>
 
+                        <h6 style="font-size:13px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;">Basic Information</h6>
                         <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Ordination Date</label>
-                                <input type="date" name="ordination_date" class="form-control">
+                            <div class="col-md-4">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Title</label>
+                                    <select name="title_id" class="form-control-modern form-select-modern">
+                                        <option value="">-- No Title --</option>
+                                        <?php foreach ($titles as $title): ?>
+                                            <option value="<?= $title['title_id'] ?>"><?= htmlspecialchars($title['title_name']) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Birth Date</label>
-                                <input type="date" name="birth_date" class="form-control">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Phone</label>
-                                <input type="text" name="phone" class="form-control" placeholder="+94 77 123 4567">
+                            <div class="col-md-8">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Full Name <span class="required">*</span></label>
+                                    <input type="text" name="full_name" class="form-control-modern" placeholder="Enter monk's full name" required>
+                                </div>
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Emergency Contact</label>
-                                <input type="text" name="emergency_contact" class="form-control" placeholder="Name & Phone">
+                            <div class="col-md-4">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Ordination Date</label>
+                                    <input type="date" name="ordination_date" class="form-control-modern">
+                                </div>
                             </div>
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label">Blood Group</label>
-                                <select name="blood_group" class="form-select">
-                                    <option value="">-- Select --</option>
-                                    <option value="A+">A+</option>
-                                    <option value="A-">A-</option>
-                                    <option value="B+">B+</option>
-                                    <option value="B-">B-</option>
-                                    <option value="AB+">AB+</option>
-                                    <option value="AB-">AB-</option>
-                                    <option value="O+">O+</option>
-                                    <option value="O-">O-</option>
-                                </select>
+                            <div class="col-md-4">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Birth Date</label>
+                                    <input type="date" name="birth_date" class="form-control-modern">
+                                </div>
                             </div>
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label">Status</label>
-                                <select name="status" class="form-select">
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                </select>
+                            <div class="col-md-4">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Phone</label>
+                                    <input type="text" name="phone" class="form-control-modern" placeholder="+94 77 123 4567">
+                                </div>
                             </div>
                         </div>
 
-                        <hr>
-                        <h6 class="text-muted mb-3"><i class="bi bi-heart-pulse"></i> Medical History</h6>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Allergies</label>
-                            <textarea name="allergies" class="form-control" rows="2" placeholder="e.g., Penicillin, Peanuts, etc."></textarea>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Emergency Contact</label>
+                                    <input type="text" name="emergency_contact" class="form-control-modern" placeholder="Name & Phone">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Blood Group</label>
+                                    <select name="blood_group" class="form-control-modern form-select-modern">
+                                        <option value="">-- Select --</option>
+                                        <option value="A+">A+</option>
+                                        <option value="A-">A-</option>
+                                        <option value="B+">B+</option>
+                                        <option value="B-">B-</option>
+                                        <option value="AB+">AB+</option>
+                                        <option value="AB-">AB-</option>
+                                        <option value="O+">O+</option>
+                                        <option value="O-">O-</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Status</label>
+                                    <select name="status" class="form-control-modern form-select-modern">
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Chronic Conditions</label>
-                            <textarea name="chronic_conditions" class="form-control" rows="2" placeholder="e.g., Diabetes, Hypertension, Asthma, etc."></textarea>
+                        <hr style="border-color:var(--border-color);margin:24px 0;">
+                        <h6 style="font-size:13px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;"><i class="bi bi-heart-pulse me-1"></i>Medical History</h6>
+
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Allergies</label>
+                            <textarea name="allergies" class="form-control-modern" rows="2" placeholder="e.g., Penicillin, Peanuts, etc."></textarea>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Current Medications</label>
-                            <textarea name="current_medications" class="form-control" rows="2" placeholder="List current medications and dosages"></textarea>
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Chronic Conditions</label>
+                            <textarea name="chronic_conditions" class="form-control-modern" rows="2" placeholder="e.g., Diabetes, Hypertension, Asthma, etc."></textarea>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Additional Notes</label>
-                            <textarea name="notes" class="form-control" rows="2" placeholder="Any other important medical or personal information"></textarea>
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Current Medications</label>
+                            <textarea name="current_medications" class="form-control-modern" rows="2" placeholder="List current medications and dosages"></textarea>
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Additional Notes</label>
+                            <textarea name="notes" class="form-control-modern" rows="2" placeholder="Any other important medical or personal information"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary" style="background: var(--monastery-saffron); border: none;">
-                            <i class="bi bi-save"></i> Add Monk
+                        <button type="button" class="btn-modern btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn-modern btn-primary-modern">
+                            <i class="bi bi-plus-circle"></i> Add Monk
                         </button>
                     </div>
                 </form>
@@ -445,101 +428,117 @@ $conn->close();
     <div class="modal fade" id="editModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%); color: white;">
-                    <h5 class="modal-title"><i class="bi bi-pencil"></i> Edit Monk</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit Monk</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form method="POST">
                     <div class="modal-body">
                         <input type="hidden" name="form_name" value="update">
                         <input type="hidden" name="monk_id" id="edit_monk_id">
-                        
-                        <h6 class="text-muted mb-3">Basic Information</h6>
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Title</label>
-                                <select name="title_id" id="edit_title_id" class="form-select">
-                                    <option value="">-- No Title --</option>
-                                    <?php foreach ($titles as $title): ?>
-                                        <option value="<?= $title['title_id'] ?>"><?= htmlspecialchars($title['title_name']) ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            <div class="col-md-8 mb-3">
-                                <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                                <input type="text" name="full_name" id="edit_full_name" class="form-control" required>
-                            </div>
-                        </div>
 
+                        <h6 style="font-size:13px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;">Basic Information</h6>
                         <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Ordination Date</label>
-                                <input type="date" name="ordination_date" id="edit_ordination_date" class="form-control">
+                            <div class="col-md-4">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Title</label>
+                                    <select name="title_id" id="edit_title_id" class="form-control-modern form-select-modern">
+                                        <option value="">-- No Title --</option>
+                                        <?php foreach ($titles as $title): ?>
+                                            <option value="<?= $title['title_id'] ?>"><?= htmlspecialchars($title['title_name']) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Birth Date</label>
-                                <input type="date" name="birth_date" id="edit_birth_date" class="form-control">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Phone</label>
-                                <input type="text" name="phone" id="edit_phone" class="form-control">
+                            <div class="col-md-8">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Full Name <span class="required">*</span></label>
+                                    <input type="text" name="full_name" id="edit_full_name" class="form-control-modern" required>
+                                </div>
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Emergency Contact</label>
-                                <input type="text" name="emergency_contact" id="edit_emergency_contact" class="form-control">
+                            <div class="col-md-4">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Ordination Date</label>
+                                    <input type="date" name="ordination_date" id="edit_ordination_date" class="form-control-modern">
+                                </div>
                             </div>
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label">Blood Group</label>
-                                <select name="blood_group" id="edit_blood_group" class="form-select">
-                                    <option value="">-- Select --</option>
-                                    <option value="A+">A+</option>
-                                    <option value="A-">A-</option>
-                                    <option value="B+">B+</option>
-                                    <option value="B-">B-</option>
-                                    <option value="AB+">AB+</option>
-                                    <option value="AB-">AB-</option>
-                                    <option value="O+">O+</option>
-                                    <option value="O-">O-</option>
-                                </select>
+                            <div class="col-md-4">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Birth Date</label>
+                                    <input type="date" name="birth_date" id="edit_birth_date" class="form-control-modern">
+                                </div>
                             </div>
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label">Status</label>
-                                <select name="status" id="edit_status" class="form-select">
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                </select>
+                            <div class="col-md-4">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Phone</label>
+                                    <input type="text" name="phone" id="edit_phone" class="form-control-modern">
+                                </div>
                             </div>
                         </div>
 
-                        <hr>
-                        <h6 class="text-muted mb-3"><i class="bi bi-heart-pulse"></i> Medical History</h6>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Allergies</label>
-                            <textarea name="allergies" id="edit_allergies" class="form-control" rows="2"></textarea>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Emergency Contact</label>
+                                    <input type="text" name="emergency_contact" id="edit_emergency_contact" class="form-control-modern">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Blood Group</label>
+                                    <select name="blood_group" id="edit_blood_group" class="form-control-modern form-select-modern">
+                                        <option value="">-- Select --</option>
+                                        <option value="A+">A+</option>
+                                        <option value="A-">A-</option>
+                                        <option value="B+">B+</option>
+                                        <option value="B-">B-</option>
+                                        <option value="AB+">AB+</option>
+                                        <option value="AB-">AB-</option>
+                                        <option value="O+">O+</option>
+                                        <option value="O-">O-</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Status</label>
+                                    <select name="status" id="edit_status" class="form-control-modern form-select-modern">
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Chronic Conditions</label>
-                            <textarea name="chronic_conditions" id="edit_chronic_conditions" class="form-control" rows="2"></textarea>
+                        <hr style="border-color:var(--border-color);margin:24px 0;">
+                        <h6 style="font-size:13px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;"><i class="bi bi-heart-pulse me-1"></i>Medical History</h6>
+
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Allergies</label>
+                            <textarea name="allergies" id="edit_allergies" class="form-control-modern" rows="2"></textarea>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Current Medications</label>
-                            <textarea name="current_medications" id="edit_current_medications" class="form-control" rows="2"></textarea>
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Chronic Conditions</label>
+                            <textarea name="chronic_conditions" id="edit_chronic_conditions" class="form-control-modern" rows="2"></textarea>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Additional Notes</label>
-                            <textarea name="notes" id="edit_notes" class="form-control" rows="2"></textarea>
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Current Medications</label>
+                            <textarea name="current_medications" id="edit_current_medications" class="form-control-modern" rows="2"></textarea>
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Additional Notes</label>
+                            <textarea name="notes" id="edit_notes" class="form-control-modern" rows="2"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary" style="background: var(--monastery-saffron); border: none;">
+                        <button type="button" class="btn-modern btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn-modern btn-primary-modern">
                             <i class="bi bi-save"></i> Update Monk
                         </button>
                     </div>
@@ -548,33 +547,38 @@ $conn->close();
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Advanced Search System -->
-    <script src="assets/js/advanced-search.js"></script>
-    <script>
-        function editMonk(monk) {
-            document.getElementById('edit_monk_id').value = monk.monk_id;
-            document.getElementById('edit_full_name').value = monk.full_name;
-            document.getElementById('edit_title_id').value = monk.title_id || '';
-            document.getElementById('edit_ordination_date').value = monk.ordination_date || '';
-            document.getElementById('edit_birth_date').value = monk.birth_date || '';
-            document.getElementById('edit_phone').value = monk.phone || '';
-            document.getElementById('edit_emergency_contact').value = monk.emergency_contact || '';
-            document.getElementById('edit_blood_group').value = monk.blood_group || '';
-            document.getElementById('edit_allergies').value = monk.allergies || '';
-            document.getElementById('edit_chronic_conditions').value = monk.chronic_conditions || '';
-            document.getElementById('edit_current_medications').value = monk.current_medications || '';
-            document.getElementById('edit_notes').value = monk.notes || '';
-            document.getElementById('edit_status').value = monk.status;
-            
-            new bootstrap.Modal(document.getElementById('editModal')).show();
-        }
-        
-        // Initialize Advanced Search for Monks
-        window.addEventListener('load', function() {
-            new AdvancedSearch('monks');
-        });
-    </script>
+<?php include 'includes/footer.php'; ?>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/advanced-search.js"></script>
+<script>
+    function editMonk(monk) {
+        document.getElementById('edit_monk_id').value = monk.monk_id;
+        document.getElementById('edit_full_name').value = monk.full_name;
+        document.getElementById('edit_title_id').value = monk.title_id || '';
+        document.getElementById('edit_ordination_date').value = monk.ordination_date || '';
+        document.getElementById('edit_birth_date').value = monk.birth_date || '';
+        document.getElementById('edit_phone').value = monk.phone || '';
+        document.getElementById('edit_emergency_contact').value = monk.emergency_contact || '';
+        document.getElementById('edit_blood_group').value = monk.blood_group || '';
+        document.getElementById('edit_allergies').value = monk.allergies || '';
+        document.getElementById('edit_chronic_conditions').value = monk.chronic_conditions || '';
+        document.getElementById('edit_current_medications').value = monk.current_medications || '';
+        document.getElementById('edit_notes').value = monk.notes || '';
+        document.getElementById('edit_status').value = monk.status;
+
+        new bootstrap.Modal(document.getElementById('editModal')).show();
+    }
+
+    // Initialize popovers for medical info
+    document.querySelectorAll('[data-bs-toggle="popover"]').forEach(function(el) {
+        new bootstrap.Popover(el);
+    });
+
+    // Initialize Advanced Search for Monks
+    window.addEventListener('load', function() {
+        new AdvancedSearch('monks');
+    });
+</script>
 </body>
 </html>

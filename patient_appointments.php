@@ -1,6 +1,5 @@
 <?php
 session_start();
-include 'navbar.php';
 
 $servername = "localhost";
 $dbusername = "root";
@@ -139,269 +138,289 @@ while ($rs = $rooms_res->fetch_assoc()) {
                    date('g:i A', strtotime($rs['end_time']))
     ];
 }
+
+// Compute stats
+$total_count = $appointments_res->num_rows;
+$all_appointments = [];
+$stat_scheduled = 0;
+$stat_completed = 0;
+$stat_cancelled = 0;
+while ($row = $appointments_res->fetch_assoc()) {
+    $all_appointments[] = $row;
+    if ($row['status'] === 'scheduled') $stat_scheduled++;
+    elseif ($row['status'] === 'completed') $stat_completed++;
+    elseif ($row['status'] === 'cancelled') $stat_cancelled++;
+}
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Appointment Management - Seela Suwa Herath Bikshu Gilan Arana</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/css/premium-theme.css">
-    <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
-    <link rel="stylesheet" href="assets/css/monastery-theme.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <style>
-        body { background: linear-gradient(135deg, var(--bg-main) 0%, #efe6d8 100%); }
-        .appointment-card {
-            transition: transform 0.2s;
-            border-left: 4px solid var(--primary);
-            background: #fff;
-        }
-        .appointment-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14);
-        }
-        .page-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: #fff;
-            padding: 1.8rem;
-            border-radius: 14px;
-            margin-bottom: 2rem;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            border: none;
-        }
-    </style>
 </head>
 <body>
-<div class="container mt-4 mb-5">
-    <div class="page-header">
-        <div class="row align-items-center">
-            <div class="col">
-                <h2 class="mb-0"><i class="bi bi-calendar-check"></i> Appointment Management</h2>
-                <p class="mb-0 mt-1 opacity-75">Schedule and manage monk appointments with doctors</p>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addModal">
-                    <i class="bi bi-plus-circle"></i> New Appointment
-                </button>
-            </div>
-        </div>
-    </div>
-    <div class="alert" style="background: linear-gradient(135deg, rgba(110, 134, 98, 0.08) 0%, rgba(79, 102, 69, 0.05) 100%); border-left: 3px solid var(--primary); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-        <img src="images/img1.jpeg" alt="Founder" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
-        <div style="font-size: 0.875rem; line-height: 1.4;">
-            <div style="font-weight: 600; color: var(--primary);">Seela Suwa Herath Bikshu Gilan Arana</div>
-            <div style="opacity: 0.75; font-size: 0.8rem;">Founded by Ven. Solewewa Chandrasiri Thero</div>
-        </div>
-    </div>
+<?php include 'navbar.php'; ?>
 
     <?php if($error): ?>
-        <div class="alert alert-danger alert-dismissible fade show">
+        <div class="alert-modern alert-danger-modern">
             <i class="bi bi-exclamation-triangle"></i> <?= htmlspecialchars($error) ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
 
     <?php if($success): ?>
-        <div class="alert alert-success alert-dismissible fade show">
+        <div class="alert-modern alert-success-modern">
             <i class="bi bi-check-circle"></i> <?= htmlspecialchars($success) ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
 
+    <!-- Stat Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="bi bi-calendar-check"></i></div>
+                <div class="stat-info">
+                    <span class="stat-label">Total Appointments</span>
+                    <span class="stat-value"><?= $total_count ?></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <div class="stat-icon amber"><i class="bi bi-clock-history"></i></div>
+                <div class="stat-info">
+                    <span class="stat-label">Scheduled</span>
+                    <span class="stat-value"><?= $stat_scheduled ?></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <div class="stat-icon emerald"><i class="bi bi-check-circle"></i></div>
+                <div class="stat-info">
+                    <span class="stat-label">Completed</span>
+                    <span class="stat-value"><?= $stat_completed ?></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <div class="stat-icon rose"><i class="bi bi-x-circle"></i></div>
+                <div class="stat-info">
+                    <span class="stat-label">Cancelled</span>
+                    <span class="stat-value"><?= $stat_cancelled ?></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Advanced Search Section -->
     <div id="advanced-search" data-type="appointments" class="mb-4"></div>
 
-    <!-- Appointments Grid -->
+    <!-- Appointments Table -->
     <div id="appointments-list">
-    <div class="row">
-        <?php if ($appointments_res->num_rows == 0): ?>
-            <div class="col-12">
-                <div class="alert alert-info text-center">
-                    <i class="bi bi-info-circle"></i> No appointments found. Click "New Appointment" to create one.
-                </div>
+        <div class="modern-table-wrapper">
+            <div class="modern-table-header">
+                <h5><i class="bi bi-calendar-check"></i> Appointment Management</h5>
+                <button class="btn-modern btn-primary-modern" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <i class="bi bi-plus-circle"></i> New Appointment
+                </button>
             </div>
-        <?php endif; ?>
-
-        <?php while($row = $appointments_res->fetch_assoc()): ?>
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card appointment-card shadow-sm h-100">
-                    <div class="card-header bg-<?= $status_colors[$row['status']] ?> text-white">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span><i class="bi bi-calendar-event"></i> <?= date('M d, Y', strtotime($row['app_date'])) ?></span>
-                            <span class="badge bg-light text-dark"><?= date('g:i A', strtotime($row['app_time'])) ?></span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-person"></i> Monk</h6>
-                        <p class="mb-3"><strong><?= htmlspecialchars($row['monk_name']) ?></strong></p>
-
-                        <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-person-badge"></i> Doctor</h6>
-                        <p class="mb-1"><strong><?= htmlspecialchars($row['doctor_name']) ?></strong></p>
-                        <p class="text-muted small mb-3"><?= htmlspecialchars($row['specialization']) ?></p>
-
-                        <?php if($row['room_name']): ?>
-                            <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-door-open"></i> Room</h6>
-                            <p class="mb-3"><?= htmlspecialchars($row['room_name']) ?></p>
+            <div class="table-responsive-modern">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Date &amp; Time</th>
+                            <th>Monk</th>
+                            <th>Doctor</th>
+                            <th>Specialization</th>
+                            <th>Room</th>
+                            <th>Notes</th>
+                            <th>Status</th>
+                            <th>Created By</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (count($all_appointments) == 0): ?>
+                            <tr>
+                                <td colspan="9" class="text-center py-4 text-muted">
+                                    <i class="bi bi-info-circle"></i> No appointments found. Click "New Appointment" to create one.
+                                </td>
+                            </tr>
                         <?php endif; ?>
 
-                        <?php if($row['notes']): ?>
-                            <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-card-text"></i> Notes</h6>
-                            <p class="small mb-3"><?= htmlspecialchars($row['notes']) ?></p>
-                        <?php endif; ?>
+                        <?php foreach($all_appointments as $row): ?>
+                            <tr>
+                                <td>
+                                    <strong><?= date('M d, Y', strtotime($row['app_date'])) ?></strong><br>
+                                    <small class="text-muted"><?= date('g:i A', strtotime($row['app_time'])) ?></small>
+                                </td>
+                                <td><?= htmlspecialchars($row['monk_name']) ?></td>
+                                <td><?= htmlspecialchars($row['doctor_name']) ?></td>
+                                <td><?= htmlspecialchars($row['specialization']) ?></td>
+                                <td><?= $row['room_name'] ? htmlspecialchars($row['room_name']) : '<span class="text-muted">—</span>' ?></td>
+                                <td><?= $row['notes'] ? htmlspecialchars($row['notes']) : '<span class="text-muted">—</span>' ?></td>
+                                <td>
+                                    <?php
+                                        $badge_class = 'badge-neutral';
+                                        if ($row['status'] === 'scheduled') $badge_class = 'badge-primary';
+                                        elseif ($row['status'] === 'completed') $badge_class = 'badge-success';
+                                        elseif ($row['status'] === 'cancelled') $badge_class = 'badge-danger';
+                                        elseif ($row['status'] === 'no-show') $badge_class = 'badge-warning';
+                                    ?>
+                                    <span class="badge-modern <?= $badge_class ?> badge-dot"><?= ucfirst($row['status']) ?></span>
+                                </td>
+                                <td><?= $row['created_by_name'] ? htmlspecialchars($row['created_by_name']) : '<span class="text-muted">—</span>' ?></td>
+                                <td>
+                                    <button class="btn-icon" data-bs-toggle="modal" data-bs-target="#editModal<?= $row['app_id'] ?>" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn-icon danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?= $row['app_id'] ?>" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
 
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="badge bg-<?= $status_colors[$row['status']] ?>"><?= ucfirst($row['status']) ?></span>
-                            <div>
-                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal<?= $row['app_id'] ?>" title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?= $row['app_id'] ?>" title="Delete">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <?php if($row['created_by_name']): ?>
-                        <div class="card-footer text-muted small">
-                            <i class="bi bi-person-circle"></i> Created by: <?= htmlspecialchars($row['created_by_name']) ?>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
+                            <!-- Edit Modal -->
+                            <div class="modal fade" id="editModal<?= $row['app_id'] ?>" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form method="post">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title"><i class="bi bi-pencil-square"></i> Edit Appointment</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <input type="hidden" name="form_name" value="update">
+                                                <input type="hidden" name="app_id" value="<?= $row['app_id'] ?>">
+                                                
+                                                <div class="form-group-modern">
+                                                    <label class="form-label-modern">Monk</label>
+                                                    <select name="monk_id" class="form-select-modern" required>
+                                                        <?php foreach($monks as $monk): ?>
+                                                            <option value="<?= $monk['monk_id'] ?>" <?= $monk['monk_id'] == $row['monk_id'] ? 'selected' : '' ?>>
+                                                                <?= htmlspecialchars($monk['full_name']) ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
 
-            <!-- Edit Modal -->
-            <div class="modal fade" id="editModal<?= $row['app_id'] ?>" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form method="post">
-                            <div class="modal-header bg-primary text-white">
-                                <h5 class="modal-title"><i class="bi bi-pencil-square"></i> Edit Appointment</h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <input type="hidden" name="form_name" value="update">
-                                <input type="hidden" name="app_id" value="<?= $row['app_id'] ?>">
-                                
-                                <div class="mb-3">
-                                    <label class="form-label">Monk</label>
-                                    <select name="monk_id" class="form-select" required>
-                                        <?php foreach($monks as $monk): ?>
-                                            <option value="<?= $monk['monk_id'] ?>" <?= $monk['monk_id'] == $row['monk_id'] ? 'selected' : '' ?>>
-                                                <?= htmlspecialchars($monk['full_name']) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
+                                                <div class="form-group-modern">
+                                                    <label class="form-label-modern">Doctor</label>
+                                                    <select name="doctor_id" class="form-select-modern" required>
+                                                        <?php foreach($doctors as $doctor): ?>
+                                                            <option value="<?= $doctor['doctor_id'] ?>" <?= $doctor['doctor_id'] == $row['doctor_id'] ? 'selected' : '' ?>>
+                                                                <?= htmlspecialchars($doctor['full_name']) ?> - <?= $doctor['specialization'] ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
 
-                                <div class="mb-3">
-                                    <label class="form-label">Doctor</label>
-                                    <select name="doctor_id" class="form-select" required>
-                                        <?php foreach($doctors as $doctor): ?>
-                                            <option value="<?= $doctor['doctor_id'] ?>" <?= $doctor['doctor_id'] == $row['doctor_id'] ? 'selected' : '' ?>>
-                                                <?= htmlspecialchars($doctor['full_name']) ?> - <?= $doctor['specialization'] ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
+                                                <div class="form-group-modern">
+                                                    <label class="form-label-modern">Room Slot (Optional)</label>
+                                                    <select name="room_slot_id" class="form-select-modern">
+                                                        <option value="">-- No Room --</option>
+                                                        <?php foreach($room_slots as $slot): ?>
+                                                            <option value="<?= $slot['id'] ?>" <?= $slot['id'] == $row['room_slot_id'] ? 'selected' : '' ?>>
+                                                                <?= htmlspecialchars($slot['label']) ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
 
-                                <div class="mb-3">
-                                    <label class="form-label">Room Slot (Optional)</label>
-                                    <select name="room_slot_id" class="form-select">
-                                        <option value="">-- No Room --</option>
-                                        <?php foreach($room_slots as $slot): ?>
-                                            <option value="<?= $slot['id'] ?>" <?= $slot['id'] == $row['room_slot_id'] ? 'selected' : '' ?>>
-                                                <?= htmlspecialchars($slot['label']) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group-modern">
+                                                            <label class="form-label-modern">Date</label>
+                                                            <input type="date" name="app_date" class="form-control-modern" value="<?= $row['app_date'] ?>" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group-modern">
+                                                            <label class="form-label-modern">Time</label>
+                                                            <input type="time" name="app_time" class="form-control-modern" value="<?= $row['app_time'] ?>" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Date</label>
-                                        <input type="date" name="app_date" class="form-control" value="<?= $row['app_date'] ?>" required>
+                                                <div class="form-group-modern">
+                                                    <label class="form-label-modern">Status</label>
+                                                    <select name="status" class="form-select-modern" required>
+                                                        <option value="scheduled" <?= $row['status'] == 'scheduled' ? 'selected' : '' ?>>Scheduled</option>
+                                                        <option value="completed" <?= $row['status'] == 'completed' ? 'selected' : '' ?>>Completed</option>
+                                                        <option value="cancelled" <?= $row['status'] == 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
+                                                        <option value="no-show" <?= $row['status'] == 'no-show' ? 'selected' : '' ?>>No-Show</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="form-group-modern">
+                                                    <label class="form-label-modern">Notes</label>
+                                                    <textarea name="notes" class="form-control-modern" rows="3"><?= htmlspecialchars($row['notes']) ?></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn-modern btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn-modern btn-primary-modern">Save Changes</button>
+                                            </div>
+                                        </form>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Time</label>
-                                        <input type="time" name="app_time" class="form-control" value="<?= $row['app_time'] ?>" required>
+                                </div>
+                            </div>
+
+                            <!-- Delete Modal -->
+                            <div class="modal fade" id="deleteModal<?= $row['app_id'] ?>" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form method="post">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title"><i class="bi bi-trash"></i> Confirm Delete</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to delete this appointment?</p>
+                                                <ul class="list-unstyled">
+                                                    <li><strong>Monk:</strong> <?= htmlspecialchars($row['monk_name']) ?></li>
+                                                    <li><strong>Doctor:</strong> <?= htmlspecialchars($row['doctor_name']) ?></li>
+                                                    <li><strong>Date:</strong> <?= date('M d, Y', strtotime($row['app_date'])) ?> at <?= date('g:i A', strtotime($row['app_time'])) ?></li>
+                                                </ul>
+                                                <input type="hidden" name="form_name" value="delete">
+                                                <input type="hidden" name="app_id" value="<?= $row['app_id'] ?>">
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn-modern btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn-modern" style="background:#ef4444;color:#fff;">Yes, Delete</button>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label">Status</label>
-                                    <select name="status" class="form-select" required>
-                                        <option value="scheduled" <?= $row['status'] == 'scheduled' ? 'selected' : '' ?>>Scheduled</option>
-                                        <option value="completed" <?= $row['status'] == 'completed' ? 'selected' : '' ?>>Completed</option>
-                                        <option value="cancelled" <?= $row['status'] == 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
-                                        <option value="no-show" <?= $row['status'] == 'no-show' ? 'selected' : '' ?>>No-Show</option>
-                                    </select>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label">Notes</label>
-                                    <textarea name="notes" class="form-control" rows="3"><?= htmlspecialchars($row['notes']) ?></textarea>
-                                </div>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save Changes</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
-
-            <!-- Delete Modal -->
-            <div class="modal fade" id="deleteModal<?= $row['app_id'] ?>" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form method="post">
-                            <div class="modal-header bg-danger text-white">
-                                <h5 class="modal-title"><i class="bi bi-trash"></i> Confirm Delete</h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <p>Are you sure you want to delete this appointment?</p>
-                                <ul class="list-unstyled">
-                                    <li><strong>Monk:</strong> <?= htmlspecialchars($row['monk_name']) ?></li>
-                                    <li><strong>Doctor:</strong> <?= htmlspecialchars($row['doctor_name']) ?></li>
-                                    <li><strong>Date:</strong> <?= date('M d, Y', strtotime($row['app_date'])) ?> at <?= date('g:i A', strtotime($row['app_time'])) ?></li>
-                                </ul>
-                                <input type="hidden" name="form_name" value="delete">
-                                <input type="hidden" name="app_id" value="<?= $row['app_id'] ?>">
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-danger">Yes, Delete</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        <?php endwhile; ?>
-    </div>
+        </div>
     </div><!-- END appointments-list -->
-</div>
 
 <!-- Add New Appointment Modal -->
 <div class="modal fade" id="addModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post">
-                <div class="modal-header bg-success text-white">
+                <div class="modal-header">
                     <h5 class="modal-title"><i class="bi bi-plus-circle"></i> New Appointment</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="form_name" value="create">
                     
-                    <div class="mb-3">
-                        <label class="form-label">Monk</label>
-                        <select name="monk_id" class="form-select" required>
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Monk</label>
+                        <select name="monk_id" class="form-select-modern" required>
                             <option value="">-- Select Monk --</option>
                             <?php foreach($monks as $monk): ?>
                                 <option value="<?= $monk['monk_id'] ?>">
@@ -411,9 +430,9 @@ while ($rs = $rooms_res->fetch_assoc()) {
                         </select>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Doctor</label>
-                        <select name="doctor_id" class="form-select" required>
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Doctor</label>
+                        <select name="doctor_id" class="form-select-modern" required>
                             <option value="">-- Select Doctor --</option>
                             <?php foreach($doctors as $doctor): ?>
                                 <option value="<?= $doctor['doctor_id'] ?>">
@@ -423,9 +442,9 @@ while ($rs = $rooms_res->fetch_assoc()) {
                         </select>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Room Slot (Optional)</label>
-                        <select name="room_slot_id" class="form-select">
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Room Slot (Optional)</label>
+                        <select name="room_slot_id" class="form-select-modern">
                             <option value="">-- No Room --</option>
                             <?php foreach($room_slots as $slot): ?>
                                 <option value="<?= $slot['id'] ?>">
@@ -436,35 +455,42 @@ while ($rs = $rooms_res->fetch_assoc()) {
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Date</label>
-                            <input type="date" name="app_date" class="form-control" required>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Date</label>
+                                <input type="date" name="app_date" class="form-control-modern" required>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Time</label>
-                            <input type="time" name="app_time" class="form-control" required>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Time</label>
+                                <input type="time" name="app_time" class="form-control-modern" required>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Notes (Optional)</label>
-                        <textarea name="notes" class="form-control" rows="3" placeholder="Any special instructions or notes..."></textarea>
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Notes (Optional)</label>
+                        <textarea name="notes" class="form-control-modern" rows="3" placeholder="Any special instructions or notes..."></textarea>
                     </div>
 
-                    <div class="alert alert-info">
+                    <div class="alert-modern alert-success-modern">
                         <i class="bi bi-info-circle"></i> <small>Appointment will be created with "Scheduled" status.</small>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success">Create Appointment</button>
+                    <button type="button" class="btn-modern btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-modern btn-primary-modern">Create Appointment</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+<?php include 'includes/footer.php'; ?>
+
 <!-- Advanced Search System -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/advanced-search.js"></script>
 <script>
 // Initialize Advanced Search for Appointments

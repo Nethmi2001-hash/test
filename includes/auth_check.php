@@ -79,11 +79,4 @@ function isDoctor() {
     return isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Doctor';
 }
 
-/**
- * Check if current user is helper
- * @return bool True if helper
- */
-function isHelper() {
-    return isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Helper';
-}
 ?>
