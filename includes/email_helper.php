@@ -259,8 +259,8 @@ function logEmail($to, $subject, $status, $error = '') {
     }
     
     $stmt = $conn->prepare("
-        INSERT INTO email_notifications (recipient, subject, status, error_message, sent_at) 
-        VALUES (?, ?, ?, ?, NOW())
+        INSERT INTO email_notifications (recipient_email, subject, body, type, status, error_message, sent_at) 
+        VALUES (?, ?, '', 'general', ?, ?, NOW())
     ");
     $stmt->bind_param("ssss", $to, $subject, $status, $error);
     $stmt->execute();
