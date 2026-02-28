@@ -7,6 +7,21 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
+// Route to role-specific dashboards
+$userRole = $_SESSION['role_name'] ?? 'Admin';
+switch ($userRole) {
+    case 'Doctor':
+        include __DIR__ . '/dashboard_doctor.php';
+        exit();
+    case 'Donor':
+        include __DIR__ . '/dashboard_donor.php';
+        exit();
+    case 'Monk':
+        include __DIR__ . '/dashboard_monk.php';
+        exit();
+}
+
+// Admin Dashboard (default)
 // Database connection
 require_once __DIR__ . '/includes/db_config.php';
 $conn = getDBConnection();

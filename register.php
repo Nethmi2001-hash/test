@@ -7,7 +7,7 @@ $success = "";
 $con = getDBConnection();
 
 $roles = [];
-$result = $con->query("SELECT role_id, role_name FROM roles");
+$result = $con->query("SELECT role_id, role_name FROM roles WHERE role_name IN ('Doctor', 'Donor', 'Monk') ORDER BY role_name");
 if ($result) {
     while ($row = $result->fetch_assoc()) {
         $roles[] = $row;

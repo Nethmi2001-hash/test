@@ -16,6 +16,9 @@ if (!function_exists('getPageTitle')) {
 function getPageTitle($page) {
   $titles = [
     'dashboard.php' => 'Dashboard',
+    'dashboard_doctor.php' => 'Doctor Dashboard',
+    'dashboard_donor.php' => 'Donor Dashboard',
+    'dashboard_monk.php' => 'Monk Dashboard',
     'donation_management.php' => 'Donations',
     'bill_management.php' => 'Bills',
     'patient_appointments.php' => 'Appointments',
@@ -42,6 +45,10 @@ $pageTitle = getPageTitle($currentPage);
 $userName = $_SESSION['username'] ?? 'User';
 $userRole = $_SESSION['role_name'] ?? 'Admin';
 $userInitial = strtoupper(substr($userName, 0, 1));
+$isAdmin = ($userRole === 'Admin');
+$isDoctor = ($userRole === 'Doctor');
+$isDonor = ($userRole === 'Donor');
+$isMonk = ($userRole === 'Monk');
 ?>
 
 <!-- Modern Design System -->
@@ -66,6 +73,8 @@ $userInitial = strtoupper(substr($userName, 0, 1));
       <i class="bi bi-grid-1x2"></i> <?= __('dashboard') ?>
     </a>
 
+    <?php if ($isAdmin): ?>
+    <!-- Admin: Full Access -->
     <div class="sidebar-section-label">Main</div>
     <a class="sidebar-link <?= isActivePage('donation_management.php', $currentPage) ?>" href="donation_management.php">
       <i class="bi bi-cash-coin"></i> <?= __('donations') ?>
@@ -111,6 +120,58 @@ $userInitial = strtoupper(substr($userName, 0, 1));
     <a class="sidebar-link <?= isActivePage('import_monks.php', $currentPage) ?>" href="import_monks.php">
       <i class="bi bi-upload"></i> <?= __('import_monks') ?>
     </a>
+
+    <?php elseif ($isDoctor): ?>
+    <!-- Doctor: Appointments, Patients, Availability -->
+    <div class="sidebar-section-label">My Practice</div>
+    <a class="sidebar-link <?= isActivePage('patient_appointments.php', $currentPage) ?>" href="patient_appointments.php">
+      <i class="bi bi-calendar2-check"></i> <?= __('appointments') ?>
+    </a>
+    <a class="sidebar-link <?= isActivePage('monk_management.php', $currentPage) ?>" href="monk_management.php">
+      <i class="bi bi-person-hearts"></i> Patient Records
+    </a>
+    <a class="sidebar-link <?= isActivePage('doctor_availability.php', $currentPage) ?>" href="doctor_availability.php">
+      <i class="bi bi-clock-history"></i> My Availability
+    </a>
+
+    <div class="sidebar-section-label">Tools</div>
+    <a class="sidebar-link <?= isActivePage('chatbot.php', $currentPage) ?>" href="chatbot.php">
+      <i class="bi bi-robot"></i> <?= __('ai_assistant') ?>
+    </a>
+
+    <?php elseif ($isDonor): ?>
+    <!-- Donor: Donations, Transparency -->
+    <div class="sidebar-section-label">My Donations</div>
+    <a class="sidebar-link <?= isActivePage('donation_management.php', $currentPage) ?>" href="donation_management.php">
+      <i class="bi bi-cash-coin"></i> <?= __('donations') ?>
+    </a>
+    <a class="sidebar-link <?= isActivePage('public_donate.php', $currentPage) ?>" href="public_donate.php">
+      <i class="bi bi-heart"></i> Make Donation
+    </a>
+    <a class="sidebar-link <?= isActivePage('public_transparency.php', $currentPage) ?>" href="public_transparency.php">
+      <i class="bi bi-shield-check"></i> Transparency
+    </a>
+
+    <div class="sidebar-section-label">Tools</div>
+    <a class="sidebar-link <?= isActivePage('chatbot.php', $currentPage) ?>" href="chatbot.php">
+      <i class="bi bi-robot"></i> <?= __('ai_assistant') ?>
+    </a>
+
+    <?php elseif ($isMonk): ?>
+    <!-- Monk: Health Records, Appointments, Doctors -->
+    <div class="sidebar-section-label">My Health</div>
+    <a class="sidebar-link <?= isActivePage('patient_appointments.php', $currentPage) ?>" href="patient_appointments.php">
+      <i class="bi bi-calendar2-check"></i> My Appointments
+    </a>
+    <a class="sidebar-link <?= isActivePage('doctor_management.php', $currentPage) ?>" href="doctor_management.php">
+      <i class="bi bi-person-badge"></i> View Doctors
+    </a>
+
+    <div class="sidebar-section-label">Tools</div>
+    <a class="sidebar-link <?= isActivePage('chatbot.php', $currentPage) ?>" href="chatbot.php">
+      <i class="bi bi-robot"></i> Health Assistant
+    </a>
+    <?php endif; ?>
   </nav>
 
   <div class="sidebar-footer">

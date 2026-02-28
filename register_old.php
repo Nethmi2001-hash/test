@@ -7,7 +7,7 @@ $success = "";
 $error = "";
 
 // Fetch roles for dropdown (monastery_healthcare schema)
-$roles_res = $con->query("SELECT role_id, role_name FROM roles WHERE role_name IN ('Donor', 'Monk', 'Helper')");
+$roles_res = $con->query("SELECT role_id, role_name FROM roles WHERE role_name IN ('Donor', 'Monk')");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = trim($_POST['full_name'] ?? '');
