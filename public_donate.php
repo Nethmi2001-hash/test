@@ -901,7 +901,7 @@ $stats = $stats_result->fetch_assoc();
                     <i class="bi bi-bank2"></i> Bank Transfer Details
                 </div>
                 <div class="bank-details-body">
-                    <p style="margin-bottom:16px;color:var(--slate-600);font-size:0.9rem;">Please transfer your donation to the following bank account and upload the payment slip below.</p>
+                    <p style="margin-bottom:16px;color:var(--slate-600);font-size:0.9rem;">Enter your bank account details, branch, and upload the payment slip below.</p>
                     <div class="row g-3">
                         <div class="col-sm-6">
                             <div class="bank-detail-item">
