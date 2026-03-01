@@ -10,6 +10,64 @@ if (empty($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 require_once __DIR__ . '/includes/db_config.php';
 $conn = getDBConnection();
 
+// Handle AJAX verify request
+if (isset($_POST['ajax_verify']) && isset($_POST['donation_id'])) {
+    header('Content-Type: application/json');
+    $donation_id = intval($_POST['donation_id']);
+    
+    // Get donation details before verification
+    $donation_query = $conn->prepare("
+        SELECT d.*, c.name as category_name 
+        FROM donations d 
+        LEFT JOIN categories c ON d.category_id = c.category_id 
+        WHERE d.donation_id = ?
+    ");
+    $donation_query->bind_param("i", $donation_id);
+    $donation_query->execute();
+    $donation_result = $donation_query->get_result();
+    $donation_data = $donation_result->fetch_assoc();
+    $donation_query->close();
+    
+    $stmt = $conn->prepare("UPDATE donations SET status='verified', verified_by=?, verified_at=NOW() WHERE donation_id=?");
+    $verified_by = $_SESSION['user_id'];
+    $stmt->bind_param("ii", $verified_by, $donation_id);
+    
+    if ($stmt->execute()) {
+        $msg = "Donation verified successfully!";
+        if (!empty($donation_data['donor_email'])) {
+            require_once __DIR__ . '/includes/email_helper.php';
+            if (sendDonationThankYou($donation_data)) {
+                $msg .= " Thank you email sent!";
+            }
+        }
+        echo json_encode(['success' => true, 'message' => $msg]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $stmt->error]);
+    }
+    $stmt->close();
+    $conn->close();
+    exit();
+}
+
+// Handle AJAX reject request
+if (isset($_POST['ajax_reject']) && isset($_POST['donation_id'])) {
+    header('Content-Type: application/json');
+    $donation_id = intval($_POST['donation_id']);
+    
+    $stmt = $conn->prepare("UPDATE donations SET status='rejected', verified_by=?, verified_at=NOW() WHERE donation_id=?");
+    $rejected_by = $_SESSION['user_id'];
+    $stmt->bind_param("ii", $rejected_by, $donation_id);
+    
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Donation rejected.']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $stmt->error]);
+    }
+    $stmt->close();
+    $conn->close();
+    exit();
+}
+
 $error = "";
 $success = "";
 
@@ -302,6 +360,14 @@ if ($isDonor || $isDoctor) {
     <title>Donation Management - Seela Suwa Herath Bikshu Gilan Arana</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .badge-success { background: #dcfce7 !important; color: #16a34a !important; }
+        .badge-success::before { background: #16a34a !important; }
+        .badge-warning { background: #fef9c3 !important; color: #ca8a04 !important; }
+        .badge-warning::before { background: #ca8a04 !important; }
+        .badge-danger { background: #fee2e2 !important; color: #dc2626 !important; }
+        .badge-danger::before { background: #dc2626 !important; }
+    </style>
 </head>
 <body>
 
@@ -405,6 +471,7 @@ if ($isDonor || $isDoctor) {
                             <th>Receipt</th>
                             <th>Status</th>
                             <th>Date</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -442,15 +509,25 @@ if ($isDonor || $isDoctor) {
                             </td>
                             <td>
                                 <?php
-                                $status_badges = [
-                                    'pending' => 'badge-warning',
-                                    'verified' => 'badge-success',
-                                    'rejected' => 'badge-danger'
+                                $status_styles = [
+                                    'pending'  => 'background:#fef9c3;color:#ca8a04;',
+                                    'verified' => 'background:#dcfce7;color:#16a34a;',
+                                    'rejected' => 'background:#fee2e2;color:#dc2626;',
+                                    'paid'     => 'background:#dbeafe;color:#2563eb;',
                                 ];
-                                $s_badge = $status_badges[$donation['status']] ?? 'badge-neutral';
+                                $dot_colors = [
+                                    'pending'  => '#ca8a04',
+                                    'verified' => '#16a34a',
+                                    'rejected' => '#dc2626',
+                                    'paid'     => '#2563eb',
+                                ];
+                                $st = !empty($donation['status']) ? $donation['status'] : 'pending';
+                                $badge_style = $status_styles[$st] ?? 'background:#f1f5f9;color:#64748b;';
+                                $dot_color = $dot_colors[$st] ?? '#64748b';
                                 ?>
-                                <span class="badge-modern badge-dot <?= $s_badge ?>">
-                                    <?= ucfirst($donation['status']) ?>
+                                <span data-status-badge="true" style="display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;<?= $badge_style ?>">
+                                    <span style="width:7px;height:7px;border-radius:50%;background:<?= $dot_color ?>;display:inline-block;"></span>
+                                    <?= ucfirst($st) ?>
                                 </span>
                             </td>
                             <td>
@@ -458,6 +535,23 @@ if ($isDonor || $isDoctor) {
                                 <?php if ($donation['notes']): ?>
                                     <br><small class="text-muted"><i class="bi bi-sticky"></i> <?= htmlspecialchars($donation['notes']) ?></small>
                                 <?php endif; ?>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1 flex-wrap">
+                                    <?php if ($st === 'pending'): ?>
+                                        <button type="button" class="btn-modern btn-success-modern btn-sm-modern verify-btn" data-id="<?= $donation['donation_id'] ?>" title="Verify">
+                                            <i class="bi bi-check-circle"></i>
+                                        </button>
+                                        <button type="button" class="btn-modern btn-danger-modern btn-sm-modern reject-btn" data-id="<?= $donation['donation_id'] ?>" title="Reject">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                    <?php if ($st === 'verified'): ?>
+                                        <a href="generate_receipt.php?id=<?= $donation['donation_id'] ?>" target="_blank" class="btn-modern btn-primary-modern btn-sm-modern" title="Download Receipt">
+                                            <i class="bi bi-file-earmark-pdf"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -845,6 +939,93 @@ if ($isDonor || $isDoctor) {
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+// AJAX Verify
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.verify-btn');
+    if (!btn) return;
+    if (!confirm('Verify this donation?')) return;
+    
+    const donationId = btn.dataset.id;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+    
+    const formData = new FormData();
+    formData.append('ajax_verify', '1');
+    formData.append('donation_id', donationId);
+    
+    fetch('donation_management.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            const row = btn.closest('tr');
+            const badge = row.querySelector('[data-status-badge]');
+            if (badge) {
+                badge.style.background = '#dcfce7';
+                badge.style.color = '#16a34a';
+                badge.innerHTML = '<span style="width:7px;height:7px;border-radius:50%;background:#16a34a;display:inline-block;"></span> Verified';
+            }
+            // Replace action buttons with PDF receipt link
+            const actionDiv = btn.closest('.d-flex');
+            actionDiv.innerHTML = '<a href="generate_receipt.php?id=' + donationId + '" target="_blank" class="btn-modern btn-primary-modern btn-sm-modern" title="Download Receipt"><i class="bi bi-file-earmark-pdf"></i></a>';
+        } else {
+            alert(data.message || 'Verification failed');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-check-circle"></i>';
+        }
+    })
+    .catch(() => {
+        alert('Network error. Please try again.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-check-circle"></i>';
+    });
+});
+
+// AJAX Reject
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.reject-btn');
+    if (!btn) return;
+    if (!confirm('Reject this donation?')) return;
+    
+    const donationId = btn.dataset.id;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+    
+    const formData = new FormData();
+    formData.append('ajax_reject', '1');
+    formData.append('donation_id', donationId);
+    
+    fetch('donation_management.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            const row = btn.closest('tr');
+            const badge = row.querySelector('[data-status-badge]');
+            if (badge) {
+                badge.style.background = '#fee2e2';
+                badge.style.color = '#dc2626';
+                badge.innerHTML = '<span style="width:7px;height:7px;border-radius:50%;background:#dc2626;display:inline-block;"></span> Rejected';
+            }
+            const actionDiv = btn.closest('.d-flex');
+            actionDiv.innerHTML = '<span class="text-muted" style="font-size:12px;">Rejected</span>';
+        } else {
+            alert(data.message || 'Rejection failed');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-x-circle"></i>';
+        }
+    })
+    .catch(() => {
+        alert('Network error. Please try again.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-x-circle"></i>';
+    });
+});
+
 function editDonation(donation) {
     document.getElementById('edit_donation_id').value = donation.donation_id;
     document.getElementById('edit_donor_name').value = donation.donor_name;
