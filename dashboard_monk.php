@@ -1,11 +1,11 @@
 <?php
-if (!isset($_SESSION['logged_in']) || (basename($_SERVER['PHP_SELF']) === 'dashboard_monk.php')) {
-    if (session_status() === PHP_SESSION_NONE) session_start();
-    if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-        header("Location: login.php");
-        exit();
-    }
+if (session_status() === PHP_SESSION_NONE) session_start();
+
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header("Location: login.php");
+    exit();
 }
+
 require_once __DIR__ . '/includes/db_config.php';
 $conn = getDBConnection();
 
@@ -16,9 +16,13 @@ $userEmail = $_SESSION['email'] ?? '';
 // Try to find linked monk profile by name match
 $monk = null;
 $monk_id = null;
-$r = $conn->query("SELECT * FROM monks WHERE full_name LIKE '%" . $conn->real_escape_string($userName) . "%' AND status = 'active' LIMIT 1");
-if ($r && $r->num_rows > 0) {
-    $monk = $r->fetch_assoc();
+$stmt = $conn->prepare("SELECT * FROM monks WHERE full_name LIKE ? AND status = 'active' LIMIT 1");
+$searchName = "%{$userName}%";
+$stmt->bind_param("s", $searchName);
+$stmt->execute();
+$result = $stmt->get_result();
+if ($result && $result->num_rows > 0) {
+    $monk = $result->fetch_assoc();
     $monk_id = $monk['monk_id'];
 }
 

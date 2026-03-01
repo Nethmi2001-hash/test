@@ -145,11 +145,8 @@ $isMonk = ($userRole === 'Monk');
     <a class="sidebar-link <?= isActivePage('donation_management.php', $currentPage) ?>" href="donation_management.php">
       <i class="bi bi-cash-coin"></i> <?= __('donations') ?>
     </a>
-    <a class="sidebar-link <?= isActivePage('public_donate.php', $currentPage) ?>" href="public_donate.php">
+    <a class="sidebar-link" href="donation_management.php?action=donate">
       <i class="bi bi-heart"></i> Make Donation
-    </a>
-    <a class="sidebar-link <?= isActivePage('public_transparency.php', $currentPage) ?>" href="public_transparency.php">
-      <i class="bi bi-shield-check"></i> Transparency
     </a>
 
     <div class="sidebar-section-label">Tools</div>

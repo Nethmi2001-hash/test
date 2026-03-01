@@ -7,48 +7,112 @@ if (empty($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
-// Database connection
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "monastery_healthcare";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+require_once __DIR__ . '/includes/db_config.php';
+$conn = getDBConnection();
 
 $error = "";
 $success = "";
+
+// Get user info
+$userId = $_SESSION['user_id'] ?? 0;
+$userName = $_SESSION['username'] ?? 'User';
+$userEmail = $_SESSION['email'] ?? '';
+$userRole = $_SESSION['role_name'] ?? 'Admin';
+$isAdmin = ($userRole === 'Admin');
+$isDonor = ($userRole === 'Donor');
+$isDoctor = ($userRole === 'Doctor');
+
+// Handle file upload for bank slip
+function handleBankSlipUpload() {
+    if (!isset($_FILES['bank_slip']) || $_FILES['bank_slip']['error'] !== UPLOAD_ERR_OK) {
+        return null;
+    }
+    
+    $uploadDir = 'uploads/bank_slips/';
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+    
+    $file = $_FILES['bank_slip'];
+    $fileName = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $file['name']);
+    $filePath = $uploadDir . $fileName;
+    
+    // Check file type (images only)
+    $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    if (!in_array($file['type'], $allowedTypes)) {
+        throw new Exception('Only image files are allowed for bank slips.');
+    }
+    
+    // Check file size (5MB max)
+    if ($file['size'] > 5 * 1024 * 1024) {
+        throw new Exception('File size must be less than 5MB.');
+    }
+    
+    if (move_uploaded_file($file['tmp_name'], $filePath)) {
+        return $filePath;
+    }
+    
+    throw new Exception('Failed to upload bank slip.');
+}
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
     $form_name = $_POST['form_name'];
 
     if ($form_name === 'create') {
-        $donor_name = trim($_POST['donor_name']);
-        $donor_email = trim($_POST['donor_email']);
-        $donor_phone = trim($_POST['donor_phone']);
-        $amount = floatval($_POST['amount']);
-        $category_id = intval($_POST['category_id']);
-        $payment_method = $_POST['payment_method'];
-        $reference_number = trim($_POST['reference_number'] ?? '');
-        $notes = trim($_POST['notes'] ?? '');
-        $status = $_POST['status'] ?? 'pending';
-
-        if (empty($donor_name) || $amount <= 0 || empty($category_id)) {
-            $error = "Donor name, valid amount, and category are required.";
-        } else {
-            $stmt = $conn->prepare("INSERT INTO donations (donor_name, donor_email, donor_phone, amount, category_id, payment_method, reference_number, notes, status, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $created_by = $_SESSION['user_id'];
-            $stmt->bind_param("sssdissssi", $donor_name, $donor_email, $donor_phone, $amount, $category_id, $payment_method, $reference_number, $notes, $status, $created_by);
-            
-            if ($stmt->execute()) {
-                $success = "Donation recorded successfully! Donation ID: " . $stmt->insert_id;
+        try {
+            // For donors, auto-fill their information
+            if ($isDonor) {
+                $donor_name = $userName;
+                $donor_email = $userEmail;
+                $donor_user_id = $userId;
             } else {
-                $error = "Error: " . $stmt->error;
+                $donor_name = trim($_POST['donor_name']);
+                $donor_email = trim($_POST['donor_email']);
+                $donor_user_id = null;
             }
-            $stmt->close();
+            
+            $amount = floatval($_POST['amount']);
+            $category_id = intval($_POST['category_id']);
+            $bank = trim($_POST['bank'] ?? '');
+            $brand = trim($_POST['brand'] ?? '');
+            $reference_number = trim($_POST['reference_number'] ?? '');
+            $notes = trim($_POST['notes'] ?? '');
+            $status = $isDonor ? 'pending' : ($_POST['status'] ?? 'pending');
+            
+            // Handle bank slip upload
+            $slip_path = null;
+            try {
+                $slip_path = handleBankSlipUpload();
+            } catch (Exception $e) {
+                $error = $e->getMessage();
+            }
+
+            if (empty($donor_name) || empty($category_id)) {
+                $error = "Donor name and category are required.";
+            } elseif ($amount < 100 || !is_numeric($amount)) {
+                $error = "Amount must be at least Rs. 100.00.";
+            } elseif (!$error) { // Only proceed if no upload error occurred
+                $stmt = $conn->prepare("INSERT INTO donations (donor_name, donor_email, donor_user_id, amount, category_id, bank, brand, bank_reference, notes, status, slip_path, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $created_by = $_SESSION['user_id'];
+                $stmt->bind_param("ssiisssssssi", $donor_name, $donor_email, $donor_user_id, $amount, $category_id, $bank, $brand, $reference_number, $notes, $status, $slip_path, $created_by);
+                
+                if ($stmt->execute()) {
+                    if ($isDonor) {
+                        $success = "Your donation has been submitted for verification!";
+                        if ($slip_path) {
+                            $success .= " Bank slip uploaded successfully.";
+                        }
+                    } else {
+                        $success = "Donation recorded successfully!";
+                    }
+                } else {
+                    $error = "Error: " . $stmt->error;
+                }
+                $stmt->close();
+            }
+        } catch (Exception $e) {
+            $error = "Error processing donation: " . $e->getMessage();
         }
     }
 
@@ -135,22 +199,44 @@ if ($cat_result) {
     }
 }
 
-// Get donations with category info
+// Get donations with category info - filter by user role
 $donations = [];
-$result = $conn->query("
-    SELECT d.*, c.name as category_name, u.name as created_by_name 
-    FROM donations d 
-    LEFT JOIN categories c ON d.category_id = c.category_id 
-    LEFT JOIN users u ON d.created_by = u.user_id 
-    ORDER BY d.created_at DESC
-");
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $donations[] = $row;
+if ($isDonor || $isDoctor) {
+    // For donors and doctors, show only their own donations
+    $stmt = $conn->prepare("
+        SELECT d.*, c.name as category_name, u.name as created_by_name 
+        FROM donations d 
+        LEFT JOIN categories c ON d.category_id = c.category_id 
+        LEFT JOIN users u ON d.created_by = u.user_id 
+        WHERE (d.donor_user_id = ? OR d.donor_email = ?)
+        ORDER BY d.created_at DESC
+    ");
+    $stmt->bind_param("is", $userId, $userEmail);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $donations[] = $row;
+        }
+    }
+    $stmt->close();
+} else {
+    // For admins, show all donations
+    $result = $conn->query("
+        SELECT d.*, c.name as category_name, u.name as created_by_name 
+        FROM donations d 
+        LEFT JOIN categories c ON d.category_id = c.category_id 
+        LEFT JOIN users u ON d.created_by = u.user_id 
+        ORDER BY d.created_at DESC
+    ");
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $donations[] = $row;
+        }
     }
 }
 
-// Calculate statistics
+// Calculate statistics - role specific
 $stats = [
     'total_donations' => 0,
     'pending_amount' => 0,
@@ -158,20 +244,55 @@ $stats = [
     'this_month' => 0
 ];
 
-$result = $conn->query("SELECT COUNT(*) as count, COALESCE(SUM(amount), 0) as total FROM donations");
-if ($result) {
-    $row = $result->fetch_assoc();
-    $stats['total_donations'] = $row['count'];
+if ($isDonor || $isDoctor) {
+    // For donors/doctors, show only their own statistics
+    $stmt = $conn->prepare("SELECT COUNT(*) as count, COALESCE(SUM(amount), 0) as total FROM donations WHERE (donor_user_id = ? OR donor_email = ?)");
+    $stmt->bind_param("is", $userId, $userEmail);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result) {
+        $row = $result->fetch_assoc();
+        $stats['total_donations'] = $row['count'];
+    }
+    $stmt->close();
+
+    $stmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE (donor_user_id = ? OR donor_email = ?) AND status='pending'");
+    $stmt->bind_param("is", $userId, $userEmail);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result) $stats['pending_amount'] = $result->fetch_assoc()['total'];
+    $stmt->close();
+
+    $stmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE (donor_user_id = ? OR donor_email = ?) AND status='verified'");
+    $stmt->bind_param("is", $userId, $userEmail);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result) $stats['verified_amount'] = $result->fetch_assoc()['total'];
+    $stmt->close();
+
+    $stmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE (donor_user_id = ? OR donor_email = ?) AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())");
+    $stmt->bind_param("is", $userId, $userEmail);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
+    $stmt->close();
+} else {
+    // For admins, show all statistics
+    $result = $conn->query("SELECT COUNT(*) as count, COALESCE(SUM(amount), 0) as total FROM donations");
+    if ($result) {
+        $row = $result->fetch_assoc();
+        $stats['total_donations'] = $row['count'];
+    }
+
+    $result = $conn->query("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE status='pending'");
+    if ($result) $stats['pending_amount'] = $result->fetch_assoc()['total'];
+
+    $result = $conn->query("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE status='verified'");
+    if ($result) $stats['verified_amount'] = $result->fetch_assoc()['total'];
+
+    $result = $conn->query("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())");
+    if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
 }
-
-$result = $conn->query("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE status='pending'");
-if ($result) $stats['pending_amount'] = $result->fetch_assoc()['total'];
-
-$result = $conn->query("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE status='verified'");
-if ($result) $stats['verified_amount'] = $result->fetch_assoc()['total'];
-
-$result = $conn->query("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())");
-if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
 
 ?>
 <!DOCTYPE html>
@@ -189,13 +310,13 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
     <!-- Page Header -->
     <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
-            <h1 class="page-title"><i class="bi bi-cash-coin"></i> Donation Management</h1>
-            <p class="page-subtitle">Track and manage monastery donations</p>
-        </div>
-        <div class="page-header-actions">
-            <button class="btn-modern btn-primary-modern" data-bs-toggle="modal" data-bs-target="#addModal">
-                <i class="bi bi-plus-circle"></i> Record Donation
-            </button>
+            <?php if ($isDonor || $isDoctor): ?>
+                <h1 class="page-title"><i class="bi bi-heart"></i> My Donations</h1>
+                <p class="page-subtitle">View and manage your donation history</p>
+            <?php else: ?>
+                <h1 class="page-title"><i class="bi bi-cash-coin"></i> Donation Management</h1>
+                <p class="page-subtitle">Track and manage monastery donations</p>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -222,7 +343,7 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
                     <i class="bi bi-gift"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-label">Total Donations</div>
+                    <div class="stat-label"><?= ($isDonor || $isDoctor) ? 'My Total Donations' : 'Total Donations' ?></div>
                     <div class="stat-value"><?= $stats['total_donations'] ?></div>
                 </div>
             </div>
@@ -265,11 +386,13 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
     <!-- Donations Table -->
     <div class="modern-table-wrapper">
         <div class="modern-table-header">
-            <h5><i class="bi bi-list-ul"></i> Recent Donations</h5>
+            <h5><i class="bi bi-list-ul"></i> <?= ($isDonor || $isDoctor) ? 'My Recent Donations' : 'Recent Donations' ?></h5>
         </div>
 
         <!-- Advanced Search Section -->
-        <div id="advanced-search" data-type="donations" class="px-3 pt-3"></div>
+        <?php if ($isAdmin): ?>
+            <div id="advanced-search" data-type="donations" class="px-3 pt-3"></div>
+        <?php endif; ?>
 
         <div class="table-responsive-modern">
             <div id="donations-list">
@@ -282,7 +405,6 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
                             <th>Receipt</th>
                             <th>Status</th>
                             <th>Date</th>
-                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -293,8 +415,16 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
                                 <?php if ($donation['donor_email']): ?>
                                     <br><small class="text-muted"><i class="bi bi-envelope"></i> <?= htmlspecialchars($donation['donor_email']) ?></small>
                                 <?php endif; ?>
-                                <?php if ($donation['donor_phone']): ?>
-                                    <br><small class="text-muted"><i class="bi bi-telephone"></i> <?= htmlspecialchars($donation['donor_phone']) ?></small>
+                                <?php if ($donation['bank'] || $donation['brand']): ?>
+                                    <br><small class="text-muted">
+                                        <?php if ($donation['bank']): ?>
+                                            <i class="bi bi-bank"></i> <?= htmlspecialchars($donation['bank']) ?>
+                                        <?php endif; ?>
+                                        <?php if ($donation['bank'] && $donation['brand']): echo ' • '; endif; ?>
+                                        <?php if ($donation['brand']): ?>
+                                            <i class="bi bi-geo-alt"></i> <?= htmlspecialchars($donation['brand']) ?>
+                                        <?php endif; ?>
+                                    </small>
                                 <?php endif; ?>
                             </td>
                             <td>
@@ -329,28 +459,6 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
                                     <br><small class="text-muted"><i class="bi bi-sticky"></i> <?= htmlspecialchars($donation['notes']) ?></small>
                                 <?php endif; ?>
                             </td>
-                            <td>
-                                <div class="d-flex gap-1 align-items-center">
-                                    <?php if ($donation['status'] == 'verified'): ?>
-                                        <a href="generate_receipt.php?id=<?= $donation['donation_id'] ?>" class="btn-icon" target="_blank" title="Receipt">
-                                            <i class="bi bi-file-pdf"></i>
-                                        </a>
-                                    <?php endif; ?>
-                                    <?php if ($donation['status'] == 'pending'): ?>
-                                        <form method="POST" class="d-inline">
-                                            <input type="hidden" name="form_name" value="verify">
-                                            <input type="hidden" name="donation_id" value="<?= $donation['donation_id'] ?>">
-                                            <button type="submit" class="btn-icon" onclick="return confirm('Verify this donation?')" title="Verify">
-                                                <i class="bi bi-check-circle"></i>
-                                            </button>
-                                        </form>
-                                    <?php else: ?>
-                                        <button class="btn-icon" disabled style="opacity:0.4;cursor:not-allowed;" title="Already Verified">
-                                            <i class="bi bi-check-circle-fill"></i>
-                                        </button>
-                                    <?php endif; ?>
-                                </div>
-                            </td>
                         </tr>
                     <?php endforeach; ?>
                     </tbody>
@@ -370,10 +478,14 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Record New Donation</h5>
+                <?php if ($isDonor || $isDoctor): ?>
+                    <h5 class="modal-title"><i class="bi bi-heart"></i> Make a Donation</h5>
+                <?php else: ?>
+                    <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Record New Donation</h5>
+                <?php endif; ?>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
                 <div class="modal-body">
                     <input type="hidden" name="form_name" value="create">
                     
@@ -381,33 +493,38 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
                         <div class="col-md-6">
                             <div class="form-group-modern">
                                 <label class="form-label-modern">Donor Name <span class="required">*</span></label>
-                                <input type="text" name="donor_name" class="form-control-modern" required>
+                                <?php if ($isDonor || $isDoctor): ?>
+                                    <input type="text" name="donor_name" class="form-control-modern" 
+                                           value="<?= htmlspecialchars($userName) ?>" 
+                                           readonly required>
+                                <?php else: ?>
+                                    <input type="text" name="donor_name" class="form-control-modern" required>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group-modern">
                                 <label class="form-label-modern">Donor Email</label>
-                                <input type="email" name="donor_email" class="form-control-modern">
+                                <?php if ($isDonor || $isDoctor): ?>
+                                    <input type="email" name="donor_email" class="form-control-modern" 
+                                           value="<?= htmlspecialchars($userEmail) ?>" 
+                                           readonly>
+                                <?php else: ?>
+                                    <input type="email" name="donor_email" class="form-control-modern">
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group-modern">
-                                <label class="form-label-modern">Donor Phone</label>
-                                <input type="text" name="donor_phone" class="form-control-modern">
-                            </div>
-                        </div>
                         <div class="col-md-6">
                             <div class="form-group-modern">
                                 <label class="form-label-modern">Amount (Rs.) <span class="required">*</span></label>
-                                <input type="number" name="amount" class="form-control-modern" step="0.01" min="0" required>
+                                <input type="number" name="amount" class="form-control-modern" step="0.01" min="100" required 
+                                       oninput="validateAmount(this)" placeholder="Enter amount in rupees">
+                                <small class="text-muted">Minimum donation: Rs. 100.00</small>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group-modern">
                                 <label class="form-label-modern">Category <span class="required">*</span></label>
@@ -419,14 +536,49 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
                                 </select>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group-modern">
-                                <label class="form-label-modern">Payment Method <span class="required">*</span></label>
-                                <select name="payment_method" class="form-select-modern" required>
-                                    <option value="cash">Cash</option>
-                                    <option value="bank_transfer">Bank Transfer</option>
-                                    <option value="card">Card</option>
-                                    <option value="payhere">PayHere (Online)</option>
+                                <label class="form-label-modern">Bank <span class="required">*</span></label>
+                                <select name="bank" class="form-select-modern" required>
+                                    <option value="">-- Select Bank --</option>
+                                    <option value="Commercial Bank">Commercial Bank</option>
+                                    <option value="People's Bank">People's Bank</option>
+                                    <option value="Bank of Ceylon">Bank of Ceylon</option>
+                                    <option value="Sampath Bank">Sampath Bank</option>
+                                    <option value="Hatton National Bank">Hatton National Bank (HNB)</option>
+                                    <option value="Seylan Bank">Seylan Bank</option>
+                                    <option value="Nations Trust Bank">Nations Trust Bank (NTB)</option>
+                                    <option value="DFCC Bank">DFCC Bank</option>
+                                    <option value="Union Bank">Union Bank</option>
+                                    <option value="Pan Asia Bank">Pan Asia Bank</option>
+                                    <option value="Other">Other Bank</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Bank Branch</label>
+                                <select name="brand" class="form-select-modern">
+                                    <option value="">-- Select Branch --</option>
+                                    <option value="Colombo Main">Colombo Main</option>
+                                    <option value="Kandy">Kandy</option>
+                                    <option value="Galle">Galle</option>
+                                    <option value="Negombo">Negombo</option>
+                                    <option value="Matara">Matara</option>
+                                    <option value="Kurunegala">Kurunegala</option>
+                                    <option value="Anuradhapura">Anuradhapura</option>
+                                    <option value="Ratnapura">Ratnapura</option>
+                                    <option value="Batticaloa">Batticaloa</option>
+                                    <option value="Jaffna">Jaffna</option>
+                                    <option value="Dehiwala">Dehiwala</option>
+                                    <option value="Maharagama">Maharagama</option>
+                                    <option value="Kotte">Kotte</option>
+                                    <option value="Moratuwa">Moratuwa</option>
+                                    <option value="Panadura">Panadura</option>
+                                    <option value="Other">Other Branch</option>
                                 </select>
                             </div>
                         </div>
@@ -441,24 +593,42 @@ if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
                         </div>
                         <div class="col-md-6">
                             <div class="form-group-modern">
-                                <label class="form-label-modern">Status</label>
-                                <select name="status" class="form-select-modern">
-                                    <option value="pending">Pending Verification</option>
-                                    <option value="verified">Verified</option>
-                                </select>
+                                <label class="form-label-modern">Bank Slip Upload</label>
+                                <input type="file" name="bank_slip" class="form-control-modern" accept="image/*,.pdf">
+                                <small class="text-muted">Upload bank slip or receipt (JPG, PNG, PDF - max 5MB)</small>
                             </div>
                         </div>
                     </div>
 
+                    <?php if ($isAdmin): ?>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Status</label>
+                                    <select name="status" class="form-select-modern">
+                                        <option value="pending">Pending Verification</option>
+                                        <option value="verified">Verified</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <input type="hidden" name="status" value="pending">
+                    <?php endif; ?>
+
                     <div class="form-group-modern">
                         <label class="form-label-modern">Notes</label>
-                        <textarea name="notes" class="form-control-modern" rows="3"></textarea>
+                        <textarea name="notes" class="form-control-modern" rows="3" placeholder="Add any additional details about this donation..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn-modern btn-primary-modern">
-                        <i class="bi bi-save"></i> Save Donation
+                        <?php if ($isDonor || $isDoctor): ?>
+                            <i class="bi bi-heart"></i> Submit Donation
+                        <?php else: ?>
+                            <i class="bi bi-save"></i> Save Donation
+                        <?php endif; ?>
                     </button>
                 </div>
             </form>
@@ -732,6 +902,14 @@ function initiatePayHere() {
 // Initialize Advanced Search for Donations
 window.addEventListener('load', function() {
     new AdvancedSearch('donations');
+    
+    // Check if we should auto-open donation modal
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('action') === 'donate') {
+        openDonationModal();
+        // Remove the URL parameter without reloading the page
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
 });
 
 function viewSlip(slipPath, donorName) {
@@ -740,6 +918,72 @@ function viewSlip(slipPath, donorName) {
     document.getElementById('slipModalTitle').textContent = 'Bank Slip - ' + donorName;
     new bootstrap.Modal(document.getElementById('slipViewerModal')).show();
 }
+
+function openDonationModal() {
+    new bootstrap.Modal(document.getElementById('addModal')).show();
+}
+
+function validateAmount(input) {
+    // Remove any negative values
+    if (parseFloat(input.value) < 0) {
+        input.value = '';
+        input.style.borderColor = '#e74c3c';
+        showErrorMessage('Amount cannot be negative');
+        return false;
+    } else if (parseFloat(input.value) < 100) {
+        input.style.borderColor = '#f39c12';
+        showErrorMessage('Amount must be at least Rs. 100.00');
+        return false;
+    } else {
+        input.style.borderColor = '#27ae60';
+        clearErrorMessage();
+        return true;
+    }
+}
+
+function showErrorMessage(message) {
+    // Remove existing error message
+    clearErrorMessage();
+    
+    // Create and show error message
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'text-danger small mt-1';
+    errorDiv.id = 'amount-error';
+    errorDiv.textContent = message;
+    
+    const amountInput = document.querySelector('input[name="amount"]');
+    amountInput.parentNode.appendChild(errorDiv);
+}
+
+function clearErrorMessage() {
+    const existingError = document.getElementById('amount-error');
+    if (existingError) {
+        existingError.remove();
+    }
+}
+
+// Form submission validation
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const amountInput = form.querySelector('input[name="amount"]');
+            if (amountInput) {
+                const amount = parseFloat(amountInput.value);
+                if (amount < 100 || isNaN(amount)) {
+                    e.preventDefault();
+                    amountInput.focus();
+                    validateAmount(amountInput);
+                    alert('Please enter a valid amount of at least Rs. 100.00');
+                    return false;
+                }
+            }
+        });
+    });
+});
+
+// Global function for sidebar access
+window.openDonationModal = openDonationModal;
 </script>
 
 <!-- Advanced Search System -->
