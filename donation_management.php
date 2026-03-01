@@ -569,7 +569,7 @@ if ($isDonor || $isDoctor) {
 
 <!-- Add Donation Modal -->
 <div class="modal fade" id="addModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <?php if ($isDonor || $isDoctor): ?>
@@ -580,50 +580,44 @@ if ($isDonor || $isDoctor) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" enctype="multipart/form-data">
-                <div class="modal-body">
+                <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
                     <input type="hidden" name="form_name" value="create">
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group-modern">
-                                <label class="form-label-modern">Donor Name <span class="required">*</span></label>
-                                <?php if ($isDonor || $isDoctor): ?>
-                                    <input type="text" name="donor_name" class="form-control-modern" 
-                                           value="<?= htmlspecialchars($userName) ?>" 
-                                           readonly required>
-                                <?php else: ?>
-                                    <input type="text" name="donor_name" class="form-control-modern" required>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group-modern">
-                                <label class="form-label-modern">Donor Email</label>
-                                <?php if ($isDonor || $isDoctor): ?>
-                                    <input type="email" name="donor_email" class="form-control-modern" 
-                                           value="<?= htmlspecialchars($userEmail) ?>" 
-                                           readonly>
-                                <?php else: ?>
-                                    <input type="email" name="donor_email" class="form-control-modern">
-                                <?php endif; ?>
-                            </div>
-                        </div>
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Donor Name <span class="required">*</span></label>
+                        <?php if ($isDonor || $isDoctor): ?>
+                            <input type="text" name="donor_name" class="form-control-modern" 
+                                   value="<?= htmlspecialchars($userName) ?>" 
+                                   readonly required>
+                        <?php else: ?>
+                            <input type="text" name="donor_name" class="form-control-modern" required>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Donor Email</label>
+                        <?php if ($isDonor || $isDoctor): ?>
+                            <input type="email" name="donor_email" class="form-control-modern" 
+                                   value="<?= htmlspecialchars($userEmail) ?>" 
+                                   readonly>
+                        <?php else: ?>
+                            <input type="email" name="donor_email" class="form-control-modern">
+                        <?php endif; ?>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-6">
                             <div class="form-group-modern">
                                 <label class="form-label-modern">Amount (Rs.) <span class="required">*</span></label>
                                 <input type="number" name="amount" class="form-control-modern" step="0.01" min="100" required 
-                                       oninput="validateAmount(this)" placeholder="Enter amount in rupees">
-                                <small class="text-muted">Minimum donation: Rs. 100.00</small>
+                                       oninput="validateAmount(this)" placeholder="Min Rs.100">
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-6">
                             <div class="form-group-modern">
                                 <label class="form-label-modern">Category <span class="required">*</span></label>
                                 <select name="category_id" class="form-select-modern" required>
-                                    <option value="">-- Select Category --</option>
+                                    <option value="">-- Select --</option>
                                     <?php foreach ($categories as $cat): ?>
                                         <option value="<?= $cat['category_id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
                                     <?php endforeach; ?>
@@ -633,30 +627,30 @@ if ($isDonor || $isDoctor) {
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-6">
                             <div class="form-group-modern">
                                 <label class="form-label-modern">Bank <span class="required">*</span></label>
                                 <select name="bank" class="form-select-modern" required>
-                                    <option value="">-- Select Bank --</option>
+                                    <option value="">-- Select --</option>
                                     <option value="Commercial Bank">Commercial Bank</option>
                                     <option value="People's Bank">People's Bank</option>
                                     <option value="Bank of Ceylon">Bank of Ceylon</option>
                                     <option value="Sampath Bank">Sampath Bank</option>
-                                    <option value="Hatton National Bank">Hatton National Bank (HNB)</option>
+                                    <option value="Hatton National Bank">HNB</option>
                                     <option value="Seylan Bank">Seylan Bank</option>
-                                    <option value="Nations Trust Bank">Nations Trust Bank (NTB)</option>
+                                    <option value="Nations Trust Bank">NTB</option>
                                     <option value="DFCC Bank">DFCC Bank</option>
                                     <option value="Union Bank">Union Bank</option>
                                     <option value="Pan Asia Bank">Pan Asia Bank</option>
-                                    <option value="Other">Other Bank</option>
+                                    <option value="Other">Other</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-6">
                             <div class="form-group-modern">
-                                <label class="form-label-modern">Bank Branch</label>
+                                <label class="form-label-modern">Branch</label>
                                 <select name="brand" class="form-select-modern">
-                                    <option value="">-- Select Branch --</option>
+                                    <option value="">-- Select --</option>
                                     <option value="Colombo Main">Colombo Main</option>
                                     <option value="Kandy">Kandy</option>
                                     <option value="Galle">Galle</option>
@@ -672,39 +666,30 @@ if ($isDonor || $isDoctor) {
                                     <option value="Kotte">Kotte</option>
                                     <option value="Moratuwa">Moratuwa</option>
                                     <option value="Panadura">Panadura</option>
-                                    <option value="Other">Other Branch</option>
+                                    <option value="Other">Other</option>
                                 </select>
                             </div>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group-modern">
-                                <label class="form-label-modern">Reference Number</label>
-                                <input type="text" name="reference_number" class="form-control-modern" placeholder="Bank ref, transaction ID, etc.">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group-modern">
-                                <label class="form-label-modern">Bank Slip Upload</label>
-                                <input type="file" name="bank_slip" class="form-control-modern" accept="image/*,.pdf">
-                                <small class="text-muted">Upload bank slip or receipt (JPG, PNG, PDF - max 5MB)</small>
-                            </div>
-                        </div>
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Reference Number</label>
+                        <input type="text" name="reference_number" class="form-control-modern" placeholder="Bank ref / transaction ID">
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Bank Slip Upload</label>
+                        <input type="file" name="bank_slip" class="form-control-modern" accept="image/*,.pdf">
+                        <small class="text-muted">JPG, PNG, PDF - max 5MB</small>
                     </div>
 
                     <?php if ($isAdmin): ?>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group-modern">
-                                    <label class="form-label-modern">Status</label>
-                                    <select name="status" class="form-select-modern">
-                                        <option value="pending">Pending Verification</option>
-                                        <option value="verified">Verified</option>
-                                    </select>
-                                </div>
-                            </div>
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Status</label>
+                            <select name="status" class="form-select-modern">
+                                <option value="pending">Pending Verification</option>
+                                <option value="verified">Verified</option>
+                            </select>
                         </div>
                     <?php else: ?>
                         <input type="hidden" name="status" value="pending">
@@ -712,11 +697,11 @@ if ($isDonor || $isDoctor) {
 
                     <div class="form-group-modern">
                         <label class="form-label-modern">Notes</label>
-                        <textarea name="notes" class="form-control-modern" rows="3" placeholder="Add any additional details about this donation..."></textarea>
+                        <textarea name="notes" class="form-control-modern" rows="2" placeholder="Additional details..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn-modern btn-primary-modern">
                         <?php if ($isDonor || $isDoctor): ?>
                             <i class="bi bi-heart"></i> Submit Donation

@@ -60,7 +60,7 @@ error_log("Filtering by - User ID: $userId, Email: $userEmail");
 
 // Simplified query - use either user ID or email, whichever is available
 if ($userId > 0 || !empty($userEmail)) {
-    $stmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total, COUNT(*) as cnt FROM donations WHERE (donor_user_id = ? OR donor_email = ?) AND status IN ('paid', 'verified', 'pending')");
+    $stmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total, COUNT(*) as cnt FROM donations WHERE (donor_user_id = ? OR donor_email = ?) AND status IN ('paid', 'verified', 'pending', 'rejected')");
     $stmt->bind_param("is", $userId, $userEmail);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -163,6 +163,67 @@ if ($userId > 0 || !empty($userEmail)) {
 error_log("User ID: " . $userId . ", Email: " . $userEmail);
 error_log("Monthly Trend: " . json_encode($monthly_trend));
 error_log("By Category: " . json_encode($by_category));
+
+// Fetch categories for donation form
+$categories = [];
+$catResult = $conn->query("SELECT category_id, name FROM categories ORDER BY name");
+if ($catResult) {
+    while ($catRow = $catResult->fetch_assoc()) {
+        $categories[] = $catRow;
+    }
+}
+
+// Handle AJAX donation submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_donate'])) {
+    header('Content-Type: application/json');
+    try {
+        $donor_name = $userName;
+        $donor_email = $userEmail;
+        $donor_user_id = $userId;
+        $amount = floatval($_POST['amount']);
+        $category_id = intval($_POST['category_id']);
+        $bank = trim($_POST['bank'] ?? '');
+        $brand = trim($_POST['brand'] ?? '');
+        $reference_number = trim($_POST['reference_number'] ?? '');
+        $notes = trim($_POST['notes'] ?? '');
+        $status = 'pending';
+
+        if (empty($donor_name) || empty($category_id)) {
+            echo json_encode(['success' => false, 'message' => 'Donor name and category are required.']);
+            exit;
+        }
+        if ($amount < 100) {
+            echo json_encode(['success' => false, 'message' => 'Amount must be at least Rs. 100.00.']);
+            exit;
+        }
+
+        // Handle bank slip upload
+        $slip_path = null;
+        if (isset($_FILES['bank_slip']) && $_FILES['bank_slip']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/uploads/slips/';
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+            $ext = pathinfo($_FILES['bank_slip']['name'], PATHINFO_EXTENSION);
+            $filename = 'slip_' . time() . '_' . uniqid() . '.' . $ext;
+            if (move_uploaded_file($_FILES['bank_slip']['tmp_name'], $uploadDir . $filename)) {
+                $slip_path = 'uploads/slips/' . $filename;
+            }
+        }
+
+        $stmt = $conn->prepare("INSERT INTO donations (donor_name, donor_email, donor_user_id, amount, category_id, bank, brand, bank_reference, notes, status, slip_path, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $created_by = $_SESSION['user_id'];
+        $stmt->bind_param("ssiisssssssi", $donor_name, $donor_email, $donor_user_id, $amount, $category_id, $bank, $brand, $reference_number, $notes, $status, $slip_path, $created_by);
+
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true, 'message' => 'Donation submitted for verification!']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Database error: ' . $stmt->error]);
+        }
+        $stmt->close();
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+    exit;
+}
 
 // Overall monastery transparency data
 $total_monastery_donations = 0;
@@ -348,16 +409,30 @@ if ($result) $total_monastery_expenses = $result->fetch_assoc()['t'];
                             <td style="font-weight:700;color:var(--primary-600);">Rs.<?= number_format($don['amount'], 2) ?></td>
                             <td>
                                 <?php
-                                    $status_map = [
-                                        'pending' => 'badge-warning',
-                                        'paid' => 'badge-success',
-                                        'verified' => 'badge-primary',
-                                        'failed' => 'badge-danger',
-                                        'cancelled' => 'badge-neutral'
+                                    $status_styles = [
+                                        'pending'   => 'background:#fef9c3;color:#ca8a04;',
+                                        'paid'      => 'background:#dbeafe;color:#2563eb;',
+                                        'verified'  => 'background:#dcfce7;color:#16a34a;',
+                                        'rejected'  => 'background:#fee2e2;color:#dc2626;',
+                                        'failed'    => 'background:#fee2e2;color:#dc2626;',
+                                        'cancelled' => 'background:#f1f5f9;color:#64748b;',
                                     ];
-                                    $badge = $status_map[$don['status']] ?? 'badge-neutral';
+                                    $dot_colors = [
+                                        'pending'   => '#ca8a04',
+                                        'paid'      => '#2563eb',
+                                        'verified'  => '#16a34a',
+                                        'rejected'  => '#dc2626',
+                                        'failed'    => '#dc2626',
+                                        'cancelled' => '#64748b',
+                                    ];
+                                    $st = !empty($don['status']) ? $don['status'] : 'pending';
+                                    $bs = $status_styles[$st] ?? 'background:#f1f5f9;color:#64748b;';
+                                    $dc = $dot_colors[$st] ?? '#64748b';
                                 ?>
-                                <span class="badge-modern <?= $badge ?> badge-dot"><?= ucfirst($don['status']) ?></span>
+                                <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;<?= $bs ?>">
+                                    <span style="width:7px;height:7px;border-radius:50%;background:<?= $dc ?>;display:inline-block;"></span>
+                                    <?= ucfirst($st) ?>
+                                </span>
                             </td>
                         </tr>
                         <?php endforeach; ?>
@@ -377,6 +452,141 @@ if ($result) $total_monastery_expenses = $result->fetch_assoc()['t'];
         </div>
     </div>
 </div>
+
+<!-- Make Donation Modal -->
+<div class="modal fade" id="donateModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-heart"></i> Make a Donation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="donateForm" enctype="multipart/form-data">
+                <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
+                    <div id="donateAlert" style="display:none;" class="alert alert-sm mb-3"></div>
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold">Amount (Rs.) <span class="text-danger">*</span></label>
+                            <input type="number" name="amount" class="form-control" step="0.01" min="100" required placeholder="Min Rs.100">
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+                            <select name="category_id" class="form-select" required>
+                                <option value="">-- Select --</option>
+                                <?php foreach ($categories as $cat): ?>
+                                    <option value="<?= $cat['category_id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold">Bank <span class="text-danger">*</span></label>
+                            <select name="bank" class="form-select" required>
+                                <option value="">-- Select --</option>
+                                <option value="Commercial Bank">Commercial Bank</option>
+                                <option value="People's Bank">People's Bank</option>
+                                <option value="Bank of Ceylon">Bank of Ceylon</option>
+                                <option value="Sampath Bank">Sampath Bank</option>
+                                <option value="Hatton National Bank">HNB</option>
+                                <option value="Seylan Bank">Seylan Bank</option>
+                                <option value="Nations Trust Bank">NTB</option>
+                                <option value="DFCC Bank">DFCC Bank</option>
+                                <option value="Union Bank">Union Bank</option>
+                                <option value="Pan Asia Bank">Pan Asia Bank</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold">Branch <span class="text-danger">*</span></label>
+                            <select name="brand" class="form-select" required>
+                                <option value="">-- Select --</option>
+                                <option value="Colombo Main">Colombo Main</option>
+                                <option value="Kandy">Kandy</option>
+                                <option value="Galle">Galle</option>
+                                <option value="Negombo">Negombo</option>
+                                <option value="Matara">Matara</option>
+                                <option value="Kurunegala">Kurunegala</option>
+                                <option value="Anuradhapura">Anuradhapura</option>
+                                <option value="Ratnapura">Ratnapura</option>
+                                <option value="Batticaloa">Batticaloa</option>
+                                <option value="Jaffna">Jaffna</option>
+                                <option value="Dehiwala">Dehiwala</option>
+                                <option value="Maharagama">Maharagama</option>
+                                <option value="Kotte">Kotte</option>
+                                <option value="Moratuwa">Moratuwa</option>
+                                <option value="Panadura">Panadura</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Reference Number <span class="text-danger">*</span></label>
+                        <input type="text" name="reference_number" class="form-control" placeholder="Bank ref / transaction ID" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Bank Slip Upload <span class="text-danger">*</span></label>
+                        <input type="file" name="bank_slip" class="form-control" accept="image/*,.pdf" required>
+                        <small class="text-muted">JPG, PNG, PDF - max 5MB</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Notes</label>
+                        <textarea name="notes" class="form-control" rows="2" placeholder="Additional details..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm" id="donateSubmitBtn" style="background:var(--primary-500,#f97316);color:#fff;font-weight:600;">
+                        <i class="bi bi-heart"></i> Submit Donation
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('donateForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = this;
+    const btn = document.getElementById('donateSubmitBtn');
+    const alertDiv = document.getElementById('donateAlert');
+    const formData = new FormData(form);
+    formData.append('ajax_donate', '1');
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Submitting...';
+    alertDiv.style.display = 'none';
+
+    fetch('dashboard.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        alertDiv.style.display = 'block';
+        if (data.success) {
+            alertDiv.className = 'alert alert-success mb-3';
+            alertDiv.textContent = data.message;
+            form.reset();
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            alertDiv.className = 'alert alert-danger mb-3';
+            alertDiv.textContent = data.message;
+        }
+    })
+    .catch(() => {
+        alertDiv.style.display = 'block';
+        alertDiv.className = 'alert alert-danger mb-3';
+        alertDiv.textContent = 'Network error, please try again.';
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-heart"></i> Submit Donation';
+    });
+});
+</script>
 
 <?php include 'includes/footer.php'; ?>
 

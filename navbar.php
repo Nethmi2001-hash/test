@@ -142,10 +142,7 @@ $isMonk = ($userRole === 'Monk');
     <?php elseif ($isDonor): ?>
     <!-- Donor: Donations, Transparency -->
     <div class="sidebar-section-label">My Donations</div>
-    <a class="sidebar-link <?= isActivePage('donation_management.php', $currentPage) ?>" href="donation_management.php">
-      <i class="bi bi-cash-coin"></i> <?= __('donations') ?>
-    </a>
-    <a class="sidebar-link" href="donation_management.php?action=donate">
+    <a class="sidebar-link" href="#" data-bs-toggle="modal" data-bs-target="#donateModal">
       <i class="bi bi-heart"></i> Make Donation
     </a>
 
