@@ -9,15 +9,45 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 require_once __DIR__ . '/includes/db_config.php';
 $conn = getDBConnection();
 
-$userId = $_SESSION['user_id'] ?? 0;
+$userId = (int)($_SESSION['user_id'] ?? 0);
 $userName = $_SESSION['username'] ?? 'Donor';
 $userEmail = $_SESSION['email'] ?? '';
 $userRole = $_SESSION['role_name'] ?? 'Donor';
 
+// If session lacks user data, reload it from DB using the logged-in user's ID
+if (($userId <= 0 && empty($userEmail)) || ($userId <= 0 && !empty($userEmail))) {
+    // Try looking up by email first
+    if (!empty($userEmail)) {
+        $fallbackStmt = $conn->prepare("SELECT u.user_id, u.name, u.email FROM users u WHERE u.email = ? LIMIT 1");
+        $fallbackStmt->bind_param("s", $userEmail);
+        $fallbackStmt->execute();
+        $fallbackResult = $fallbackStmt->get_result();
+        if ($fallbackResult && $fallbackRow = $fallbackResult->fetch_assoc()) {
+            $userId = (int)$fallbackRow['user_id'];
+            $userEmail = $fallbackRow['email'];
+            $userName = $fallbackRow['name'];
+        }
+        $fallbackStmt->close();
+    }
+}
+
+// If still no user, try to get any Donor from roles join
+if ($userId <= 0 && empty($userEmail)) {
+    $fallbackStmt = $conn->prepare("SELECT u.user_id, u.name, u.email FROM users u JOIN roles r ON u.role_id = r.role_id WHERE r.role_name = 'Donor' AND u.status = 'active' LIMIT 1");
+    $fallbackStmt->execute();
+    $fallbackResult = $fallbackStmt->get_result();
+    if ($fallbackResult && $fallbackRow = $fallbackResult->fetch_assoc()) {
+        $userId = (int)$fallbackRow['user_id'];
+        $userEmail = $fallbackRow['email'];
+        $userName = $fallbackRow['name'];
+    }
+    $fallbackStmt->close();
+}
+
 // Debug: Log current session info
 error_log("Dashboard Donor - User ID: $userId, Email: $userEmail, Role: $userRole");
 
-// Get donor's donation stats with better filtering
+// Get donor's donation stats with better filtering - use both ID and email for maximum compatibility
 $stats = [
     'total_donated' => 0,
     'donation_count' => 0,
@@ -25,78 +55,114 @@ $stats = [
     'verified_count' => 0
 ];
 
-// Use both donor_user_id and donor_email for filtering to ensure we get only this user's data
-$stmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total, COUNT(*) as cnt FROM donations WHERE (donor_user_id = ? OR donor_email = ?) AND status IN ('paid', 'verified')");
-$stmt->bind_param("is", $userId, $userEmail);
-$stmt->execute();
-$result = $stmt->get_result();
-if ($result) {
-    $row = $result->fetch_assoc();
-    $stats['total_donated'] = $row['total'];
-    $stats['donation_count'] = $row['cnt'];
+// Debug: Check what we're filtering by
+error_log("Filtering by - User ID: $userId, Email: $userEmail");
+
+// Simplified query - use either user ID or email, whichever is available
+if ($userId > 0 || !empty($userEmail)) {
+    $stmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total, COUNT(*) as cnt FROM donations WHERE (donor_user_id = ? OR donor_email = ?) AND status IN ('paid', 'verified', 'pending')");
+    $stmt->bind_param("is", $userId, $userEmail);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result) {
+        $row = $result->fetch_assoc();
+        $stats['total_donated'] = $row['total'];
+        $stats['donation_count'] = $row['cnt'];
+        error_log("Stats query result - Total: {$row['total']}, Count: {$row['cnt']}");
+    }
+    $stmt->close();
+
+    $stmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE (donor_user_id = ? OR donor_email = ?) AND status IN ('paid', 'verified', 'pending') AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())");
+    $stmt->bind_param("is", $userId, $userEmail);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result) {
+        $stats['this_month'] = $result->fetch_assoc()['total'];
+    }
+    $stmt->close();
+
+    $stmt = $conn->prepare("SELECT COUNT(*) as c FROM donations WHERE (donor_user_id = ? OR donor_email = ?) AND status = 'verified'");
+    $stmt->bind_param("is", $userId, $userEmail);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result) {
+        $stats['verified_count'] = $result->fetch_assoc()['c'];
+    }
+    $stmt->close();
+} else {
+    error_log("No valid user ID or email for donation queries");
 }
-
-$stmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE (donor_user_id = ? OR donor_email = ?) AND status IN ('paid', 'verified') AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())");
-$stmt->bind_param("is", $userId, $userEmail);
-$stmt->execute();
-$result = $stmt->get_result();
-if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
-
-$stmt = $conn->prepare("SELECT COUNT(*) as c FROM donations WHERE (donor_user_id = ? OR donor_email = ?) AND status = 'verified'");
-$stmt->bind_param("is", $userId, $userEmail);
-$stmt->execute();
-$result = $stmt->get_result();
-if ($result) $stats['verified_count'] = $result->fetch_assoc()['c'];
 
 // Recent donations
 $recent_donations = [];
-$stmt = $conn->prepare("
-    SELECT d.*, c.name as category_name 
-    FROM donations d 
-    LEFT JOIN categories c ON d.category_id = c.category_id 
-    WHERE (d.donor_user_id = ? OR d.donor_email = ?) 
-    ORDER BY d.created_at DESC 
-    LIMIT 10
-");
-$stmt->bind_param("is", $userId, $userEmail);
-$stmt->execute();
-$result = $stmt->get_result();
-if ($result) while ($row = $result->fetch_assoc()) $recent_donations[] = $row;
-
-// Donations by category
-$by_category = [];
-$stmt = $conn->prepare("
-    SELECT c.name as category_name, COALESCE(SUM(d.amount), 0) as total 
-    FROM donations d 
-    JOIN categories c ON d.category_id = c.category_id 
-    WHERE (d.donor_user_id = ? OR d.donor_email = ?) AND d.status IN ('paid', 'verified')
-    GROUP BY c.category_id, c.name
-    ORDER BY total DESC
-");
-$stmt->bind_param("is", $userId, $userEmail);
-$stmt->execute();
-$result = $stmt->get_result();
-if ($result) while ($row = $result->fetch_assoc()) $by_category[] = $row;
+if ($userId > 0 || !empty($userEmail)) {
+    $stmt = $conn->prepare("
+        SELECT d.*, c.name as category_name 
+        FROM donations d 
+        LEFT JOIN categories c ON d.category_id = c.category_id 
+        WHERE (d.donor_user_id = ? OR d.donor_email = ?) 
+        ORDER BY d.created_at DESC 
+        LIMIT 10
+    ");
+    $stmt->bind_param("is", $userId, $userEmail);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $recent_donations[] = $row;
+        }
+    }
+    $stmt->close();
+}
 
 // Monthly donation trend (last 6 months)
 $monthly_trend = [];
-for ($i = 5; $i >= 0; $i--) {
-    $month = date('Y-m', strtotime("-$i months"));
-    $trendStmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE (donor_user_id = ? OR donor_email = ?) AND DATE_FORMAT(created_at, '%Y-%m') = ? AND status IN ('paid', 'verified')");
-    $trendStmt->bind_param("iss", $userId, $userEmail, $month);
-    $trendStmt->execute();
-    $trendResult = $trendStmt->get_result();
-    $monthlyAmount = 0;
-    if ($trendResult) {
-        $trendRow = $trendResult->fetch_assoc();
-        $monthlyAmount = $trendRow['total'] ?? 0;
+if ($userId > 0 || !empty($userEmail)) {
+    for ($i = 5; $i >= 0; $i--) {
+        $month = date('Y-m', strtotime("-$i months"));
+        $trendStmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE (donor_user_id = ? OR donor_email = ?) AND DATE_FORMAT(created_at, '%Y-%m') = ? AND status IN ('paid', 'verified', 'pending')");
+        $trendStmt->bind_param("iss", $userId, $userEmail, $month);
+        $trendStmt->execute();
+        $trendResult = $trendStmt->get_result();
+        $monthlyAmount = 0;
+        if ($trendResult) {
+            $trendRow = $trendResult->fetch_assoc();
+            $monthlyAmount = $trendRow['total'] ?? 0;
+        }
+        $monthly_trend[] = [
+            'month' => date('M', strtotime($month)),
+            'amount' => (float)$monthlyAmount
+        ];
+        $trendStmt->close();
     }
-    $monthly_trend[] = [
-        'month' => date('M', strtotime($month)),
-        'amount' => (float)$monthlyAmount
-    ];
-    $trendStmt->close();
 }
+
+// Donations by category
+$by_category = [];
+if ($userId > 0 || !empty($userEmail)) {
+    $stmt = $conn->prepare("
+        SELECT c.name as category_name, COALESCE(SUM(d.amount), 0) as total 
+        FROM donations d 
+        JOIN categories c ON d.category_id = c.category_id 
+        WHERE (d.donor_user_id = ? OR d.donor_email = ?) AND d.status IN ('paid', 'verified', 'pending')
+        GROUP BY c.category_id, c.name
+        ORDER BY total DESC
+    ");
+    $stmt->bind_param("is", $userId, $userEmail);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $by_category[] = $row;
+        }
+    }
+    $stmt->close();
+}
+
+// Debug output (remove in production)
+error_log("User ID: " . $userId . ", Email: " . $userEmail);
+error_log("Monthly Trend: " . json_encode($monthly_trend));
+error_log("By Category: " . json_encode($by_category));
 
 // Overall monastery transparency data
 $total_monastery_donations = 0;
@@ -225,15 +291,11 @@ if ($result) $total_monastery_expenses = $result->fetch_assoc()['t'];
                     <h6><i class="bi bi-graph-up me-2"></i>My Donation Trend</h6>
                     <span class="badge-modern badge-neutral">Last 6 months</span>
                 </div>
-                <?php if (count($monthly_trend) > 0 && array_sum(array_column($monthly_trend, 'amount')) > 0): ?>
-                    <canvas id="trendChart" height="160"></canvas>
-                <?php else: ?>
-                    <div class="empty-state" style="padding:48px 16px;">
-                        <i class="bi bi-graph-up" style="font-size:36px;color:var(--primary-400);"></i>
-                        <h5 style="font-size:16px;margin-top:16px;">No donation history yet</h5>
-                        <p style="font-size:13px;color:var(--text-secondary);">Start donating to see your contribution trend</p>
-                    </div>
-                <?php endif; ?>
+                <?php 
+                // Debug output 
+                echo "<!-- Monthly trend count: " . count($monthly_trend) . ", sum: " . array_sum(array_column($monthly_trend, 'amount')) . " -->\n";
+                ?>
+                <canvas id="trendChart" height="160"></canvas>
             </div>
         </div>
         <div class="col-lg-5">
@@ -241,41 +303,11 @@ if ($result) $total_monastery_expenses = $result->fetch_assoc()['t'];
                 <div class="chart-header">
                     <h6><i class="bi bi-pie-chart me-2"></i>My Donations by Category</h6>
                 </div>
-                <?php if (count($by_category) > 0): ?>
-                    <canvas id="categoryChart" height="200"></canvas>
-                <?php else: ?>
-                    <div class="empty-state" style="padding:48px 16px;">
-                        <i class="bi bi-pie-chart" style="font-size:36px;color:var(--text-muted);"></i>
-                        <p style="margin-top:8px;font-size:13px;color:var(--text-secondary);">No category data yet</p>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-
-    <!-- Transparency Card -->
-    <div class="modern-card mb-4 animate-fade-in">
-        <div class="card-header-modern">
-            <h6><i class="bi bi-shield-check me-2"></i>Monastery Transparency</h6>
-            <a href="public_transparency.php" class="btn btn-sm" style="background:var(--primary-100);color:var(--primary-700);font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;">
-                View Full Report <i class="bi bi-arrow-right ms-1"></i>
-            </a>
-        </div>
-        <div class="card-body-modern" style="padding:24px;">
-            <div class="row g-4">
-                <div class="col-md-4 text-center">
-                    <div style="font-size:28px;font-weight:800;color:var(--primary-600);">Rs.<?= number_format($total_monastery_donations) ?></div>
-                    <div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">Total Donations Received</div>
-                </div>
-                <div class="col-md-4 text-center">
-                    <div style="font-size:28px;font-weight:800;color:#d97706;">Rs.<?= number_format($total_monastery_expenses) ?></div>
-                    <div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">Total Expenses</div>
-                </div>
-                <div class="col-md-4 text-center">
-                    <?php $balance = $total_monastery_donations - $total_monastery_expenses; ?>
-                    <div style="font-size:28px;font-weight:800;color:<?= $balance >= 0 ? '#f97316' : '#dc2626' ?>;">Rs.<?= number_format(abs($balance)) ?></div>
-                    <div style="font-size:13px;color:var(--text-secondary);margin-top:4px;"><?= $balance >= 0 ? 'Balance' : 'Deficit' ?></div>
-                </div>
+                <?php 
+                // Debug output 
+                echo "<!-- Category count: " . count($by_category) . " -->\n";
+                ?>
+                <canvas id="categoryChart" height="200"></canvas>
             </div>
         </div>
     </div>
@@ -294,19 +326,16 @@ if ($result) $total_monastery_expenses = $result->fetch_assoc()['t'];
                 <table class="modern-table">
                     <thead>
                         <tr>
-                            <th>#</th>
                             <th>Date</th>
                             <th>Category</th>
                             <th>Method</th>
                             <th>Amount</th>
                             <th>Status</th>
-                            <th>Receipt</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($recent_donations as $don): ?>
                         <tr>
-                            <td style="font-weight:600;"><?= $don['donation_id'] ?></td>
                             <td><?= date('M j, Y', strtotime($don['created_at'])) ?></td>
                             <td><span class="badge-modern badge-neutral"><?= htmlspecialchars($don['category_name'] ?? 'N/A') ?></span></td>
                             <td>
@@ -330,15 +359,6 @@ if ($result) $total_monastery_expenses = $result->fetch_assoc()['t'];
                                 ?>
                                 <span class="badge-modern <?= $badge ?> badge-dot"><?= ucfirst($don['status']) ?></span>
                             </td>
-                            <td>
-                                <?php if ($don['status'] === 'verified' || $don['status'] === 'paid'): ?>
-                                    <a href="generate_receipt.php?id=<?= $don['donation_id'] ?>" target="_blank" class="btn btn-sm" style="background:var(--primary-100);color:var(--primary-700);font-size:11px;padding:4px 10px;border-radius:6px;">
-                                        <i class="bi bi-download me-1"></i>PDF
-                                    </a>
-                                <?php else: ?>
-                                    <span style="color:var(--text-muted);font-size:12px;">—</span>
-                                <?php endif; ?>
-                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -354,34 +374,6 @@ if ($result) $total_monastery_expenses = $result->fetch_assoc()['t'];
                     </a>
                 </div>
             <?php endif; ?>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="row g-3 mb-4 stagger-children">
-        <div class="col-xl-3 col-md-6">
-            <a href="public_donate.php" class="quick-action-card">
-                <div class="quick-action-icon" style="background:#fff7ed;color:#f97316;"><i class="bi bi-heart"></i></div>
-                <span class="quick-action-label">Make Donation</span>
-            </a>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <a href="donation_management.php" class="quick-action-card">
-                <div class="quick-action-icon" style="background:#e0f2fe;color:#0284c7;"><i class="bi bi-list-ul"></i></div>
-                <span class="quick-action-label">All Donations</span>
-            </a>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <a href="public_transparency.php" class="quick-action-card">
-                <div class="quick-action-icon" style="background:#f5f3ff;color:#7c3aed;"><i class="bi bi-shield-check"></i></div>
-                <span class="quick-action-label">Transparency</span>
-            </a>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <a href="chatbot.php" class="quick-action-card">
-                <div class="quick-action-icon" style="background:#cffafe;color:#0891b2;"><i class="bi bi-robot"></i></div>
-                <span class="quick-action-label">AI Assistant</span>
-            </a>
         </div>
     </div>
 </div>
@@ -409,6 +401,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const trendLabels = <?= json_encode(array_slice(array_column($monthly_trend, 'month'), 0, 6), JSON_NUMERIC_CHECK) ?>;
         const trendData = <?= json_encode(array_slice(array_column($monthly_trend, 'amount'), 0, 6), JSON_NUMERIC_CHECK) ?>;
+        
+        console.log('Trend data:', {labels: trendLabels, data: trendData});
         
         // Validate data
         if (!Array.isArray(trendLabels) || !Array.isArray(trendData) || trendLabels.length === 0) {
@@ -460,7 +454,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    <?php if (count($by_category) > 0): ?>
     // Category Chart
     const catCanvas = document.getElementById('categoryChart');
     if (catCanvas) {
@@ -475,47 +468,75 @@ document.addEventListener('DOMContentLoaded', function() {
         const catData = <?= json_encode(array_slice(array_column($by_category, 'total'), 0, 10), JSON_NUMERIC_CHECK) ?>;
         const catColors = ['#f97316', '#0284c7', '#7c3aed', '#d97706', '#dc2626', '#0891b2'];
         
-        // Validate data
-        if (!Array.isArray(catLabels) || !Array.isArray(catData) || catLabels.length === 0) {
-            console.warn('Invalid category data');
-            return;
-        }
+        console.log('Category data:', {labels: catLabels, data: catData});
         
-        try {
-            window.categoryChart = new Chart(catCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: catLabels,
-                    datasets: [{
-                        data: catData,
-                        backgroundColor: catColors.slice(0, catLabels.length),
-                        borderWidth: 2,
-                        borderColor: '#fff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: {
-                        duration: 1000
+        // Handle empty data case
+        if (!Array.isArray(catLabels) || !Array.isArray(catData) || catLabels.length === 0) {
+            // Show empty state chart
+            const emptyLabels = ['No Data'];
+            const emptyData = [1];
+            const emptyColors = ['#e5e7eb'];
+            
+            try {
+                window.categoryChart = new Chart(catCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: emptyLabels,
+                        datasets: [{
+                            data: emptyData,
+                            backgroundColor: emptyColors,
+                            borderWidth: 0
+                        }]
                     },
-                    plugins: {
-                        legend: { 
-                            position: 'bottom', 
-                            labels: { 
-                                font: { size: 12, family: 'Inter' }, 
-                                padding: 16, 
-                                boxWidth: 12 
-                            } 
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { enabled: false }
                         }
                     }
-                }
-            });
-        } catch (error) {
-            console.error('Error creating category chart:', error);
+                });
+            } catch (error) {
+                console.error('Error creating empty category chart:', error);
+            }
+        } else {
+            // Show actual data chart
+            try {
+                window.categoryChart = new Chart(catCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: catLabels,
+                        datasets: [{
+                            data: catData,
+                            backgroundColor: catColors.slice(0, catLabels.length),
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 1000
+                        },
+                        plugins: {
+                            legend: { 
+                                position: 'bottom', 
+                                labels: { 
+                                    font: { size: 12, family: 'Inter' }, 
+                                    padding: 16, 
+                                    boxWidth: 12 
+                                } 
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error creating category chart:', error);
+            }
         }
     }
-    <?php endif; ?>
 });
 </script>
 
