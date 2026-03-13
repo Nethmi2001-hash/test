@@ -12,12 +12,12 @@ USE monastery_healthcare;
 -- ============================================
 CREATE TABLE roles (
     role_id INT PRIMARY KEY AUTO_INCREMENT,
-    role_name VARCHAR(50) NOT NULL UNIQUE COMMENT 'Admin|Doctor|Helper|Donor|Monk',
+    role_name VARCHAR(50) NOT NULL UNIQUE COMMENT 'Admin|Doctor|Donor|Monk',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
 INSERT INTO roles (role_name) VALUES 
-('Admin'), ('Doctor'), ('Helper'), ('Donor'), ('Monk');
+('Admin'), ('Doctor'), ('Donor'), ('Monk');
 
 -- ============================================
 -- 2. USERS TABLE

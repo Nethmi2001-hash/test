@@ -1,6 +1,5 @@
 <?php
 session_start();
-include 'navbar.php';
 
 // Access control
 if (empty($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
@@ -100,194 +99,141 @@ $stats['inactive'] = $conn->query("SELECT COUNT(*) as count FROM doctors WHERE s
 
 $conn->close();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctor Management - Monastery System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Doctor Management - Sacred Care</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/css/premium-theme.css">
-    <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
-    <link rel="stylesheet" href="assets/css/monastery-theme.css">
-    <style>
-        body {
-            background: linear-gradient(135deg, var(--bg-main) 0%, #efe6d8 100%);
-            padding-top: 20px;
-        }
-        .stat-card {
-            border-left: 4px solid var(--primary);
-            transition: transform 0.2s;
-        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        .doctor-card {
-            border-left: 3px solid var(--primary);
-            padding: 15px;
-            margin-bottom: 15px;
-            background: #fff;
-            border-radius: 5px;
-            transition: all 0.3s;
-        }
-        .doctor-card:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-left-color: var(--accent);
-        }
-        .lotus-divider {
-            text-align: center;
-            color: var(--primary);
-            font-size: 24px;
-            margin: 20px 0;
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <?php if ($error): ?>
-            <div class="alert alert-danger alert-dismissible fade show">
-                <i class="bi bi-exclamation-triangle"></i> <?= $error ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endif; ?>
 
-        <?php if ($success): ?>
-            <div class="alert alert-success alert-dismissible fade show">
-                <i class="bi bi-check-circle"></i> <?= $success ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endif; ?>
+<?php include 'navbar.php'; ?>
 
-        <div class="alert" style="background: linear-gradient(135deg, rgba(110, 134, 98, 0.08) 0%, rgba(79, 102, 69, 0.05) 100%); border-left: 3px solid var(--primary); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-            <img src="images/img1.jpeg" alt="Founder" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
-            <div style="font-size: 0.875rem; line-height: 1.4;">
-                <div style="font-weight: 600; color: var(--primary);">Seela Suwa Herath Bikshu Gilan Arana</div>
-                <div style="opacity: 0.75; font-size: 0.8rem;">Founded by Ven. Solewewa Chandrasiri Thero</div>
-            </div>
+    <!-- Alerts -->
+    <?php if ($error): ?>
+        <div class="alert-modern alert-danger-modern">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span><?= $error ?></span>
         </div>
+    <?php endif; ?>
+    <?php if ($success): ?>
+        <div class="alert-modern alert-success-modern">
+            <i class="bi bi-check-circle"></i>
+            <span><?= $success ?></span>
+        </div>
+    <?php endif; ?>
 
-        <!-- Statistics Cards -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="card stat-card shadow-sm">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-muted mb-1">Total Doctors</h6>
-                                <h3 class="mb-0" style="color: var(--monastery-saffron);"><?= $stats['total'] ?></h3>
-                            </div>
-                            <div class="fs-1" style="color: var(--monastery-light);">
-                                <i class="bi bi-person-badge"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card stat-card shadow-sm">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-muted mb-1">Active Doctors</h6>
-                                <h3 class="mb-0 text-success"><?= $stats['active'] ?></h3>
-                            </div>
-                            <div class="fs-1 text-success">
-                                <i class="bi bi-check-circle"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card stat-card shadow-sm">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-muted mb-1">Inactive Doctors</h6>
-                                <h3 class="mb-0 text-secondary"><?= $stats['inactive'] ?></h3>
-                            </div>
-                            <div class="fs-1 text-secondary">
-                                <i class="bi bi-pause-circle"></i>
-                            </div>
-                        </div>
-                    </div>
+    <!-- Statistics -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-4 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="bi bi-person-badge-fill"></i></div>
+                <div class="stat-info">
+                    <div class="stat-label">Total Doctors</div>
+                    <div class="stat-value"><?= $stats['total'] ?></div>
                 </div>
             </div>
         </div>
-
-        <!-- Add New Doctor Button -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header" style="background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%); color: white;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-person-plus"></i> Doctor Management</h5>
-                    <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addModal">
-                        <i class="bi bi-plus-circle"></i> Add New Doctor
-                    </button>
+        <div class="col-xl-4 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon emerald"><i class="bi bi-check-circle-fill"></i></div>
+                <div class="stat-info">
+                    <div class="stat-label">Active Doctors</div>
+                    <div class="stat-value"><?= $stats['active'] ?></div>
                 </div>
             </div>
-            <div class="card-body">
-                <?php if (count($doctors) > 0): ?>
-                    <?php foreach ($doctors as $doctor): ?>
-                        <div class="doctor-card">
-                            <div class="row align-items-center">
-                                <div class="col-md-3">
-                                    <h6 class="mb-1" style="color: var(--monastery-dark);">
-                                        <i class="bi bi-person-badge"></i> <?= htmlspecialchars($doctor['full_name']) ?>
-                                    </h6>
-                                    <small class="text-muted">ID: #<?= $doctor['doctor_id'] ?></small>
-                                </div>
-                                <div class="col-md-2">
-                                    <span class="badge" style="background: var(--monastery-pale); color: var(--monastery-dark);">
-                                        <?= htmlspecialchars($doctor['specialization']) ?>
-                                    </span>
-                                </div>
-                                <div class="col-md-3">
+        </div>
+        <div class="col-xl-4 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon slate"><i class="bi bi-pause-circle-fill"></i></div>
+                <div class="stat-info">
+                    <div class="stat-label">Inactive Doctors</div>
+                    <div class="stat-value"><?= $stats['inactive'] ?></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctors Table -->
+    <div class="modern-table-wrapper">
+        <div class="modern-table-header">
+            <h5><i class="bi bi-person-badge me-2"></i>Doctor Records</h5>
+            <button class="btn-modern btn-primary-modern btn-sm-modern" data-bs-toggle="modal" data-bs-target="#addModal">
+                <i class="bi bi-plus-circle"></i> Add Doctor
+            </button>
+        </div>
+        <div class="table-responsive-modern">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Specialization</th>
+                        <th>Contact</th>
+                        <th>License</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (count($doctors) > 0): ?>
+                        <?php foreach ($doctors as $doctor): ?>
+                            <tr>
+                                <td><?= $doctor['doctor_id'] ?></td>
+                                <td><div style="font-weight:600;"><?= htmlspecialchars($doctor['full_name']) ?></div></td>
+                                <td><span class="badge-modern badge-primary"><?= htmlspecialchars($doctor['specialization']) ?></span></td>
+                                <td>
                                     <?php if ($doctor['phone']): ?>
-                                        <small><i class="bi bi-telephone"></i> <?= htmlspecialchars($doctor['phone']) ?></small><br>
+                                        <div style="font-size:13px;"><i class="bi bi-telephone me-1"></i><?= htmlspecialchars($doctor['phone']) ?></div>
                                     <?php endif; ?>
                                     <?php if ($doctor['email']): ?>
-                                        <small><i class="bi bi-envelope"></i> <?= htmlspecialchars($doctor['email']) ?></small>
+                                        <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;"><i class="bi bi-envelope me-1"></i><?= htmlspecialchars($doctor['email']) ?></div>
                                     <?php endif; ?>
-                                </div>
-                                <div class="col-md-2">
-                                    <?php
-                                    $status_class = $doctor['status'] == 'active' ? 'success' : 'secondary';
-                                    ?>
-                                    <span class="badge bg-<?= $status_class ?>">
-                                        <?= strtoupper($doctor['status']) ?>
-                                    </span>
-                                </div>
-                                <div class="col-md-2 text-end">
-                                    <button class="btn btn-sm btn-primary" onclick="editDoctor(<?= htmlspecialchars(json_encode($doctor)) ?>)">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <form method="POST" style="display: inline;" onsubmit="return confirm('Delete this doctor?')">
-                                        <input type="hidden" name="form_name" value="delete">
-                                        <input type="hidden" name="doctor_id" value="<?= $doctor['doctor_id'] ?>">
-                                        <button type="submit" class="btn btn-sm btn-danger">
-                                            <i class="bi bi-trash"></i>
+                                    <?php if (empty($doctor['phone']) && empty($doctor['email'])): ?>
+                                        <span style="color:var(--text-secondary);">—</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if ($doctor['license_number']): ?>
+                                        <span style="font-size:13px;"><i class="bi bi-award me-1"></i><?= htmlspecialchars($doctor['license_number']) ?></span>
+                                    <?php else: ?>
+                                        <span style="color:var(--text-secondary);">—</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <span class="badge-modern <?= $doctor['status'] == 'active' ? 'badge-success' : 'badge-neutral' ?> badge-dot"><?= ucfirst($doctor['status']) ?></span>
+                                </td>
+                                <td>
+                                    <div style="display:flex;gap:6px;">
+                                        <button class="btn-icon" onclick="editDoctor(<?= htmlspecialchars(json_encode($doctor)) ?>)" title="Edit">
+                                            <i class="bi bi-pencil"></i>
                                         </button>
-                                    </form>
-                                </div>
-                            </div>
-                            <?php if ($doctor['license_number']): ?>
-                                <div class="row mt-2">
-                                    <div class="col">
-                                        <small class="text-muted"><i class="bi bi-award"></i> License: <?= htmlspecialchars($doctor['license_number']) ?></small>
+                                        <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this doctor?')">
+                                            <input type="hidden" name="form_name" value="delete">
+                                            <input type="hidden" name="doctor_id" value="<?= $doctor['doctor_id'] ?>">
+                                            <button type="submit" class="btn-icon danger" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
                                     </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="7" style="text-align:center;padding:48px 20px;">
+                                <div style="color:var(--text-secondary);">
+                                    <i class="bi bi-person-badge" style="font-size:36px;display:block;margin-bottom:12px;opacity:0.4;"></i>
+                                    No doctors found. Click "Add Doctor" to get started.
                                 </div>
-                            <?php endif; ?>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <div class="text-center py-5">
-                        <i class="bi bi-inbox fs-1 text-muted"></i>
-                        <p class="text-muted">No doctors found. Click "Add New Doctor" to get started.</p>
-                    </div>
-                <?php endif; ?>
-            </div>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -295,55 +241,62 @@ $conn->close();
     <div class="modal fade" id="addModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%); color: white;">
-                    <h5 class="modal-title"><i class="bi bi-person-plus"></i> Add New Doctor</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Add New Doctor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form method="POST">
                     <div class="modal-body">
                         <input type="hidden" name="form_name" value="create">
-                        
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                                <input type="text" name="full_name" class="form-control" required>
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Full Name <span class="required">*</span></label>
+                                    <input type="text" name="full_name" class="form-control-modern" required>
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Specialization <span class="text-danger">*</span></label>
-                                <input type="text" name="specialization" class="form-control" placeholder="e.g., General Medicine, Cardiology" required>
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Specialization <span class="required">*</span></label>
+                                    <input type="text" name="specialization" class="form-control-modern" placeholder="e.g., General Medicine, Cardiology" required>
+                                </div>
                             </div>
                         </div>
-
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Phone</label>
-                                <input type="text" name="phone" class="form-control" placeholder="+94 77 123 4567">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Phone</label>
+                                    <input type="text" name="phone" class="form-control-modern" placeholder="+94 77 123 4567">
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" name="email" class="form-control" placeholder="doctor@example.com">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Email</label>
+                                    <input type="email" name="email" class="form-control-modern" placeholder="doctor@example.com">
+                                </div>
                             </div>
                         </div>
-
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">License Number</label>
-                                <input type="text" name="license_number" class="form-control" placeholder="Medical License #">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">License Number</label>
+                                    <input type="text" name="license_number" class="form-control-modern" placeholder="Medical License #">
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Status</label>
-                                <select name="status" class="form-select">
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                </select>
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Status</label>
+                                    <select name="status" class="form-control-modern form-select-modern">
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary" style="background: var(--monastery-saffron); border: none;">
-                            <i class="bi bi-save"></i> Add Doctor
-                        </button>
+                        <button type="button" class="btn-modern btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn-modern btn-primary-modern"><i class="bi bi-plus-circle"></i> Add Doctor</button>
                     </div>
                 </form>
             </div>
@@ -354,75 +307,83 @@ $conn->close();
     <div class="modal fade" id="editModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, var(--monastery-saffron) 0%, var(--monastery-orange) 100%); color: white;">
-                    <h5 class="modal-title"><i class="bi bi-pencil"></i> Edit Doctor</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit Doctor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form method="POST">
                     <div class="modal-body">
                         <input type="hidden" name="form_name" value="update">
                         <input type="hidden" name="doctor_id" id="edit_doctor_id">
-                        
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                                <input type="text" name="full_name" id="edit_full_name" class="form-control" required>
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Full Name <span class="required">*</span></label>
+                                    <input type="text" name="full_name" id="edit_full_name" class="form-control-modern" required>
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Specialization <span class="text-danger">*</span></label>
-                                <input type="text" name="specialization" id="edit_specialization" class="form-control" required>
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Specialization <span class="required">*</span></label>
+                                    <input type="text" name="specialization" id="edit_specialization" class="form-control-modern" required>
+                                </div>
                             </div>
                         </div>
-
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Phone</label>
-                                <input type="text" name="phone" id="edit_phone" class="form-control">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Phone</label>
+                                    <input type="text" name="phone" id="edit_phone" class="form-control-modern">
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" name="email" id="edit_email" class="form-control">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Email</label>
+                                    <input type="email" name="email" id="edit_email" class="form-control-modern">
+                                </div>
                             </div>
                         </div>
-
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">License Number</label>
-                                <input type="text" name="license_number" id="edit_license_number" class="form-control">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">License Number</label>
+                                    <input type="text" name="license_number" id="edit_license_number" class="form-control-modern">
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Status</label>
-                                <select name="status" id="edit_status" class="form-select">
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                </select>
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Status</label>
+                                    <select name="status" id="edit_status" class="form-control-modern form-select-modern">
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary" style="background: var(--monastery-saffron); border: none;">
-                            <i class="bi bi-save"></i> Update Doctor
-                        </button>
+                        <button type="button" class="btn-modern btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn-modern btn-primary-modern"><i class="bi bi-save"></i> Update Doctor</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function editDoctor(doctor) {
-            document.getElementById('edit_doctor_id').value = doctor.doctor_id;
-            document.getElementById('edit_full_name').value = doctor.full_name;
-            document.getElementById('edit_specialization').value = doctor.specialization;
-            document.getElementById('edit_phone').value = doctor.phone || '';
-            document.getElementById('edit_email').value = doctor.email || '';
-            document.getElementById('edit_license_number').value = doctor.license_number || '';
-            document.getElementById('edit_status').value = doctor.status;
-            
-            new bootstrap.Modal(document.getElementById('editModal')).show();
-        }
-    </script>
+<?php include 'includes/footer.php'; ?>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function editDoctor(doctor) {
+        document.getElementById('edit_doctor_id').value = doctor.doctor_id;
+        document.getElementById('edit_full_name').value = doctor.full_name;
+        document.getElementById('edit_specialization').value = doctor.specialization;
+        document.getElementById('edit_phone').value = doctor.phone || '';
+        document.getElementById('edit_email').value = doctor.email || '';
+        document.getElementById('edit_license_number').value = doctor.license_number || '';
+        document.getElementById('edit_status').value = doctor.status;
+        new bootstrap.Modal(document.getElementById('editModal')).show();
+    }
+</script>
 </body>
 </html>

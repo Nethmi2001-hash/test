@@ -7,7 +7,7 @@ $success = "";
 $con = getDBConnection();
 
 $roles = [];
-$result = $con->query("SELECT role_id, role_name FROM roles");
+$result = $con->query("SELECT role_id, role_name FROM roles WHERE role_name IN ('Doctor', 'Donor', 'Monk') ORDER BY role_name");
 if ($result) {
     while ($row = $result->fetch_assoc()) {
         $roles[] = $row;
@@ -62,383 +62,100 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Seela Suwa Herath Bikshu Gilan Arana</title>
+    <title>Register - Sacred Care</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/css/sacred-care-theme.css">
-    <link rel="stylesheet" href="assets/css/monastery-theme.css">
+    <link rel="stylesheet" href="assets/css/modern-design.css">
     <style>
-        :root {
-            --sc-primary: #6E8662;
-            --sc-primary-dark: #4F6645;
-            --sc-secondary: #ECE5D8;
-            --sc-accent: #8A5A3B;
-            --sc-bg: #F7F4EE;
-            --sc-border: #DCD4C7;
-            --sc-card: #FFFFFF;
-            --sc-muted: #6B7280;
+        body { font-family: 'Inter', sans-serif; margin: 0; min-height: 100vh; background: var(--bg-primary); }
+        .register-layout { min-height: 100vh; display: grid; grid-template-columns: 420px 1fr; }
+        .hero-panel {
+            background: linear-gradient(160deg, var(--primary-600) 0%, var(--primary-700) 60%, #7c2d12 100%);
+            color: #fff; padding: 48px 36px; display: flex; flex-direction: column; justify-content: center;
+            position: relative; overflow: hidden;
         }
+        .hero-panel::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(circle at 20% 15%, rgba(245,158,11,0.18), transparent 50%);
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 500;
+            margin-bottom: 16px; position: relative; z-index: 1; width: fit-content;
+        }
+        .hero-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 32px; font-weight: 800; margin-bottom: 8px; position: relative; z-index: 1; letter-spacing: -0.5px; }
+        .hero-subtitle { font-size: 14px; opacity: 0.9; position: relative; z-index: 1; margin-bottom: 24px; line-height: 1.6; }
+        .hero-features { list-style: none; padding: 0; margin: 0; position: relative; z-index: 1; }
+        .hero-features li { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 13.5px; font-weight: 500; }
+        .hero-features li .icon-wrap { width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+        .founder-strip { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
+        .founder-strip img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.4); }
+        .founder-strip .info { font-size: 13px; line-height: 1.4; }
+        .founder-strip .info .name { font-weight: 600; }
+        .founder-strip .info .role { opacity: 0.7; font-size: 12px; }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
-            background: radial-gradient(circle at top left, #FFEED9 0%, var(--sc-bg) 40%);
-            color: #1f2937;
-            line-height: 1.6;
-            min-height: 100vh;
-        }
-
-        .register-layout {
-            min-height: 100vh;
-            display: grid;
-            grid-template-columns: minmax(320px, 460px) minmax(420px, 1fr);
-        }
-
-        .brand-panel {
-            background: linear-gradient(160deg, var(--sc-primary) 0%, var(--sc-primary-dark) 70%, #7C2D12 100%);
-            color: #fff;
-            padding: 42px 34px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .brand-panel::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 20% 15%, rgba(245, 158, 11, 0.22), transparent 45%);
-        }
-
-        .brand-image {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            border-radius: 14px;
-            border: 2px solid rgba(255, 255, 255, 0.22);
-            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.24);
-            margin-bottom: 18px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .brand-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.14);
-            border: 1px solid rgba(255, 255, 255, 0.30);
-            border-radius: 999px;
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: 500;
-            margin-bottom: 12px;
-            position: relative;
-            z-index: 1;
-            width: fit-content;
-        }
-
-        .brand-title {
-            font-size: 28px;
-            font-weight: 650;
-            margin-bottom: 6px;
-            position: relative;
-            z-index: 1;
-            letter-spacing: 0.2px;
-        }
-
-        .brand-subtitle {
-            font-size: 14px;
-            opacity: 0.92;
-            position: relative;
-            z-index: 1;
-            margin-bottom: 14px;
-        }
-
-        .brand-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .brand-list li {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-            font-size: 13px;
-            opacity: 0.95;
-        }
-        .donation-cta {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
-            color: #FFFFFF;
-            padding: 16px 28px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 800;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 8px 32px rgba(46, 125, 50, 0.5),
-                        0 4px 16px rgba(0, 0, 0, 0.2);
-            transition: all 0.4s ease;
-            letter-spacing: 0.5px;
-            z-index: 9999;
-            border: 3px solid rgba(255, 255, 255, 0.4);
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            animation: gentle-pulse 3s ease-in-out infinite;
-        }
-
-        @keyframes gentle-pulse {
-            0%, 100% { box-shadow: 0 8px 32px rgba(46, 125, 50, 0.5), 0 4px 16px rgba(0, 0, 0, 0.2); }
-            50% { box-shadow: 0 8px 40px rgba(46, 125, 50, 0.65), 0 4px 20px rgba(0, 0, 0, 0.25); }
-        }
-
-        .donation-cta i {
-            font-size: 18px;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-        }
-
-        .donation-cta:hover {
-            background: linear-gradient(135deg, #1B5E20 0%, #0D4715 100%);
-            box-shadow: 0 12px 48px rgba(46, 125, 50, 0.65),
-                        0 6px 24px rgba(0, 0, 0, 0.3);
-            transform: translateY(-4px) scale(1.08);
-            color: #FFFFFF;
-            border-color: rgba(255, 255, 255, 0.6);
-        }
-        .form-side {
-            padding: 34px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
+        .form-side { padding: 40px; display: flex; align-items: center; justify-content: center; }
         .register-card {
-            width: 100%;
-            max-width: 560px;
-            background: var(--sc-card);
-            border: 1px solid var(--sc-border);
-            border-radius: 18px;
-            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
-            padding: 20px 24px;
+            width: 100%; max-width: 580px;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl); box-shadow: var(--shadow-lg);
+            padding: 36px 40px;
         }
+        .form-header { margin-bottom: 24px; }
+        .form-header h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 28px; font-weight: 800; color: var(--accent); margin-bottom: 6px; }
+        .form-header p { font-size: 14px; color: var(--text-secondary); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-grid .full-width { grid-column: 1 / -1; }
+        .form-group { margin-bottom: 0; }
+        .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 11px 14px; border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-lg); font-size: 14px; font-family: inherit;
+            background: var(--bg-primary); transition: all 0.2s; color: var(--text-primary);
+        }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary-500); box-shadow: 0 0 0 3px rgba(249,115,22,0.12); background: var(--bg-card); }
+        .form-group select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px; padding-right: 36px; }
+        .form-hint { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
 
-        .form-header {
-            margin-bottom: 14px;
-        }
-
-        .form-title {
-            font-size: 30px;
-            font-weight: 700;
-            color: var(--sc-accent);
-            margin-bottom: 4px;
-            letter-spacing: -0.4px;
-        }
-
-        .form-subtitle {
-            font-size: 14px;
-            color: var(--sc-muted);
-        }
-
-        .form-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 6px;
-            letter-spacing: 0.45px;
-            text-transform: uppercase;
-        }
-
-        .form-control, select {
-            width: 100%;
-            padding: 11px 14px;
-            border: 1px solid #D8D0C2;
-            border-radius: 10px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: all 0.2s ease;
-            background: #FFFDFA;
-        }
-
-        .form-control:focus, select:focus {
-            outline: none;
-            border-color: var(--sc-primary);
-            background: white;
-            box-shadow: 0 0 0 4px rgba(194, 65, 12, 0.12);
-        }
-
-        select {
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 20px;
-            padding-right: 36px;
-        }
-
-        .form-hint {
-            font-size: 11px;
-            color: var(--sc-muted);
-            margin-top: 5px;
-        }
-
-        .alert-box {
-            padding: 10px 12px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            font-size: 13px;
-            border-left: 3px solid;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .alert-error {
-            background: #fef2f2;
-            border-left-color: #dc2626;
-            color: #991b1b;
-        }
-
-        .alert-success {
-            background: #f0fdf4;
-            border-left-color: #16a34a;
-            color: #166534;
-        }
+        .alert-modern-reg { padding: 12px 16px; border-radius: var(--radius-lg); margin-bottom: 16px; font-size: 13px; display: flex; align-items: center; gap: 10px; border-left: 3px solid; }
+        .alert-modern-reg.error { background: #fef2f2; border-left-color: #ef4444; color: #991b1b; }
+        .alert-modern-reg.success { background: #f0fdf4; border-left-color: #22c55e; color: #166534; }
 
         .btn-register {
-            width: 100%;
-            padding: 12px 24px;
-            background: var(--sc-primary);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 6px;
-            text-transform: uppercase;
+            width: 100%; padding: 13px 24px; background: var(--primary-600); color: #fff;
+            border: none; border-radius: var(--radius-lg); font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.5px;
         }
+        .btn-register:hover { background: var(--primary-700); box-shadow: 0 4px 14px rgba(249,115,22,0.3); transform: translateY(-1px); }
 
-        .btn-register:hover {
-            background: var(--sc-primary-dark);
-            box-shadow: 0 4px 12px rgba(194, 65, 12, 0.25);
-        }
+        .divider { height: 1px; background: var(--border-color); margin: 24px 0; }
+        .login-link { text-align: center; font-size: 13px; color: var(--text-secondary); }
+        .login-link a { color: var(--accent); font-weight: 600; text-decoration: none; text-transform: uppercase; letter-spacing: 0.3px; }
+        .login-link a:hover { color: var(--primary-600); }
 
-        .divider-line {
-            height: 1px;
-            background: #ECE5D9;
-            margin: 16px 0;
-        }
-
-        .login-section {
-            text-align: center;
-        }
-
-        .login-text {
-            font-size: 13px;
-            color: var(--sc-muted);
-            margin-bottom: 12px;
-        }
-
-        .btn-login {
-            color: var(--sc-accent);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 13px;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
-            transition: all 0.3s ease;
-        }
-
-        .btn-login:hover {
-            color: var(--sc-secondary);
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-        }
-
-        .form-grid .full-width {
-            grid-column: 1 / -1;
-        }
-
-        @media (max-width: 1024px) {
-            .register-layout {
-                grid-template-columns: 1fr;
-            }
-
-            .brand-panel {
-                padding: 22px;
-            }
-
-            .brand-image {
-                height: 200px;
-            }
-
-            .form-side {
-                padding: 18px;
-            }
-
-            .register-card {
-                padding: 22px;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .form-title {
-                font-size: 26px;
-            }
-
-            .register-card {
-                padding: 18px;
-            }
-        }
+        @media (max-width: 1024px) { .register-layout { grid-template-columns: 1fr; } .hero-panel { padding: 28px; } }
+        @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } .register-card { padding: 24px; } .form-header h1 { font-size: 24px; } }
     </style>
 </head>
 <body>
     <div class="register-layout">
-        <div class="brand-panel">
-            <img src="images/img3.jpeg" alt="Seela Suwa Herath" class="brand-image">
-            <div class="brand-badge"><i class="bi bi-person-hearts"></i> Helping-Hand Community</div>
-            <h2 class="brand-title">Join Sacred Care</h2>
-            <p class="brand-subtitle">Create your account to support monastery healthcare and donations.</p>
-            <ul class="brand-list">
-                <li><i class="bi bi-check-circle"></i> Secure account with role-based access</li>
-                <li><i class="bi bi-check-circle"></i> Transparent donation and healthcare workflows</li>
-                <li><i class="bi bi-check-circle"></i> Trusted and compassionate service platform</li>
+        <div class="hero-panel">
+            <div class="hero-badge"><i class="bi bi-person-hearts"></i> Join Our Community</div>
+            <h2 class="hero-title">Create Your Account</h2>
+            <p class="hero-subtitle">Join the Sacred Care platform to support monastery healthcare and make a meaningful difference.</p>
+            <ul class="hero-features">
+                <li><span class="icon-wrap"><i class="bi bi-shield-check"></i></span> Secure role-based access control</li>
+                <li><span class="icon-wrap"><i class="bi bi-heart-pulse"></i></span> Healthcare management tools</li>
+                <li><span class="icon-wrap"><i class="bi bi-graph-up-arrow"></i></span> Transparent donation tracking</li>
+                <li><span class="icon-wrap"><i class="bi bi-people"></i></span> Compassionate community platform</li>
             </ul>
-            <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.2);">
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <img src="images/img1.jpeg" alt="Founder" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.5);">
-                    <div style="font-size: 0.85rem; line-height: 1.4; opacity: 0.95;">
-                        <div style="font-weight: 600;">Founded by Ven. Solewewa Chandrasiri Thero</div>
-                        <div style="opacity: 0.8; font-size: 0.8rem;">Monastery healthcare & donation platform</div>
-                    </div>
+            <div class="founder-strip">
+                <img src="images/img1.jpeg" alt="Founder">
+                <div class="info">
+                    <div class="name">Ven. Solewewa Chandrasiri Thero</div>
+                    <div class="role">Monastery Healthcare & Donation Platform</div>
                 </div>
             </div>
         </div>
@@ -446,18 +163,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="form-side">
             <div class="register-card">
                 <div class="form-header">
-                    <h1 class="form-title">Create Account</h1>
-                    <p class="form-subtitle">Use your details to join the monastery healthcare platform.</p>
+                    <h1>Create Account</h1>
+                    <p>Fill in your details to join the monastery healthcare platform.</p>
                 </div>
 
                 <?php if ($error): ?>
-                    <div class="alert-box alert-error">
+                    <div class="alert-modern-reg error">
                         <i class="bi bi-exclamation-triangle"></i> <?php echo htmlspecialchars($error); ?>
                     </div>
                 <?php endif; ?>
 
                 <?php if ($success): ?>
-                    <div class="alert-box alert-success">
+                    <div class="alert-modern-reg success">
                         <i class="bi bi-check-circle"></i> <?php echo htmlspecialchars($success); ?>
                     </div>
                 <?php endif; ?>
@@ -465,103 +182,62 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <form method="POST">
                     <div class="form-grid">
                         <div class="form-group full-width">
-                            <label class="form-label" for="name">Full Name</label>
-                            <input 
-                                type="text" 
-                                id="name" 
-                                name="name" 
-                                class="form-control" 
-                                placeholder="John Smith"
-                                value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>"
-                                required
-                            >
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" placeholder="John Smith"
+                                value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>" required>
                         </div>
 
                         <div class="form-group full-width">
-                            <label class="form-label" for="email">Email Address</label>
-                            <input 
-                                type="email" 
-                                id="email" 
-                                name="email" 
-                                class="form-control" 
-                                placeholder="your@email.com"
-                                value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>"
-                                required
-                            >
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" placeholder="your@email.com"
+                                value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" for="phone">Phone Number</label>
-                            <input 
-                                type="tel" 
-                                id="phone" 
-                                name="phone" 
-                                class="form-control" 
-                                placeholder="0712345678"
-                                value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>"
-                                required
-                            >
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" placeholder="0712345678"
+                                value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>" required>
                             <div class="form-hint">Sri Lankan format (071-078)</div>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" for="role_id">Role</label>
-                            <select id="role_id" name="role_id" class="form-control" required>
+                            <label for="role_id">Role</label>
+                            <select id="role_id" name="role_id" required>
                                 <option value="">Select role...</option>
                                 <?php foreach ($roles as $role): ?>
-                                    <option value="<?php echo $role['role_id']; ?>">
-                                        <?php echo htmlspecialchars($role['role_name']); ?>
-                                    </option>
+                                    <option value="<?php echo $role['role_id']; ?>"><?php echo htmlspecialchars($role['role_name']); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" for="password">Password</label>
-                            <input 
-                                type="password" 
-                                id="password" 
-                                name="password" 
-                                class="form-control" 
-                                placeholder="••••••••"
-                                required
-                            >
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" placeholder="••••••••" required>
                             <div class="form-hint">Minimum 6 characters</div>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" for="password_confirm">Confirm Password</label>
-                            <input 
-                                type="password" 
-                                id="password_confirm" 
-                                name="password_confirm" 
-                                class="form-control" 
-                                placeholder="••••••••"
-                                required
-                            >
+                            <label for="password_confirm">Confirm Password</label>
+                            <input type="password" id="password_confirm" name="password_confirm" placeholder="••••••••" required>
                         </div>
 
-                        <div class="form-group full-width">
-                            <button type="submit" class="btn-register">Create Account</button>
+                        <div class="form-group full-width" style="margin-top: 8px;">
+                            <button type="submit" class="btn-register">
+                                <i class="bi bi-person-plus me-2"></i>Create Account
+                            </button>
                         </div>
                     </div>
                 </form>
 
-                <div class="divider-line"></div>
+                <div class="divider"></div>
 
-                <div class="login-section">
-                    <p class="login-text">Already have an account?</p>
-                    <a href="login.php" class="btn-login">Sign In</a>
+                <div class="login-link">
+                    Already have an account? <a href="login.php">Sign In</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <a href="public_donate.php" class="donation-cta" title="Support Monastery Healthcare">
-        <i class="bi bi-hearts"></i> Offer Helping Hand
-    </a>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/ui-interactions.js"></script>
 </body>
 </html>
