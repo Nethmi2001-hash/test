@@ -182,7 +182,9 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
             min-height: 100vh;
             display: flex;
             align-items: center;
-            background: linear-gradient(165deg, #fb923c 0%, #f97316 35%, #ea580c 70%, #f59e0b 100%);
+            background:
+                linear-gradient(165deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.30) 50%, rgba(0,0,0,0.50) 100%),
+                url('images/hero_bg.png') center center / cover no-repeat;
             overflow: hidden;
         }
         .hp-hero::before {
@@ -550,32 +552,32 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
         }
         .hp-about-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 48px;
+            grid-template-columns: 1.2fr 1fr; /* Give more width to the images side */
+            gap: 56px;
             align-items: center;
-            margin-top: 32px;
+            margin-top: 42px;
         }
         .hp-about-images {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            gap: 20px; /* Slightly larger gap */
         }
         .hp-about-img {
-            border-radius: 16px;
+            border-radius: 20px;
             overflow: hidden;
-            aspect-ratio: 4/3;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            aspect-ratio: 5/4; /* Taller aspect ratio for bigger images */
+            box-shadow: 0 12px 32px rgba(0,0,0,0.12);
         }
         .hp-about-img img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s;
+            transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
-        .hp-about-img:hover img { transform: scale(1.05); }
+        .hp-about-img:hover img { transform: scale(1.08); }
         .hp-about-img:first-child {
             grid-row: span 2;
-            aspect-ratio: auto;
+            aspect-ratio: 3/4; /* Make the main left image much taller */
         }
         .hp-value-item {
             display: flex;
