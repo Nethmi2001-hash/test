@@ -9,69 +9,123 @@
     <link rel="stylesheet" href="assets/css/modern-design.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Newsreader:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
     :root {
-        --primary-orange: #f97316;
-        --primary-orange-dark: #ea580c;
-        --primary-orange-light: #fff7ed;
+        --primary-orange: #d98967;
+        --primary-orange-dark: #b86a48;
+        --primary-orange-light: #f7eee7;
+        --calm-sage: #9ab3aa;
+        --calm-blue: #7fa4ad;
+        --surface: #ffffff;
+        --surface-soft: #f6f4f1;
+        --green-500: #6aa095;
+        --green-600: #557b74;
         --slate-50: #f8fafc;
         --slate-100: #f1f5f9;
         --slate-200: #e2e8f0;
         --slate-400: #94a3b8;
         --slate-500: #64748b;
+        --slate-600: #475569;
         --slate-700: #334155;
         --slate-900: #0f172a;
         --border-radius: 12px;
         --border-radius-sm: 8px;
-        --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
-        --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1);
+        --shadow-xs: 0 1px 3px rgba(15,23,42,0.08);
+        --shadow-lg: 0 24px 40px -28px rgba(15,23,42,0.45);
     }
     body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        background: var(--slate-50);
+        font-family: 'Manrope', 'Segoe UI', sans-serif;
+        background:
+            radial-gradient(1200px 600px at 10% -10%, #f6efe8 0%, rgba(246,239,232,0) 60%),
+            radial-gradient(900px 500px at 90% 0%, #eef3f2 0%, rgba(238,243,242,0) 55%),
+            linear-gradient(180deg, #f8fafb 0%, #f2f6f4 100%);
+        color: var(--slate-700);
         min-height: 100vh;
     }
     .landing-navbar {
-        background: #fff;
+        background: rgba(255,255,255,0.92);
         border-bottom: 1px solid var(--slate-200);
         padding: 0 0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        box-shadow: 0 2px 8px rgba(15,23,42,0.04);
+        backdrop-filter: blur(10px);
     }
     .landing-navbar .navbar-brand {
-        font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-        font-weight: 800;
+        font-family: 'Newsreader', 'Manrope', serif;
+        font-weight: 700;
         font-size: 1.2rem;
         color: var(--primary-orange-dark);
-        letter-spacing: -0.5px;
+        letter-spacing: -0.3px;
         display: flex;
         align-items: center;
         gap: 10px;
     }
     .brand-icon {
-        width: 36px;
-        height: 36px;
+        width: 32px;
+        height: 32px;
         border-radius: 10px;
-        background: var(--primary-orange);
+        background: linear-gradient(135deg, #d9b7a0 0%, #a8c4bf 100%);
         display: flex;
         align-items: center;
         justify-content: center;
         color: #fff;
-        font-size: 18px;
+        font-size: 16px;
+        box-shadow: 0 10px 18px -14px rgba(15,23,42,0.5);
     }
     .hero-section {
-        padding: 64px 0 40px;
-        text-align: center;
-        background: #fff;
+        padding: 60px 0 36px;
+        text-align: left;
+        background: linear-gradient(180deg, #ffffff 0%, #f7f4f1 100%);
         border-radius: var(--border-radius);
         box-shadow: var(--shadow-xs);
         margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--slate-100);
+    }
+    .hero-grid {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 28px;
+        align-items: center;
+        padding: 0 24px;
+    }
+    .hero-copy {
+        text-align: left;
+    }
+    .hero-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--slate-500);
+        margin-bottom: 12px;
+    }
+    .hero-kicker .kicker-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--calm-sage);
+        box-shadow: 0 0 0 4px rgba(154,179,170,0.2);
+    }
+    .hero-section::after {
+        content: "";
+        position: absolute;
+        width: 240px;
+        height: 240px;
+        right: -80px;
+        top: -90px;
+        background: radial-gradient(circle, rgba(217,183,160,0.4) 0%, rgba(217,183,160,0) 70%);
+        pointer-events: none;
     }
     .hero-section h1 {
-        font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-        font-weight: 800;
-        font-size: 2.5rem;
-        letter-spacing: -1px;
+        font-family: 'Newsreader', 'Manrope', serif;
+        font-weight: 700;
+        font-size: 2.35rem;
+        letter-spacing: -0.6px;
         color: var(--slate-900);
         margin-bottom: 12px;
     }
@@ -80,18 +134,180 @@
         color: var(--slate-500);
         margin-bottom: 24px;
     }
-    .badge-status {
+    .hero-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+    }
+    .btn-calm {
+        background: var(--calm-blue);
+        border: 1px solid var(--calm-blue);
+        color: #fff;
         font-weight: 600;
-        font-size: 0.82rem;
-        padding: 6px 16px;
-        border-radius: 9999px;
-        background: var(--primary-orange);
+        padding: 8px 18px;
+        border-radius: 10px;
+        box-shadow: 0 10px 18px -16px rgba(15,23,42,0.6);
+    }
+    .btn-calm:hover {
+        background: #6c96a1;
+        border-color: #6c96a1;
         color: #fff;
     }
-    .action-card {
+    .btn-soft {
+        background: #f6efe8;
+        border: 1px solid #e6d7cc;
+        color: var(--primary-orange-dark);
+        font-weight: 600;
+        padding: 8px 18px;
+        border-radius: 10px;
+    }
+    .btn-soft:hover {
+        background: #efe5dc;
+        border-color: #dec9bc;
+        color: var(--primary-orange-dark);
+    }
+    .hero-highlights {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+    .hero-highlights .highlight {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 9999px;
         background: #fff;
+        border: 1px solid var(--slate-100);
+        font-size: 0.82rem;
+        color: var(--slate-600);
+        box-shadow: var(--shadow-xs);
+    }
+    .hero-highlights .highlight i {
+        color: var(--calm-sage);
+    }
+    .hero-media {
+        position: relative;
+        border-radius: 18px;
+        overflow: hidden;
+        min-height: 280px;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid #ede2d9;
+        background: #f2ede8;
+    }
+    .hero-media::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(217,183,160,0.2) 100%);
+        pointer-events: none;
+    }
+    .hero-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .section-block {
+        background: var(--surface);
+        border: 1px solid var(--slate-100);
+        border-radius: var(--border-radius);
+        padding: 32px;
+        box-shadow: var(--shadow-xs);
+    }
+    .section-title {
+        font-family: 'Newsreader', 'Manrope', serif;
+        font-weight: 600;
+        font-size: 1.4rem;
         color: var(--slate-900);
-        border: 1px solid var(--slate-200);
+        margin-bottom: 10px;
+    }
+    .section-subtitle {
+        color: var(--slate-600);
+        margin-bottom: 18px;
+    }
+    .split-panel {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 24px;
+        align-items: center;
+    }
+    .image-card {
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid #e8ddd3;
+        box-shadow: var(--shadow-lg);
+        background: #f2ede8;
+    }
+    .image-card img {
+        width: 100%;
+        height: 100%;
+        min-height: 240px;
+        object-fit: cover;
+        display: block;
+    }
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+    }
+    .stat-card {
+        background: #f8f5f2;
+        border: 1px solid #eadfd6;
+        border-radius: 12px;
+        padding: 14px 16px;
+    }
+    .stat-card .value {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--primary-orange-dark);
+    }
+    .stat-card .label {
+        font-size: 0.82rem;
+        color: var(--slate-600);
+    }
+    .gallery-strip {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+    .gallery-strip .thumb {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--slate-100);
+        box-shadow: var(--shadow-xs);
+        background: #f2ede8;
+    }
+    .gallery-strip img {
+        width: 100%;
+        height: 140px;
+        object-fit: cover;
+        display: block;
+    }
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        padding: 6px 14px;
+        border-radius: 9999px;
+        background: var(--primary-orange-light);
+        color: var(--primary-orange-dark);
+        border: 1px solid rgba(184,106,72,0.25);
+    }
+    .badge-status.badge-calm {
+        background: #e7f1f2;
+        color: #4c6c73;
+        border-color: rgba(127,164,173,0.35);
+    }
+    .action-card {
+        background: var(--surface);
+        color: var(--slate-900);
+        border: 1px solid var(--slate-100);
         border-radius: var(--border-radius);
         padding: 28px 24px;
         box-shadow: var(--shadow-xs);
@@ -102,7 +318,7 @@
         position: relative;
     }
     .action-card:hover {
-        transform: translateY(-4px);
+        transform: translateY(-3px);
         box-shadow: var(--shadow-lg);
         text-decoration: none;
     }
@@ -110,17 +326,18 @@
         width: 48px;
         height: 48px;
         border-radius: 12px;
-        background: var(--primary-orange-light);
-        color: var(--primary-orange-dark);
+        background: #f0f4f2;
+        color: var(--calm-blue);
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.5rem;
         margin-bottom: 18px;
+        border: 1px solid #e1ece9;
     }
     .action-card h3 {
-        font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-        font-weight: 700;
+        font-family: 'Newsreader', 'Manrope', serif;
+        font-weight: 600;
         font-size: 1.15rem;
         margin-bottom: 6px;
     }
@@ -132,8 +349,8 @@
     }
     .action-card .step-pill {
         display: inline-block;
-        background: var(--primary-orange-light);
-        color: var(--primary-orange-dark);
+        background: #eef3f2;
+        color: #4f6f68;
         font-size: 0.72rem;
         font-weight: 700;
         text-transform: uppercase;
@@ -141,6 +358,7 @@
         padding: 3px 10px;
         border-radius: 9999px;
         margin-bottom: 12px;
+        border: 1px solid rgba(154,179,170,0.35);
     }
     .bg-green, .bg-emerald, .bg-violet, .bg-amber, .bg-cyan {
         background: #fff !important;
@@ -148,11 +366,11 @@
         border: 1px solid var(--slate-200);
     }
     .section-label {
-        font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+        font-family: 'Manrope', 'Segoe UI', sans-serif;
         font-size: 0.7rem;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 1.5px;
+        letter-spacing: 2px;
         color: var(--slate-400);
         margin-bottom: 16px;
     }
@@ -166,29 +384,31 @@
         align-items: center;
         gap: 10px;
         padding: 12px 16px;
-        background: #fff;
-        border: 1px solid var(--slate-200);
+        background: var(--surface);
+        border: 1px solid var(--slate-100);
         border-radius: var(--border-radius-sm);
         color: var(--slate-700);
         font-weight: 600;
         font-size: 0.82rem;
         box-shadow: var(--shadow-xs);
-        transition: background 0.18s;
+        transition: background 0.18s, transform 0.18s, box-shadow 0.18s, color 0.18s;
     }
     .quick-link-item:hover {
-        background: var(--primary-orange-light);
+        background: #f5f1ec;
         color: var(--primary-orange-dark);
-        border-color: var(--primary-orange);
+        border-color: #e7d7cc;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-lg);
     }
     .quick-link-item i {
         font-size: 1.1rem;
-        color: var(--primary-orange);
+        color: var(--calm-blue);
         width: 20px;
         text-align: center;
     }
     .doc-card {
-        background: #fff;
-        border: 1px solid var(--slate-200);
+        background: var(--surface);
+        border: 1px solid var(--slate-100);
         border-radius: var(--border-radius);
         padding: 24px;
         box-shadow: var(--shadow-xs);
@@ -201,27 +421,27 @@
         background: #fff;
         border: 1px solid var(--slate-200);
         border-radius: var(--border-radius-sm);
-        color: var(--primary-orange-dark);
+        color: var(--slate-700);
         font-weight: 500;
         font-size: 0.85rem;
         text-decoration: none;
         transition: all 0.18s ease;
     }
     .doc-link:hover {
-        background: var(--primary-orange-light);
-        border-color: var(--primary-orange);
+        background: #f5efe9;
+        border-color: #e6d7cc;
         color: var(--primary-orange-dark);
     }
     .checklist-card {
-        background: #fff;
-        border: 1px solid var(--slate-200);
+        background: var(--surface);
+        border: 1px solid var(--slate-100);
         border-radius: var(--border-radius);
         padding: 24px 28px;
         box-shadow: var(--shadow-xs);
     }
     .checklist-card h5 {
-        font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-        font-weight: 700;
+        font-family: 'Newsreader', 'Manrope', serif;
+        font-weight: 600;
         font-size: 1rem;
         color: var(--slate-800, #1e293b);
     }
@@ -231,33 +451,81 @@
         font-size: 0.92rem;
     }
     .cta-banner {
-        background: var(--primary-orange);
+        background: linear-gradient(135deg, #e7d4c6 0%, #c9d9d6 100%);
         border-radius: var(--border-radius);
         padding: 28px 32px;
-        color: #fff;
+        color: #1f2937;
         text-align: center;
         box-shadow: var(--shadow-xs);
+        border: 1px solid #e4d6cb;
     }
     .cta-banner h4 {
-        font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-        font-weight: 700;
+        font-family: 'Newsreader', 'Manrope', serif;
+        font-weight: 600;
         font-size: 1.2rem;
         margin-bottom: 8px;
     }
     .cta-banner p {
         margin-bottom: 0;
-        opacity: 0.9;
+        opacity: 0.8;
         font-size: 0.92rem;
     }
     .landing-footer {
         text-align: center;
         padding: 24px 0 32px;
-        color: var(--slate-400);
+        color: var(--slate-500);
         font-size: 0.85rem;
+    }
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+        opacity: 0;
+        animation: fadeUp 700ms ease forwards;
+    }
+    .reveal.delay-1 { animation-delay: 80ms; }
+    .reveal.delay-2 { animation-delay: 160ms; }
+    .reveal.delay-3 { animation-delay: 240ms; }
+    .reveal.delay-4 { animation-delay: 320ms; }
+    .reveal.delay-5 { animation-delay: 400ms; }
+    .reveal.delay-6 { animation-delay: 480ms; }
+    @media (prefers-reduced-motion: reduce) {
+        .reveal { animation: none; opacity: 1; }
     }
     @media (max-width: 768px) {
         .hero-section h1 { font-size: 1.8rem; }
         .hero-section { padding: 40px 0 24px; }
+    }
+    @media (max-width: 992px) {
+        .hero-grid {
+            grid-template-columns: 1fr;
+        }
+        .hero-copy {
+            text-align: center;
+        }
+        .hero-actions,
+        .hero-highlights,
+        .hero-copy .d-flex {
+            justify-content: center;
+        }
+        .hero-media {
+            min-height: 220px;
+        }
+        .split-panel {
+            grid-template-columns: 1fr;
+        }
+        .stat-grid {
+            grid-template-columns: 1fr;
+        }
+        .gallery-strip {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+    @media (max-width: 576px) {
+        .gallery-strip {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 </head>
@@ -280,25 +548,75 @@
 <div class="container" style="max-width: 1080px;">
 
     <!-- Hero -->
-    <div class="hero-section">
-        <h1>Monastery Healthcare System</h1>
-        <p class="subtitle">Giribawa Seela Suva Herath Bhikkhu Hospital</p>
-        <div class="d-flex justify-content-center gap-2 flex-wrap">
-            <span class="badge-status text-white" style="background:#f97316;">
-                <i class="bi bi-check-circle-fill me-1"></i>90% Complete
-            </span>
-            <span class="badge-status text-white" style="background:#0891b2;">
-                <i class="bi bi-rocket-takeoff-fill me-1"></i>Ready to Test
-            </span>
+    <div class="hero-section reveal delay-1">
+        <div class="hero-grid">
+            <div class="hero-copy">
+                <div class="hero-kicker"><span class="kicker-dot"></span>Compassionate Care & Giving</div>
+                <h1>Monastery Healthcare System</h1>
+                <p class="subtitle">Giribawa Seela Suva Herath Bhikkhu Hospital</p>
+                <div class="hero-actions">
+                    <a href="generate_sample_data.php" class="btn btn-calm">Start Testing</a>
+                    <a href="donation_management.php" class="btn btn-soft">Donations & Payments</a>
+                </div>
+                <div class="hero-highlights">
+                    <span class="highlight"><i class="bi bi-shield-check"></i>Transparent Reports</span>
+                    <span class="highlight"><i class="bi bi-heart-pulse"></i>Patient Care</span>
+                    <span class="highlight"><i class="bi bi-cash-coin"></i>Trusted Giving</span>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <span class="badge-status">
+                        <i class="bi bi-check-circle-fill me-1"></i>90% Complete
+                    </span>
+                    <span class="badge-status badge-calm">
+                        <i class="bi bi-rocket-takeoff-fill me-1"></i>Ready to Test
+                    </span>
+                </div>
+            </div>
+            <div class="hero-media">
+                <img src="images/monks2.jpg" alt="Monastery care and community support">
+            </div>
+        </div>
+    </div>
+
+    <!-- Mission / Impact -->
+    <div class="section-block mb-4 reveal delay-2">
+        <div class="split-panel">
+            <div>
+                <div class="section-title">Healthcare with Clarity and Compassion</div>
+                <p class="section-subtitle">
+                    A calm, trustworthy space for patient care, monk wellbeing, and donations that are tracked with care and transparency.
+                </p>
+                <div class="hero-actions">
+                    <a href="patient_appointments.php" class="btn btn-calm">Book an Appointment</a>
+                    <a href="donation_management.php" class="btn btn-soft">Support the Monastery</a>
+                </div>
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="value">Appointments</div>
+                        <div class="label">Organized daily care</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value">Donations</div>
+                        <div class="label">Transparent giving</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value">Reports</div>
+                        <div class="label">Clear financial insights</div>
+                    </div>
+                </div>
+            </div>
+            <div class="image-card">
+                <img src="images/img3.jpeg" alt="Peaceful care environment">
+            </div>
         </div>
     </div>
 
     <!-- Step 1: Primary CTA -->
-    <div class="row g-3 mb-3">
+    <div class="row g-3 mb-3 reveal delay-2">
         <div class="col-12">
             <a href="generate_sample_data.php" class="action-card bg-emerald">
                 <div>
-                    <span class="step-pill">Step 1 — Start Here</span>
+                    <span class="step-pill">Step 1 - Start Here</span>
                     <div class="card-icon"><i class="bi bi-database-fill-gear"></i></div>
                     <h3>Generate Sample Data</h3>
                     <p>Create 50+ sample donations, expenses, and appointments for testing reports</p>
@@ -309,7 +627,7 @@
     </div>
 
     <!-- Steps 2 & 3 -->
-    <div class="row g-3 mb-3">
+    <div class="row g-3 mb-3 reveal delay-3">
         <div class="col-md-6">
             <a href="reports.php" class="action-card bg-green">
                 <div>
@@ -333,7 +651,7 @@
     </div>
 
     <!-- Extra Features -->
-    <div class="row g-3 mb-4">
+    <div class="row g-3 mb-4 reveal delay-4">
         <div class="col-md-6">
             <a href="donation_management.php" class="action-card bg-amber">
                 <div>
@@ -354,8 +672,19 @@
         </div>
     </div>
 
+    <!-- Community Gallery -->
+    <div class="section-block mb-4 reveal delay-4">
+        <div class="section-title">Monastery Community</div>
+        <p class="section-subtitle">A calm, respectful space that reflects care, mindfulness, and service.</p>
+        <div class="gallery-strip">
+            <div class="thumb"><img src="images/img1.jpeg" alt="Community moment"></div>
+            <div class="thumb"><img src="images/img4.jpeg" alt="Monastery environment"></div>
+            <div class="thumb"><img src="images/img6.jpeg" alt="Peaceful surroundings"></div>
+        </div>
+    </div>
+
     <!-- Quick Access -->
-    <div class="mb-4">
+    <div class="mb-4 reveal delay-5">
         <div class="section-label"><i class="bi bi-grid-3x3-gap-fill me-1"></i> Quick Access</div>
         <div class="quick-link-grid">
             <a href="login.php" class="quick-link-item"><i class="bi bi-box-arrow-in-right"></i> Login</a>
@@ -369,8 +698,8 @@
     </div>
 
     <!-- Documentation -->
-    <div class="doc-card mb-4">
-        <div class="section-label" style="color:#92400e;"><i class="bi bi-book-half me-1"></i> Documentation &amp; Guides</div>
+    <div class="doc-card mb-4 reveal delay-6">
+        <div class="section-label" style="color:var(--primary-orange-dark);"><i class="bi bi-book-half me-1"></i> Documentation &amp; Guides</div>
         <div class="d-flex flex-wrap gap-2">
             <a href="COMPLETE_TESTING_GUIDE.md" target="_blank" class="doc-link"><i class="bi bi-flag-fill"></i> Complete Testing Guide</a>
             <a href="PAYHERE_SETUP_GUIDE.md" target="_blank" class="doc-link"><i class="bi bi-credit-card"></i> PayHere Setup</a>
@@ -380,7 +709,7 @@
     </div>
 
     <!-- Checklist -->
-    <div class="checklist-card mb-4">
+    <div class="checklist-card mb-4 reveal delay-5">
         <h5><i class="bi bi-list-check me-2" style="color:var(--green-500);"></i>Testing Checklist (15 Minutes)</h5>
         <ol style="margin-bottom: 0; padding-left: 20px; margin-top: 12px;">
             <li>Click "Generate Sample Data" above (5 seconds)</li>
@@ -392,14 +721,14 @@
     </div>
 
     <!-- CTA Banner -->
-    <div class="cta-banner mb-3">
+    <div class="cta-banner mb-3 reveal delay-6">
         <h4><i class="bi bi-stars me-1"></i> All Features Ready!</h4>
         <p>90% Complete &bull; Reports Module &bull; PayHere Integration &bull; AI Chatbot</p>
         <p style="opacity:0.75; margin-top:6px; font-size:0.85rem;">Default Login: admin@monastery.lk / admin123</p>
     </div>
 
     <!-- Footer -->
-    <div class="landing-footer">
+    <div class="landing-footer reveal delay-4">
         Theruwan Saranai! May this helping-hand service bless all beings. 🙏
     </div>
 </div>
