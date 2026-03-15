@@ -38,7 +38,10 @@ if (!$donation) {
 }
 
 $stmt->close();
-$conn->close();
+
+// Keep connection open for QR code generation
+// Set global $con for qrcode_helper.php compatibility
+$GLOBALS['con'] = $conn;
 
 // Check if FPDF library exists
 $fpdf_path = __DIR__ . '/fpdf/fpdf.php';
@@ -135,16 +138,18 @@ $pdf->Cell(50, 8, 'Category:', 0, 0);
 $pdf->SetFont('Arial', 'B', 12);
 $pdf->Cell(0, 8, $donation['category_name'], 0, 1);
 
+$payment_method = $donation['payment_method'] ?? 'bank_transfer';
 $pdf->SetFont('Arial', '', 12);
 $pdf->Cell(50, 8, 'Payment Method:', 0, 0);
 $pdf->SetFont('Arial', 'B', 12);
-$pdf->Cell(0, 8, strtoupper(str_replace('_', ' ', $donation['payment_method'])), 0, 1);
+$pdf->Cell(0, 8, strtoupper(str_replace('_', ' ', $payment_method)), 0, 1);
 
-if ($donation['reference_number']) {
+$reference_number = $donation['reference_number'] ?? '';
+if ($reference_number) {
     $pdf->SetFont('Arial', '', 12);
     $pdf->Cell(50, 8, 'Reference:', 0, 0);
     $pdf->SetFont('Arial', 'B', 12);
-    $pdf->Cell(0, 8, $donation['reference_number'], 0, 1);
+    $pdf->Cell(0, 8, $reference_number, 0, 1);
 }
 
 $pdf->SetFont('Arial', '', 12);
@@ -176,21 +181,31 @@ if ($donation['notes']) {
     $pdf->Ln(5);
 }
 
-// QR Code for verification
+// QR Code for verification - download image first for FPDF compatibility
 $qr_code_url = generateDonationQR($donation['donation_id']);
 if ($qr_code_url) {
-    $pdf->Ln(10);
-    $pdf->SetFont('Arial', 'B', 12);
-    $pdf->SetTextColor(0, 0, 0);
-    $pdf->Cell(0, 8, 'Scan to Verify Receipt:', 0, 1, 'C');
-    
-    // Add QR code image
-    $pdf->Image($qr_code_url, 75, $pdf->GetY() + 5, 60, 60);
-    $pdf->Ln(65);
-    
-    $pdf->SetFont('Arial', 'I', 9);
-    $pdf->SetTextColor(128, 128, 128);
-    $pdf->Cell(0, 5, 'Scan this QR code with any smartphone to verify this receipt online', 0, 1, 'C');
+    // Download QR image to a temp file so FPDF can read it
+    $qr_image_data = @file_get_contents($qr_code_url);
+    if ($qr_image_data) {
+        $qr_temp_file = tempnam(sys_get_temp_dir(), 'qr_') . '.png';
+        file_put_contents($qr_temp_file, $qr_image_data);
+        
+        $pdf->Ln(10);
+        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Cell(0, 8, 'Scan to Verify Receipt:', 0, 1, 'C');
+        
+        // Add QR code image from temp file
+        $pdf->Image($qr_temp_file, 75, $pdf->GetY() + 5, 60, 60, 'PNG');
+        $pdf->Ln(65);
+        
+        $pdf->SetFont('Arial', 'I', 9);
+        $pdf->SetTextColor(128, 128, 128);
+        $pdf->Cell(0, 5, 'Scan this QR code with any smartphone to verify this receipt online', 0, 1, 'C');
+        
+        // Clean up temp file
+        @unlink($qr_temp_file);
+    }
 }
 
 // Tax Deduction Notice
@@ -274,8 +289,8 @@ function generateHTMLReceipt($donation) {
                 <div class="section-title">Donation Details</div>
                 <p>
                     <strong>Category:</strong> <?= htmlspecialchars($donation['category_name']) ?><br>
-                    <strong>Payment Method:</strong> <?= strtoupper(str_replace('_', ' ', $donation['payment_method'])) ?><br>
-                    <?php if ($donation['reference_number']): ?>
+                    <strong>Payment Method:</strong> <?= strtoupper(str_replace('_', ' ', $donation['payment_method'] ?? 'bank_transfer')) ?><br>
+                    <?php if (!empty($donation['reference_number'])): ?>
                         <strong>Reference:</strong> <?= htmlspecialchars($donation['reference_number']) ?><br>
                     <?php endif; ?>
                     <strong>Status:</strong> <span class="badge bg-success"><?= strtoupper($donation['status']) ?></span>

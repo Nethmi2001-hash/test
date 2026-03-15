@@ -12,6 +12,7 @@ function getDonationThankYouTemplate($donation) {
     $category = htmlspecialchars($donation['category_name']);
     $date = date('F d, Y', strtotime($donation['created_at']));
     $receipt_no = 'DON-' . str_pad($donation['donation_id'], 6, '0', STR_PAD_LEFT);
+    $payment_method = strtoupper(str_replace('_', ' ', $donation['method'] ?? $donation['payment_method'] ?? 'Bank Transfer'));
     
     $html = <<<HTML
 <!DOCTYPE html>
@@ -140,12 +141,13 @@ function getDonationThankYouTemplate($donation) {
                 </tr>
                 <tr>
                     <td>Payment Method:</td>
-                    <td>{$donation['payment_method']}</td>
+                    <td>{$payment_method}</td>
                 </tr>
 HTML;
 
-    if (!empty($donation['reference_number'])) {
-        $ref = htmlspecialchars($donation['reference_number']);
+    $ref_number = $donation['reference_number'] ?? $donation['bank_reference'] ?? '';
+    if (!empty($ref_number)) {
+        $ref = htmlspecialchars($ref_number);
         $html .= <<<HTML
                 <tr>
                     <td>Reference Number:</td>
