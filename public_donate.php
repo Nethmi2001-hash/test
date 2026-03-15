@@ -120,7 +120,9 @@ $stats = $stats_result->fetch_assoc();
 
         /* ---- Hero Section ---- */
         .hero-section {
-            background: linear-gradient(160deg, #9a3412 0%, #c2410c 30%, #ea580c 60%, #f97316 100%);
+            background:
+                linear-gradient(160deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.30) 50%, rgba(0,0,0,0.50) 100%),
+                url('images/hero_bg.png') center center / cover no-repeat;
             color: #fff;
             padding: 100px 24px 110px;
             text-align: center;
@@ -132,9 +134,8 @@ $stats = $stats_result->fetch_assoc();
             position: absolute;
             inset: 0;
             background:
-                radial-gradient(ellipse at 25% 0%, rgba(251, 191, 36, 0.14) 0%, transparent 55%),
-                radial-gradient(ellipse at 75% 100%, rgba(52, 211, 153, 0.10) 0%, transparent 55%),
-                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.02) 0%, transparent 70%);
+                radial-gradient(ellipse at 25% 0%, rgba(251, 191, 36, 0.18) 0%, transparent 55%),
+                radial-gradient(ellipse at 75% 100%, rgba(0, 0, 0, 0.25) 0%, transparent 60%);
             pointer-events: none;
         }
         .hero-section::after {
