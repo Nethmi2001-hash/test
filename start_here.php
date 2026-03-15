@@ -74,42 +74,16 @@
     }
     .hero-section {
         padding: 60px 0 36px;
-        text-align: left;
-        background: linear-gradient(180deg, #ffffff 0%, #f7f4f1 100%);
+        text-align: center;
+        background:
+            linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(247,244,241,0.9) 100%),
+            url('images/monks2.jpg') center center / cover no-repeat;
         border-radius: var(--border-radius);
         box-shadow: var(--shadow-xs);
         margin-bottom: 24px;
         position: relative;
         overflow: hidden;
         border: 1px solid var(--slate-100);
-    }
-    .hero-grid {
-        display: grid;
-        grid-template-columns: 1.05fr 0.95fr;
-        gap: 28px;
-        align-items: center;
-        padding: 0 24px;
-    }
-    .hero-copy {
-        text-align: left;
-    }
-    .hero-kicker {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: var(--slate-500);
-        margin-bottom: 12px;
-    }
-    .hero-kicker .kicker-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 999px;
-        background: var(--calm-sage);
-        box-shadow: 0 0 0 4px rgba(154,179,170,0.2);
     }
     .hero-section::after {
         content: "";
@@ -133,159 +107,6 @@
         font-size: 1.1rem;
         color: var(--slate-500);
         margin-bottom: 24px;
-    }
-    .hero-actions {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-bottom: 16px;
-    }
-    .btn-calm {
-        background: var(--calm-blue);
-        border: 1px solid var(--calm-blue);
-        color: #fff;
-        font-weight: 600;
-        padding: 8px 18px;
-        border-radius: 10px;
-        box-shadow: 0 10px 18px -16px rgba(15,23,42,0.6);
-    }
-    .btn-calm:hover {
-        background: #6c96a1;
-        border-color: #6c96a1;
-        color: #fff;
-    }
-    .btn-soft {
-        background: #f6efe8;
-        border: 1px solid #e6d7cc;
-        color: var(--primary-orange-dark);
-        font-weight: 600;
-        padding: 8px 18px;
-        border-radius: 10px;
-    }
-    .btn-soft:hover {
-        background: #efe5dc;
-        border-color: #dec9bc;
-        color: var(--primary-orange-dark);
-    }
-    .hero-highlights {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 18px;
-    }
-    .hero-highlights .highlight {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 10px;
-        border-radius: 9999px;
-        background: #fff;
-        border: 1px solid var(--slate-100);
-        font-size: 0.82rem;
-        color: var(--slate-600);
-        box-shadow: var(--shadow-xs);
-    }
-    .hero-highlights .highlight i {
-        color: var(--calm-sage);
-    }
-    .hero-media {
-        position: relative;
-        border-radius: 18px;
-        overflow: hidden;
-        min-height: 280px;
-        box-shadow: var(--shadow-lg);
-        border: 1px solid #ede2d9;
-        background: #f2ede8;
-    }
-    .hero-media::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(217,183,160,0.2) 100%);
-        pointer-events: none;
-    }
-    .hero-media img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-    }
-    .section-block {
-        background: var(--surface);
-        border: 1px solid var(--slate-100);
-        border-radius: var(--border-radius);
-        padding: 32px;
-        box-shadow: var(--shadow-xs);
-    }
-    .section-title {
-        font-family: 'Newsreader', 'Manrope', serif;
-        font-weight: 600;
-        font-size: 1.4rem;
-        color: var(--slate-900);
-        margin-bottom: 10px;
-    }
-    .section-subtitle {
-        color: var(--slate-600);
-        margin-bottom: 18px;
-    }
-    .split-panel {
-        display: grid;
-        grid-template-columns: 1.1fr 0.9fr;
-        gap: 24px;
-        align-items: center;
-    }
-    .image-card {
-        border-radius: 16px;
-        overflow: hidden;
-        border: 1px solid #e8ddd3;
-        box-shadow: var(--shadow-lg);
-        background: #f2ede8;
-    }
-    .image-card img {
-        width: 100%;
-        height: 100%;
-        min-height: 240px;
-        object-fit: cover;
-        display: block;
-    }
-    .stat-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 12px;
-        margin-top: 18px;
-    }
-    .stat-card {
-        background: #f8f5f2;
-        border: 1px solid #eadfd6;
-        border-radius: 12px;
-        padding: 14px 16px;
-    }
-    .stat-card .value {
-        font-weight: 700;
-        font-size: 1.1rem;
-        color: var(--primary-orange-dark);
-    }
-    .stat-card .label {
-        font-size: 0.82rem;
-        color: var(--slate-600);
-    }
-    .gallery-strip {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 12px;
-    }
-    .gallery-strip .thumb {
-        border-radius: 12px;
-        overflow: hidden;
-        border: 1px solid var(--slate-100);
-        box-shadow: var(--shadow-xs);
-        background: #f2ede8;
-    }
-    .gallery-strip img {
-        width: 100%;
-        height: 140px;
-        object-fit: cover;
-        display: block;
     }
     .badge-status {
         display: inline-flex;
@@ -498,34 +319,6 @@
         .hero-section { padding: 40px 0 24px; }
     }
     @media (max-width: 992px) {
-        .hero-grid {
-            grid-template-columns: 1fr;
-        }
-        .hero-copy {
-            text-align: center;
-        }
-        .hero-actions,
-        .hero-highlights,
-        .hero-copy .d-flex {
-            justify-content: center;
-        }
-        .hero-media {
-            min-height: 220px;
-        }
-        .split-panel {
-            grid-template-columns: 1fr;
-        }
-        .stat-grid {
-            grid-template-columns: 1fr;
-        }
-        .gallery-strip {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-    }
-    @media (max-width: 576px) {
-        .gallery-strip {
-            grid-template-columns: 1fr;
-        }
     }
 </style>
 </head>
@@ -549,65 +342,15 @@
 
     <!-- Hero -->
     <div class="hero-section reveal delay-1">
-        <div class="hero-grid">
-            <div class="hero-copy">
-                <div class="hero-kicker"><span class="kicker-dot"></span>Compassionate Care & Giving</div>
-                <h1>Monastery Healthcare System</h1>
-                <p class="subtitle">Giribawa Seela Suva Herath Bhikkhu Hospital</p>
-                <div class="hero-actions">
-                    <a href="generate_sample_data.php" class="btn btn-calm">Start Testing</a>
-                    <a href="donation_management.php" class="btn btn-soft">Donations & Payments</a>
-                </div>
-                <div class="hero-highlights">
-                    <span class="highlight"><i class="bi bi-shield-check"></i>Transparent Reports</span>
-                    <span class="highlight"><i class="bi bi-heart-pulse"></i>Patient Care</span>
-                    <span class="highlight"><i class="bi bi-cash-coin"></i>Trusted Giving</span>
-                </div>
-                <div class="d-flex gap-2 flex-wrap">
-                    <span class="badge-status">
-                        <i class="bi bi-check-circle-fill me-1"></i>90% Complete
-                    </span>
-                    <span class="badge-status badge-calm">
-                        <i class="bi bi-rocket-takeoff-fill me-1"></i>Ready to Test
-                    </span>
-                </div>
-            </div>
-            <div class="hero-media">
-                <img src="images/monks2.jpg" alt="Monastery care and community support">
-            </div>
-        </div>
-    </div>
-
-    <!-- Mission / Impact -->
-    <div class="section-block mb-4 reveal delay-2">
-        <div class="split-panel">
-            <div>
-                <div class="section-title">Healthcare with Clarity and Compassion</div>
-                <p class="section-subtitle">
-                    A calm, trustworthy space for patient care, monk wellbeing, and donations that are tracked with care and transparency.
-                </p>
-                <div class="hero-actions">
-                    <a href="patient_appointments.php" class="btn btn-calm">Book an Appointment</a>
-                    <a href="donation_management.php" class="btn btn-soft">Support the Monastery</a>
-                </div>
-                <div class="stat-grid">
-                    <div class="stat-card">
-                        <div class="value">Appointments</div>
-                        <div class="label">Organized daily care</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="value">Donations</div>
-                        <div class="label">Transparent giving</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="value">Reports</div>
-                        <div class="label">Clear financial insights</div>
-                    </div>
-                </div>
-            </div>
-            <div class="image-card">
-                <img src="images/img3.jpeg" alt="Peaceful care environment">
-            </div>
+        <h1>Monastery Healthcare System</h1>
+        <p class="subtitle">Giribawa Seela Suva Herath Bhikkhu Hospital</p>
+        <div class="d-flex justify-content-center gap-2 flex-wrap">
+            <span class="badge-status">
+                <i class="bi bi-check-circle-fill me-1"></i>90% Complete
+            </span>
+            <span class="badge-status badge-calm">
+                <i class="bi bi-rocket-takeoff-fill me-1"></i>Ready to Test
+            </span>
         </div>
     </div>
 
@@ -669,17 +412,6 @@
                     <p>Test bilingual assistant (English &amp; Sinhala)</p>
                 </div>
             </a>
-        </div>
-    </div>
-
-    <!-- Community Gallery -->
-    <div class="section-block mb-4 reveal delay-4">
-        <div class="section-title">Monastery Community</div>
-        <p class="section-subtitle">A calm, respectful space that reflects care, mindfulness, and service.</p>
-        <div class="gallery-strip">
-            <div class="thumb"><img src="images/img1.jpeg" alt="Community moment"></div>
-            <div class="thumb"><img src="images/img4.jpeg" alt="Monastery environment"></div>
-            <div class="thumb"><img src="images/img6.jpeg" alt="Peaceful surroundings"></div>
         </div>
     </div>
 

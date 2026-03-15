@@ -1,6 +1,10 @@
 <?php
+// Serve the redesigned homepage for the root route.
+require __DIR__ . '/start_here.php';
+exit;
+
 /**
- * Homepage - Seela Suwa Herath Bikshu Gilan Arana
+ * Legacy homepage - Seela Suwa Herath Bikshu Gilan Arana
  * Modern landing page for the Monastery Healthcare & Donation Management System
  */
 require_once __DIR__ . '/includes/db_config.php';
