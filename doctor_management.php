@@ -18,14 +18,28 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Some databases use doctors.contact while others use doctors.phone.
+$doctorPhoneColumn = 'phone';
+$colRes = $conn->query("SHOW COLUMNS FROM doctors LIKE 'phone'");
+if (!$colRes || $colRes->num_rows === 0) {
+    $doctorPhoneColumn = 'contact';
+}
+
 $error = "";
 $success = "";
+
+$userRole = $_SESSION['role_name'] ?? 'Admin';
+$isMonk = ($userRole === 'Monk');
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
     $form_name = $_POST['form_name'];
 
     if ($form_name === 'create') {
+        if ($isMonk) {
+            http_response_code(403);
+            $error = "Monk users cannot add doctors.";
+        } else {
         $full_name = trim($_POST['full_name']);
         $specialization = trim($_POST['specialization']);
         $phone = trim($_POST['phone'] ?? '');
@@ -36,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
         if (empty($full_name) || empty($specialization)) {
             $error = "Doctor name and specialization are required.";
         } else {
-            $stmt = $conn->prepare("INSERT INTO doctors (full_name, specialization, phone, email, license_number, status) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO doctors (full_name, specialization, {$doctorPhoneColumn}, email, license_number, status) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("ssssss", $full_name, $specialization, $phone, $email, $license_number, $status);
             
             if ($stmt->execute()) {
@@ -45,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
                 $error = "Error: " . $stmt->error;
             }
             $stmt->close();
+        }
         }
     }
 
@@ -57,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
         $license_number = trim($_POST['license_number'] ?? '');
         $status = $_POST['status'];
 
-        $stmt = $conn->prepare("UPDATE doctors SET full_name=?, specialization=?, phone=?, email=?, license_number=?, status=? WHERE doctor_id=?");
+        $stmt = $conn->prepare("UPDATE doctors SET full_name=?, specialization=?, {$doctorPhoneColumn}=?, email=?, license_number=?, status=? WHERE doctor_id=?");
         $stmt->bind_param("ssssssi", $full_name, $specialization, $phone, $email, $license_number, $status, $doctor_id);
         
         if ($stmt->execute()) {
@@ -87,6 +102,9 @@ $doctors = [];
 $result = $conn->query("SELECT * FROM doctors ORDER BY full_name ASC");
 if ($result) {
     while ($row = $result->fetch_assoc()) {
+        if (!array_key_exists('phone', $row)) {
+            $row['phone'] = $row['contact'] ?? '';
+        }
         $doctors[] = $row;
     }
 }
@@ -161,9 +179,11 @@ $conn->close();
     <div class="modern-table-wrapper">
         <div class="modern-table-header">
             <h5><i class="bi bi-person-badge me-2"></i>Doctor Records</h5>
+            <?php if (!$isMonk): ?>
             <button class="btn-modern btn-primary-modern btn-sm-modern" data-bs-toggle="modal" data-bs-target="#addModal">
                 <i class="bi bi-plus-circle"></i> Add Doctor
             </button>
+            <?php endif; ?>
         </div>
         <div class="table-responsive-modern">
             <table class="modern-table">
@@ -237,6 +257,7 @@ $conn->close();
         </div>
     </div>
 
+    <?php if (!$isMonk): ?>
     <!-- Add Doctor Modal -->
     <div class="modal fade" id="addModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -302,6 +323,7 @@ $conn->close();
             </div>
         </div>
     </div>
+    <?php endif; ?>
 
     <!-- Edit Doctor Modal -->
     <div class="modal fade" id="editModal" tabindex="-1">

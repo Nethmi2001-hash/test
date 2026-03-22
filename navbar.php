@@ -160,11 +160,6 @@ $isMonk = ($userRole === 'Monk');
     <a class="sidebar-link <?= isActivePage('doctor_management.php', $currentPage) ?>" href="doctor_management.php">
       <i class="bi bi-person-badge"></i> View Doctors
     </a>
-
-    <div class="sidebar-section-label">Tools</div>
-    <a class="sidebar-link <?= isActivePage('chatbot.php', $currentPage) ?>" href="chatbot.php">
-      <i class="bi bi-robot"></i> Health Assistant
-    </a>
     <?php endif; ?>
   </nav>
 
