@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
         $amount = floatval($_POST['amount']);
         $category_id = intval($_POST['category_id']);
         $bill_date = $_POST['bill_date'];
-        $vendor = trim($_POST['vendor'] ?? '');
+        $vendor_name = trim($_POST['vendor_name'] ?? '');
         $invoice_number = trim($_POST['invoice_number'] ?? '');
         $notes = trim($_POST['notes'] ?? '');
         $status = $_POST['status'] ?? 'pending';
@@ -38,9 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
         if (empty($description) || $amount <= 0 || empty($category_id)) {
             $error = "Description, valid amount, and category are required.";
         } else {
-            $stmt = $conn->prepare("INSERT INTO bills (description, amount, category_id, bill_date, vendor, invoice_number, notes, status, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO bills (description, amount, category_id, bill_date, vendor_name, invoice_number, notes, status, created_by, paid_by, paid_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $created_by = $_SESSION['user_id'];
-            $stmt->bind_param("sdisssssi", $description, $amount, $category_id, $bill_date, $vendor, $invoice_number, $notes, $status, $created_by);
+            $paid_by = ($status === 'paid') ? $created_by : null;
+            $paid_date = ($status === 'paid') ? $bill_date : null;
+            $stmt->bind_param("sdisssssiis", $description, $amount, $category_id, $bill_date, $vendor_name, $invoice_number, $notes, $status, $created_by, $paid_by, $paid_date);
             
             if ($stmt->execute()) {
                 $success = "Bill/Expense recorded successfully! Bill ID: " . $stmt->insert_id;
@@ -57,13 +59,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
         $amount = floatval($_POST['amount']);
         $category_id = intval($_POST['category_id']);
         $bill_date = $_POST['bill_date'];
-        $vendor = trim($_POST['vendor'] ?? '');
+        $vendor_name = trim($_POST['vendor_name'] ?? '');
         $invoice_number = trim($_POST['invoice_number'] ?? '');
         $notes = trim($_POST['notes'] ?? '');
         $status = $_POST['status'];
 
-        $stmt = $conn->prepare("UPDATE bills SET description=?, amount=?, category_id=?, bill_date=?, vendor=?, invoice_number=?, notes=?, status=? WHERE bill_id=?");
-        $stmt->bind_param("sdissssi", $description, $amount, $category_id, $bill_date, $vendor, $invoice_number, $notes, $status, $bill_id);
+        $stmt = $conn->prepare("UPDATE bills SET description=?, amount=?, category_id=?, bill_date=?, vendor_name=?, invoice_number=?, notes=?, status=?, paid_by=?, paid_date=? WHERE bill_id=?");
+        $paid_by = ($status === 'paid') ? $_SESSION['user_id'] : null;
+        $paid_date = ($status === 'paid') ? date('Y-m-d') : null;
+        $stmt->bind_param("sdisssssisi", $description, $amount, $category_id, $bill_date, $vendor_name, $invoice_number, $notes, $status, $paid_by, $paid_date, $bill_id);
         
         if ($stmt->execute()) {
             $success = "Bill/Expense updated successfully!";
@@ -88,12 +92,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
 
     if ($form_name === 'approve') {
         $bill_id = intval($_POST['bill_id']);
-        $stmt = $conn->prepare("UPDATE bills SET status='approved', approved_by=?, approved_at=NOW() WHERE bill_id=?");
-        $approved_by = $_SESSION['user_id'];
-        $stmt->bind_param("ii", $approved_by, $bill_id);
+        $stmt = $conn->prepare("UPDATE bills SET status='paid', paid_by=?, paid_date=CURDATE() WHERE bill_id=?");
+        $paid_by = $_SESSION['user_id'];
+        $stmt->bind_param("ii", $paid_by, $bill_id);
         
         if ($stmt->execute()) {
-            $success = "Bill/Expense approved successfully!";
+            $success = "Bill/Expense marked as paid successfully!";
         } else {
             $error = "Error: " . $stmt->error;
         }
@@ -129,7 +133,7 @@ if ($result) {
 $stats = [
     'total_bills' => 0,
     'pending_amount' => 0,
-    'approved_amount' => 0,
+    'paid_amount' => 0,
     'this_month' => 0
 ];
 
@@ -142,8 +146,8 @@ if ($result) {
 $result = $conn->query("SELECT COALESCE(SUM(amount), 0) as total FROM bills WHERE status='pending'");
 if ($result) $stats['pending_amount'] = $result->fetch_assoc()['total'];
 
-$result = $conn->query("SELECT COALESCE(SUM(amount), 0) as total FROM bills WHERE status='approved'");
-if ($result) $stats['approved_amount'] = $result->fetch_assoc()['total'];
+$result = $conn->query("SELECT COALESCE(SUM(amount), 0) as total FROM bills WHERE status='paid'");
+if ($result) $stats['paid_amount'] = $result->fetch_assoc()['total'];
 
 $result = $conn->query("SELECT COALESCE(SUM(amount), 0) as total FROM bills WHERE MONTH(bill_date) = MONTH(CURRENT_DATE()) AND YEAR(bill_date) = YEAR(CURRENT_DATE())");
 if ($result) $stats['this_month'] = $result->fetch_assoc()['total'];
@@ -173,6 +177,14 @@ if ($result) {
     <title>Bills & Expenses - Seela Suwa Herath Bikshu Gilan Arana</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .category-chart-wrap {
+            width: 280px;
+            max-width: 100%;
+            height: 280px;
+            margin: 0 auto;
+        }
+    </style>
 </head>
 <body>
 
@@ -236,8 +248,8 @@ if ($result) {
                     <i class="bi bi-check-circle"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-label">Approved Expenses</div>
-                    <div class="stat-value">Rs. <?= number_format($stats['approved_amount'], 2) ?></div>
+                    <div class="stat-label">Paid Expenses</div>
+                    <div class="stat-value">Rs. <?= number_format($stats['paid_amount'], 2) ?></div>
                 </div>
             </div>
         </div>
@@ -259,8 +271,10 @@ if ($result) {
         <div class="modern-table-header">
             <h5><i class="bi bi-pie-chart me-2"></i>Category-wise Expenses (This Month)</h5>
         </div>
-        <div class="p-4">
-            <canvas id="categoryChart" height="80"></canvas>
+        <div class="p-4 d-flex justify-content-center">
+            <div class="category-chart-wrap">
+                <canvas id="categoryChart"></canvas>
+            </div>
         </div>
     </div>
 
@@ -288,8 +302,8 @@ if ($result) {
                                 <strong><?= htmlspecialchars($bill['description']) ?></strong><br>
                                 <small class="text-muted">
                                     <i class="bi bi-tag"></i> <?= htmlspecialchars($bill['category_name']) ?>
-                                    <?php if ($bill['vendor']): ?>
-                                        &middot; <i class="bi bi-shop"></i> <?= htmlspecialchars($bill['vendor']) ?>
+                                    <?php if ($bill['vendor_name']): ?>
+                                        &middot; <i class="bi bi-shop"></i> <?= htmlspecialchars($bill['vendor_name']) ?>
                                     <?php endif; ?>
                                 </small>
                                 <?php if ($bill['notes']): ?>
@@ -311,8 +325,9 @@ if ($result) {
                                 <?php
                                 $status_badges = [
                                     'pending' => 'badge-warning',
-                                    'approved' => 'badge-success',
-                                    'rejected' => 'badge-danger'
+                                    'paid' => 'badge-success',
+                                    'overdue' => 'badge-danger',
+                                    'cancelled' => 'badge-neutral'
                                 ];
                                 $badge_class = $status_badges[$bill['status']] ?? 'badge-neutral';
                                 ?>
@@ -324,7 +339,7 @@ if ($result) {
                                         <form method="POST" class="d-inline">
                                             <input type="hidden" name="form_name" value="approve">
                                             <input type="hidden" name="bill_id" value="<?= $bill['bill_id'] ?>">
-                                            <button type="submit" class="btn-icon" onclick="return confirm('Approve this expense?')" title="Approve">
+                                            <button type="submit" class="btn-icon" onclick="return confirm('Mark this expense as paid?')" title="Mark Paid">
                                                 <i class="bi bi-check-circle"></i>
                                             </button>
                                         </form>
@@ -405,7 +420,7 @@ if ($result) {
                         <div class="col-md-6">
                             <div class="form-group-modern">
                                 <label class="form-label-modern">Vendor/Supplier</label>
-                                <input type="text" name="vendor" class="form-control-modern" placeholder="Company/Shop name">
+                                <input type="text" name="vendor_name" class="form-control-modern" placeholder="Company/Shop name">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -420,7 +435,9 @@ if ($result) {
                         <label class="form-label-modern">Status</label>
                         <select name="status" class="form-select-modern">
                             <option value="pending">Pending Approval</option>
-                            <option value="approved">Approved</option>
+                            <option value="paid">Paid</option>
+                            <option value="overdue">Overdue</option>
+                            <option value="cancelled">Cancelled</option>
                         </select>
                     </div>
 
@@ -491,7 +508,7 @@ if ($result) {
                         <div class="col-md-6">
                             <div class="form-group-modern">
                                 <label class="form-label-modern">Vendor/Supplier</label>
-                                <input type="text" name="vendor" id="edit_vendor" class="form-control-modern">
+                                <input type="text" name="vendor_name" id="edit_vendor" class="form-control-modern">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -506,8 +523,9 @@ if ($result) {
                         <label class="form-label-modern">Status</label>
                         <select name="status" id="edit_status" class="form-select-modern">
                             <option value="pending">Pending Approval</option>
-                            <option value="approved">Approved</option>
-                            <option value="rejected">Rejected</option>
+                            <option value="paid">Paid</option>
+                            <option value="overdue">Overdue</option>
+                            <option value="cancelled">Cancelled</option>
                         </select>
                     </div>
 
@@ -538,7 +556,7 @@ function editBill(bill) {
     document.getElementById('edit_amount').value = bill.amount;
     document.getElementById('edit_category_id').value = bill.category_id;
     document.getElementById('edit_bill_date').value = bill.bill_date;
-    document.getElementById('edit_vendor').value = bill.vendor || '';
+    document.getElementById('edit_vendor').value = bill.vendor_name || '';
     document.getElementById('edit_invoice_number').value = bill.invoice_number || '';
     document.getElementById('edit_status').value = bill.status;
     document.getElementById('edit_notes').value = bill.notes || '';
@@ -549,7 +567,7 @@ function editBill(bill) {
 // Category-wise Expenses Chart
 const categoryCtx = document.getElementById('categoryChart').getContext('2d');
 new Chart(categoryCtx, {
-    type: 'doughnut',
+    type: 'pie',
     data: {
         labels: <?= json_encode(array_column($category_expenses, 'name')) ?>,
         datasets: [{
@@ -568,10 +586,17 @@ new Chart(categoryCtx, {
     },
     options: {
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: {
-                position: 'right'
+                position: 'bottom',
+                labels: {
+                    boxWidth: 12,
+                    padding: 10,
+                    font: {
+                        size: 11
+                    }
+                }
             }
         }
     }

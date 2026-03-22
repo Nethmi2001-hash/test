@@ -129,14 +129,14 @@ for ($month = 5; $month >= 0; $month--) {
         $description = $bill_descriptions[array_rand($bill_descriptions)];
         $amount = rand(2000, 30000);
         $bill_cat = $bill_cats[array_rand($bill_cats)];
-        $vendor = $vendors[array_rand($vendors)];
+        $vendor_name = $vendors[array_rand($vendors)];
         
         $bill_date = date('Y-m-d', strtotime("-$month months -" . rand(1, 28) . " days"));
         
-        $stmt = $conn->prepare("INSERT INTO bills (description, amount, category_id, bill_date, vendor, invoice_number, status, created_by) VALUES (?, ?, ?, ?, ?, ?, 'approved', 1)");
+        $stmt = $conn->prepare("INSERT INTO bills (description, amount, category_id, bill_date, vendor_name, invoice_number, status, created_by, paid_by, paid_date) VALUES (?, ?, ?, ?, ?, ?, 'paid', 1, 1, ?)");
         
         $invoice = 'INV' . rand(1000, 9999);
-        $stmt->bind_param("sdisss", $description, $amount, $bill_cat['category_id'], $bill_date, $vendor, $invoice);
+        $stmt->bind_param("sdissss", $description, $amount, $bill_cat['category_id'], $bill_date, $vendor_name, $invoice, $bill_date);
         
         if ($stmt->execute()) {
             $bill_count++;
