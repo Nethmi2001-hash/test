@@ -131,11 +131,6 @@ $isMonk = ($userRole === 'Monk');
       <i class="bi bi-clock-history"></i> My Availability
     </a>
 
-    <div class="sidebar-section-label">Tools</div>
-    <a class="sidebar-link <?= isActivePage('chatbot.php', $currentPage) ?>" href="chatbot.php">
-      <i class="bi bi-robot"></i> <?= __('ai_assistant') ?>
-    </a>
-
     <?php elseif ($isDonor): ?>
     <!-- Donor: Donations, Transparency -->
     <div class="sidebar-section-label">My Donations</div>

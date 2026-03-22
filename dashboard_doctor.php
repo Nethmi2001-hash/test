@@ -16,39 +16,46 @@ $userId = $_SESSION['user_id'] ?? 0;
 // Find linked doctor profile by email
 $doctor = null;
 $doctor_id = null;
-$stmt = $conn->prepare("SELECT * FROM doctors WHERE email = ? AND status = 'active' LIMIT 1");
-$stmt->bind_param("s", $userEmail);
-$stmt->execute();
-$result = $stmt->get_result();
-$doctor = $result->fetch_assoc();
-$stmt->close();
+if (!empty($userEmail)) {
+    $stmt = $conn->prepare("SELECT * FROM doctors WHERE email = ? AND status = 'active' LIMIT 1");
+    $stmt->bind_param("s", $userEmail);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $doctor = $result ? $result->fetch_assoc() : null;
+    $stmt->close();
+}
+
+// Fallback by doctor name if email match is not found.
+if (!$doctor) {
+    $stmt = $conn->prepare("SELECT * FROM doctors WHERE status = 'active' AND (full_name = ? OR REPLACE(LOWER(full_name), ' ', '') = REPLACE(LOWER(?), ' ', '') OR LOWER(full_name) LIKE LOWER(?)) ORDER BY CASE WHEN full_name = ? THEN 0 ELSE 1 END, doctor_id ASC LIMIT 1");
+    $searchName = "%{$userName}%";
+    $stmt->bind_param("ssss", $userName, $userName, $searchName, $userName);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $doctor = $result ? $result->fetch_assoc() : null;
+    $stmt->close();
+}
+
+// Auto-create doctor profile when no active profile can be linked.
+if (!$doctor) {
+    $stmt = $conn->prepare("INSERT INTO doctors (full_name, specialization, email, status) VALUES (?, 'General', ?, 'active')");
+    $emailForProfile = !empty($userEmail) ? $userEmail : null;
+    $stmt->bind_param("ss", $userName, $emailForProfile);
+    if ($stmt->execute()) {
+        $newDoctorId = (int)$stmt->insert_id;
+        $fetch = $conn->prepare("SELECT * FROM doctors WHERE doctor_id = ? LIMIT 1");
+        $fetch->bind_param("i", $newDoctorId);
+        $fetch->execute();
+        $res = $fetch->get_result();
+        $doctor = $res ? $res->fetch_assoc() : null;
+        $fetch->close();
+    }
+    $stmt->close();
+}
 
 if ($doctor) {
     $doctor_id = $doctor['doctor_id'];
 }
-
-// Get doctor's donation data
-$donation_stats = [
-    'total_donated' => 0,
-    'donation_count' => 0,
-    'this_month' => 0
-];
-
-$stmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total, COUNT(*) as cnt FROM donations WHERE (donor_user_id = ? OR donor_email = ?) AND status IN ('paid', 'verified')");
-$stmt->bind_param("is", $userId, $userEmail);
-$stmt->execute();
-$result = $stmt->get_result();
-if ($result) {
-    $row = $result->fetch_assoc();
-    $donation_stats['total_donated'] = $row['total'];
-    $donation_stats['donation_count'] = $row['cnt'];
-}
-
-$stmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE (donor_user_id = ? OR donor_email = ?) AND status IN ('paid', 'verified') AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())");
-$stmt->bind_param("is", $userId, $userEmail);
-$stmt->execute();
-$result = $stmt->get_result();
-if ($result) $donation_stats['this_month'] = $result->fetch_assoc()['total'];
 
 // Stats
 $stats = [
@@ -148,7 +155,7 @@ if ($doctor_id) {
     <!-- No Doctor Profile Linked -->
     <div class="welcome-card animate-fade-in" style="border-left: 4px solid var(--accent-500);">
         <h2><i class="bi bi-exclamation-triangle me-2"></i>Doctor Profile Not Linked</h2>
-        <p>Your account email (<strong><?= htmlspecialchars($userEmail) ?></strong>) doesn't match any active doctor profile. Please contact the administrator to link your account.</p>
+        <p>Your account could not be linked to a doctor profile. Please contact the administrator if this message continues.</p>
     </div>
 <?php else: ?>
 
@@ -208,62 +215,6 @@ if ($doctor_id) {
         </div>
     </div>
 
-    <!-- Donation Summary for Doctor -->
-    <div class="row g-4 mb-4">
-        <div class="col-lg-8">
-            <div class="modern-card animate-fade-in">
-                <div class="card-header-modern">
-                    <h6><i class="bi bi-heart me-2"></i>My Monastery Support</h6>
-                    <a href="public_donate.php" class="btn btn-sm" style="background:#f97316;color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;">
-                        <i class="bi bi-plus-circle me-1"></i>Make Donation
-                    </a>
-                </div>
-                <div class="card-body-modern" style="padding:20px;">
-                    <div class="row g-3">
-                        <div class="col-md-4 text-center">
-                            <div style="font-size:24px;font-weight:700;color:#f97316;">Rs.<?= number_format($donation_stats['total_donated']) ?></div>
-                            <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">Total Donations</div>
-                        </div>
-                        <div class="col-md-4 text-center">
-                            <div style="font-size:24px;font-weight:700;color:#0284c7;"><?= $donation_stats['donation_count'] ?></div>
-                            <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">Donations Made</div>
-                        </div>
-                        <div class="col-md-4 text-center">
-                            <div style="font-size:24px;font-weight:700;color:#7c3aed;">Rs.<?= number_format($donation_stats['this_month']) ?></div>
-                            <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">This Month</div>
-                        </div>
-                    </div>
-                    <?php if ($donation_stats['donation_count'] == 0): ?>
-                        <div style="text-align:center;padding:20px 0;">
-                            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Support the monastery's healthcare mission with your contribution</p>
-                            <a href="public_donate.php" class="btn btn-sm" style="background:#f97316;color:#fff;padding:8px 20px;border-radius:8px;font-weight:600;">
-                                <i class="bi bi-heart me-1"></i>Make First Donation
-                            </a>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="modern-card animate-fade-in" style="height:100%;">
-                <div class="card-header-modern">
-                    <h6><i class="bi bi-info-circle me-2"></i>Quick Links</h6>
-                </div>
-                <div class="card-body-modern" style="padding:16px;">
-                    <a href="public_transparency.php" class="btn btn-outline-primary btn-sm" style="width:100%;margin-bottom:8px;">
-                        <i class="bi bi-shield-check me-1"></i>View Transparency Report
-                    </a>
-                    <a href="donation_management.php" class="btn btn-outline-secondary btn-sm" style="width:100%;margin-bottom:8px;">
-                        <i class="bi bi-list-ul me-1"></i>All Donations
-                    </a>
-                    <a href="chatbot.php" class="btn btn-outline-info btn-sm" style="width:100%;">
-                        <i class="bi bi-robot me-1"></i>AI Assistant
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Today's Schedule + Chart -->
     <div class="row g-4 mb-4">
         <div class="col-lg-7">
@@ -272,9 +223,9 @@ if ($doctor_id) {
                     <h6><i class="bi bi-calendar-event me-2"></i>Today's Schedule</h6>
                     <span class="badge-modern badge-primary"><?= count($today_list) ?> appointments</span>
                 </div>
-                <div class="card-body-modern" style="padding:0;">
+                <div class="card-body-modern" style="padding:0;max-height:420px;overflow:auto;">
                     <?php if (count($today_list) > 0): ?>
-                        <div class="table-responsive">
+                        <div class="table-responsive" style="max-height:420px;overflow:auto;">
                             <table class="modern-table">
                                 <thead>
                                     <tr>
@@ -330,12 +281,14 @@ if ($doctor_id) {
         </div>
 
         <div class="col-lg-5">
-            <div class="chart-card animate-fade-in" style="height:100%;">
+            <div class="chart-card animate-fade-in" style="height:420px;">
                 <div class="chart-header">
                     <h6><i class="bi bi-graph-up me-2"></i>Weekly Activity</h6>
                     <span class="badge-modern badge-neutral">Last 7 days</span>
                 </div>
-                <canvas id="weeklyChart" height="200"></canvas>
+                <div style="height:340px;">
+                    <canvas id="weeklyChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -450,13 +403,11 @@ if ($doctor_id) {
                 <span class="quick-action-label">Patient Records</span>
             </a>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <a href="chatbot.php" class="quick-action-card">
-                <div class="quick-action-icon" style="background:#cffafe;color:#0891b2;"><i class="bi bi-robot"></i></div>
-                <span class="quick-action-label">AI Assistant</span>
-            </a>
-        </div>
     </div>
+
+    <!-- <div class="text-center mb-4" style="color:var(--text-muted);font-size:12px;">
+        <i class="bi bi-dot"></i> End of Doctor Dashboard <i class="bi bi-dot"></i>
+    </div> -->
 
 <?php endif; ?>
 
