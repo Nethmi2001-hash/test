@@ -1,7 +1,72 @@
 <?php
 session_start();
+require_once __DIR__ . '/includes/db_config.php';
+require_once __DIR__ . '/includes/csrf.php';
+
+$conn = getDBConnection();
 $error = $_SESSION['login_error'] ?? '';
+$success = '';
 unset($_SESSION['login_error']);
+
+if (isset($_GET['registered']) && $_GET['registered'] === '1') {
+    $success = 'Registration successful. Please sign in.';
+}
+
+if (isset($_GET['logout']) && $_GET['logout'] === 'success') {
+    $success = 'You have been logged out successfully.';
+}
+
+if (isset($_GET['timeout']) && $_GET['timeout'] === '1') {
+    $error = 'Your session has expired. Please sign in again.';
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!validateCSRFToken()) {
+        $error = 'Security validation failed. Please refresh and try again.';
+    } else {
+        $email = trim($_POST['email'] ?? '');
+        $password = $_POST['password'] ?? '';
+
+        if ($email === '' || $password === '') {
+            $error = 'Both email and password are required.';
+        } else {
+            $stmt = $conn->prepare(
+                "SELECT u.user_id, u.name, u.email, u.password_hash, u.status, u.role_id, r.role_name
+                 FROM users u
+                 JOIN roles r ON u.role_id = r.role_id
+                 WHERE u.email = ?
+                 LIMIT 1"
+            );
+
+            if (!$stmt) {
+                $error = 'Unable to process sign in right now. Please try again.';
+            } else {
+                $stmt->bind_param('s', $email);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $user = $result ? $result->fetch_assoc() : null;
+                $stmt->close();
+
+                if (!$user || !password_verify($password, $user['password_hash'])) {
+                    $error = 'Invalid email or password.';
+                } elseif (strtolower((string)$user['status']) !== 'active') {
+                    $error = 'Your account is not active. Please contact support.';
+                } else {
+                    $_SESSION['logged_in'] = true;
+                    $_SESSION['user_id'] = (int)$user['user_id'];
+                    $_SESSION['username'] = $user['name'];
+                    $_SESSION['email'] = $user['email'];
+                    $_SESSION['role_id'] = (int)$user['role_id'];
+                    $_SESSION['role_name'] = $user['role_name'];
+                    $_SESSION['last_activity'] = time();
+
+                    header('Location: dashboard.php');
+                    exit();
+                }
+            }
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -170,6 +235,15 @@ unset($_SESSION['login_error']);
             background: rgba(192,97,74,0.08);
             border: 1px solid rgba(192,97,74,0.25);
             color: var(--error);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 24px;
+        }
+        .success-msg {
+            background: rgba(63, 146, 87, 0.08);
+            border: 1px solid rgba(63, 146, 87, 0.25);
+            color: #2f7a46;
             padding: 12px 16px;
             border-radius: 8px;
             font-size: 0.85rem;
@@ -372,13 +446,17 @@ unset($_SESSION['login_error']);
             <p>New here? <a href="register.php">Create an account</a></p>
         </div>
 
+        <?php if (!empty($success)): ?>
+        <div class="success-msg">✓ <?= htmlspecialchars($success) ?></div>
+        <?php endif; ?>
+
         <?php if (!empty($error)): ?>
         <div class="error-msg">⚠ <?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
         <form method="POST" action="login.php">
-            <?php if (function_exists('csrf_token')): ?>
-            <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+            <?php if (function_exists('csrfField')): ?>
+            <?php csrfField(); ?>
             <?php endif; ?>
 
             <div class="form-group">

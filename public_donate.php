@@ -1,6 +1,9 @@
 <?php
 session_start();
+require_once __DIR__ . '/includes/csrf.php';
 $amount = isset($_GET['amount']) ? (int)$_GET['amount'] : 1000;
+$errorMsg = trim((string)($_GET['error'] ?? ''));
+$successRef = trim((string)($_GET['success_ref'] ?? ''));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -391,6 +394,130 @@ $amount = isset($_GET['amount']) ? (int)$_GET['amount'] : 1000;
             .form-row-2 { grid-template-columns: 1fr; }
         }
 
+        /* Floating chatbot */
+        .chatbot-fab {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 56px;
+            height: 56px;
+            border: 0;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--deep-sage), #C05520);
+            color: var(--white);
+            font-size: 1.35rem;
+            cursor: pointer;
+            box-shadow: 0 10px 26px rgba(192,85,32,0.36);
+            z-index: 120;
+        }
+        .chatbot-panel {
+            position: fixed;
+            right: 20px;
+            bottom: 86px;
+            width: min(360px, calc(100vw - 24px));
+            height: min(520px, calc(100vh - 120px));
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: 0 18px 44px rgba(50,38,25,0.20);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 119;
+        }
+        .chatbot-panel.open { display: flex; }
+        .chatbot-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            background: linear-gradient(to right, var(--deep-sage), #C05520);
+            color: var(--white);
+        }
+        .chatbot-title {
+            font-size: 0.9rem;
+            letter-spacing: 0.03em;
+            font-weight: 400;
+        }
+        .chatbot-close {
+            border: 0;
+            background: transparent;
+            color: var(--white);
+            font-size: 1.1rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .chatbot-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            background: #FFFDFB;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .chat-msg {
+            max-width: 86%;
+            padding: 10px 12px;
+            border-radius: 12px;
+            font-size: 0.84rem;
+            line-height: 1.45;
+            white-space: pre-line;
+        }
+        .chat-msg.bot {
+            align-self: flex-start;
+            border: 1px solid var(--border);
+            background: var(--white);
+            color: var(--text-mid);
+        }
+        .chat-msg.user {
+            align-self: flex-end;
+            background: rgba(212,98,42,0.12);
+            color: var(--text-dark);
+            border: 1px solid rgba(212,98,42,0.24);
+        }
+        .chatbot-input-row {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            border-top: 1px solid var(--border);
+            background: var(--white);
+        }
+        .chatbot-input-row input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: var(--ivory);
+            font-family: 'Jost', sans-serif;
+            font-size: 0.84rem;
+            outline: none;
+        }
+        .chatbot-input-row input:focus { border-color: var(--deep-sage); background: var(--white); }
+        .chatbot-send {
+            border: 0;
+            border-radius: 10px;
+            padding: 0 14px;
+            background: var(--gold);
+            color: var(--text-dark);
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .chatbot-typing {
+            display: none;
+            padding: 0 12px 10px;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            background: #FFFDFB;
+        }
+        .chatbot-typing.show { display: block; }
+
+        @media (max-width: 600px) {
+            .chatbot-fab { right: 12px; bottom: 12px; }
+            .chatbot-panel { right: 12px; bottom: 76px; width: calc(100vw - 24px); }
+        }
+
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(20px); }
             to   { opacity: 1; transform: translateY(0); }
@@ -425,12 +552,24 @@ $amount = isset($_GET['amount']) ? (int)$_GET['amount'] : 1000;
 
     <!-- FORM -->
     <div class="form-panel">
+        <?php if ($errorMsg !== ''): ?>
+        <div style="background:rgba(185,64,64,0.08);border:1px solid rgba(185,64,64,0.28);color:#9f2f2f;padding:12px 14px;border-radius:10px;margin-bottom:18px;font-size:.86rem;">
+            ⚠ <?= htmlspecialchars($errorMsg) ?>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($successRef !== ''): ?>
+        <div style="background:rgba(46,125,82,0.08);border:1px solid rgba(46,125,82,0.28);color:#2f7a46;padding:12px 14px;border-radius:10px;margin-bottom:18px;font-size:.86rem;">
+            ✓ Donation submitted successfully. Reference: DON-<?= htmlspecialchars($successRef) ?>
+        </div>
+        <?php endif; ?>
+
         <form method="POST" action="process_public_donation.php" enctype="multipart/form-data" id="donateForm">
-            <?php if (function_exists('csrf_token')): ?>
-            <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+            <?php if (function_exists('csrfField')): ?>
+            <?php csrfField(); ?>
             <?php endif; ?>
             <input type="hidden" name="amount" id="hiddenAmount" value="<?= $amount ?>">
-            <input type="hidden" name="payment_method" id="hiddenMethod" value="payhere">
+            <input type="hidden" name="payment_method" id="hiddenMethod" value="bank_slip">
 
             <!-- STEP 1: Amount -->
             <div class="panel-section">
@@ -554,18 +693,7 @@ $amount = isset($_GET['amount']) ? (int)$_GET['amount'] : 1000;
                 </div>
                 <div class="payment-methods">
                     <div class="pay-option">
-                        <input type="radio" name="pay_method" id="pay_payhere" value="payhere" checked onchange="showPayment('payhere')">
-                        <label for="pay_payhere">
-                            <span class="pay-icon">💳</span>
-                            <div class="pay-info">
-                                <div class="pay-name">PayHere</div>
-                                <div class="pay-sub">Cards, mobile wallets, net banking</div>
-                            </div>
-                            <div class="pay-check"></div>
-                        </label>
-                    </div>
-                    <div class="pay-option">
-                        <input type="radio" name="pay_method" id="pay_bank" value="bank_slip" onchange="showPayment('bank_slip')">
+                        <input type="radio" name="pay_method" id="pay_bank" value="bank_slip" checked>
                         <label for="pay_bank">
                             <span class="pay-icon">🏦</span>
                             <div class="pay-info">
@@ -578,7 +706,7 @@ $amount = isset($_GET['amount']) ? (int)$_GET['amount'] : 1000;
                 </div>
 
                 <!-- Bank slip upload (shown when bank selected) -->
-                <div class="bank-slip-section" id="bankSlipSection">
+                <div class="bank-slip-section visible" id="bankSlipSection">
                     <p>
                         Please transfer your donation to:<br>
                         <strong>Bank:</strong> People's Bank &nbsp;|&nbsp;
@@ -616,7 +744,7 @@ $amount = isset($_GET['amount']) ? (int)$_GET['amount'] : 1000;
             </div>
             <div class="summary-row">
                 <span class="lbl">Payment</span>
-                <span class="val" id="summaryPayment">PayHere</span>
+                <span class="val" id="summaryPayment">Bank Transfer</span>
             </div>
             <div class="summary-total">
                 <span class="lbl">TOTAL</span>
@@ -650,6 +778,22 @@ $amount = isset($_GET['amount']) ? (int)$_GET['amount'] : 1000;
 
 </div>
 
+<button type="button" class="chatbot-fab" id="chatbotFab" aria-label="Open chatbot">💬</button>
+<div class="chatbot-panel" id="chatbotPanel" aria-live="polite">
+    <div class="chatbot-header">
+        <div class="chatbot-title">AI Donation Assistant</div>
+        <button type="button" class="chatbot-close" id="chatbotClose" aria-label="Close chatbot">✕</button>
+    </div>
+    <div class="chatbot-messages" id="chatbotMessages">
+        <div class="chat-msg bot">Welcome. Ask about donation process, categories, or account details.</div>
+    </div>
+    <div class="chatbot-typing" id="chatbotTyping">Assistant is typing...</div>
+    <div class="chatbot-input-row">
+        <input type="text" id="chatbotInput" placeholder="Type your question..." maxlength="500">
+        <button type="button" class="chatbot-send" id="chatbotSend">Send</button>
+    </div>
+</div>
+
 <script>
 let currentAmount = <?= $amount ?>;
 
@@ -678,8 +822,7 @@ function showPayment(method) {
     document.getElementById('hiddenMethod').value = method;
     const bs = document.getElementById('bankSlipSection');
     bs.classList.toggle('visible', method === 'bank_slip');
-    document.getElementById('summaryPayment').textContent =
-        method === 'bank_slip' ? 'Bank Transfer' : 'PayHere';
+    document.getElementById('summaryPayment').textContent = 'Bank Transfer';
 }
 
 function toggleAnon(cb) {
@@ -696,6 +839,71 @@ document.querySelectorAll('input[name="category"]').forEach(r => {
         document.getElementById('summaryCategory').textContent = labels[this.value] || this.value;
     });
 });
+
+const chatbotPanel = document.getElementById('chatbotPanel');
+const chatbotFab = document.getElementById('chatbotFab');
+const chatbotClose = document.getElementById('chatbotClose');
+const chatbotMessages = document.getElementById('chatbotMessages');
+const chatbotInput = document.getElementById('chatbotInput');
+const chatbotSend = document.getElementById('chatbotSend');
+const chatbotTyping = document.getElementById('chatbotTyping');
+
+chatbotFab.addEventListener('click', function() {
+    chatbotPanel.classList.add('open');
+    chatbotInput.focus();
+});
+
+chatbotClose.addEventListener('click', function() {
+    chatbotPanel.classList.remove('open');
+});
+
+chatbotSend.addEventListener('click', sendChatbotMessage);
+chatbotInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        sendChatbotMessage();
+    }
+});
+
+function appendChatMessage(text, type) {
+    const msg = document.createElement('div');
+    msg.className = 'chat-msg ' + type;
+    msg.textContent = text;
+    chatbotMessages.appendChild(msg);
+    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+}
+
+function sendChatbotMessage() {
+    const message = chatbotInput.value.trim();
+    if (message === '') return;
+
+    appendChatMessage(message, 'user');
+    chatbotInput.value = '';
+    chatbotTyping.classList.add('show');
+
+    fetch('chatbot_api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            message: message,
+            language: 'auto',
+            history: []
+        })
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        chatbotTyping.classList.remove('show');
+        if (data && data.success && data.response) {
+            appendChatMessage(data.response, 'bot');
+        } else {
+            appendChatMessage('Sorry, I could not process that right now. Please try again.', 'bot');
+        }
+    })
+    .catch(function() {
+        chatbotTyping.classList.remove('show');
+        appendChatMessage('Connection issue. Please try again in a moment.', 'bot');
+    });
+}
 </script>
 </body>
 </html>

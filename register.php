@@ -1,7 +1,103 @@
 <?php
 session_start();
+require_once __DIR__ . '/includes/db_config.php';
+require_once __DIR__ . '/includes/csrf.php';
+
+$conn = getDBConnection();
 $error = $_SESSION['register_error'] ?? '';
 unset($_SESSION['register_error']);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!validateCSRFToken()) {
+        $error = 'Security validation failed. Please refresh and try again.';
+    } else {
+        $first_name = trim($_POST['first_name'] ?? '');
+        $last_name = trim($_POST['last_name'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
+        $password = $_POST['password'] ?? '';
+        $password_confirm = $_POST['password_confirm'] ?? '';
+        $role = strtolower(trim($_POST['role'] ?? 'donor'));
+        $termsAccepted = isset($_POST['terms']);
+
+        $roleMap = [
+            'admin' => 'Admin',
+            'doctor' => 'Doctor',
+            'donor' => 'Donor',
+            'monk' => 'Monk'
+        ];
+
+        if ($first_name === '' || $last_name === '' || $email === '' || $password === '') {
+            $error = 'Please fill all required fields.';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $error = 'Please enter a valid email address.';
+        } elseif (strlen($password) < 6) {
+            $error = 'Password must be at least 6 characters long.';
+        } elseif ($password !== $password_confirm) {
+            $error = 'Passwords do not match.';
+        } elseif (!$termsAccepted) {
+            $error = 'You must accept the terms to continue.';
+        } elseif (!isset($roleMap[$role])) {
+            $error = 'Invalid role selected.';
+        } else {
+            $roleName = $roleMap[$role];
+            $roleStmt = $conn->prepare('SELECT role_id FROM roles WHERE role_name = ? LIMIT 1');
+
+            if (!$roleStmt) {
+                $error = 'Unable to process registration right now. Please try again.';
+            } else {
+                $roleStmt->bind_param('s', $roleName);
+                $roleStmt->execute();
+                $roleResult = $roleStmt->get_result();
+                $roleRow = $roleResult ? $roleResult->fetch_assoc() : null;
+                $roleStmt->close();
+
+                if (!$roleRow) {
+                    $error = 'Selected role is not configured in the system.';
+                } else {
+                    $checkStmt = $conn->prepare('SELECT user_id FROM users WHERE email = ? LIMIT 1');
+
+                    if (!$checkStmt) {
+                        $error = 'Unable to process registration right now. Please try again.';
+                    } else {
+                        $checkStmt->bind_param('s', $email);
+                        $checkStmt->execute();
+                        $existing = $checkStmt->get_result();
+                        $emailExists = $existing && $existing->num_rows > 0;
+                        $checkStmt->close();
+
+                        if ($emailExists) {
+                            $error = 'This email is already registered. Please sign in.';
+                        } else {
+                            $fullName = trim($first_name . ' ' . $last_name);
+                            $passwordHash = password_hash($password, PASSWORD_BCRYPT);
+                            $insertStmt = $conn->prepare(
+                                "INSERT INTO users (name, email, phone, role_id, password_hash, status)
+                                 VALUES (?, ?, ?, ?, ?, 'active')"
+                            );
+
+                            if (!$insertStmt) {
+                                $error = 'Unable to complete registration. Please try again.';
+                            } else {
+                                $roleId = (int)$roleRow['role_id'];
+                                $insertStmt->bind_param('sssis', $fullName, $email, $phone, $roleId, $passwordHash);
+                                $ok = $insertStmt->execute();
+                                $insertStmt->close();
+
+                                if ($ok) {
+                                    header('Location: login.php?registered=1');
+                                    exit();
+                                }
+
+                                $error = 'Registration failed. Please try again.';
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,6 +116,8 @@ unset($_SESSION['register_error']);
             --warm-gray:  #C9A88A;
             --muted-sage: #F0864A;
             --deep-sage:  #D4622A;
+            --orange:     #D4622A;
+            --orange-light:#F0A050;
             --gold:       #F0A050;
             --text-dark:  #2C2820;
             --text-mid:   #5A5248;
@@ -43,19 +141,20 @@ unset($_SESSION['register_error']);
 
         /* ── LEFT ── */
         .left-panel {
-            background: var(--text-dark);
+            background: var(--cream);
             padding: 56px 64px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
             overflow: hidden;
+            border-right: 1px solid var(--border);
         }
         .left-panel-bg {
             position: absolute; inset: 0; z-index: 0;
             background:
-                radial-gradient(ellipse 70% 50% at 80% 20%, rgba(212,98,42,0.18), transparent),
-                radial-gradient(ellipse 60% 60% at 20% 80%, rgba(240,160,80,0.10), transparent);
+                radial-gradient(ellipse 80% 60% at 20% 80%, rgba(240,160,80,0.10), transparent),
+                radial-gradient(ellipse 60% 60% at 80% 20%, rgba(212,98,42,0.08), transparent);
         }
         .left-content { position: relative; z-index: 1; }
         .brand {
@@ -64,19 +163,19 @@ unset($_SESSION['register_error']);
         }
         .brand-mark {
             width: 40px; height: 40px;
-            background: rgba(255,255,255,0.12);
+            background: linear-gradient(135deg, var(--orange), var(--orange-light));
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-size: 18px;
-            border: 1px solid rgba(255,255,255,0.15);
+            border: none;
         }
         .brand-name {
             font-family: 'Cormorant Garamond', serif;
             font-size: 1.4rem; font-weight: 600;
-            color: var(--white);
+            color: var(--text-dark);
         }
         .brand-sub {
-            font-size: 0.65rem; color: rgba(255,255,255,0.4);
+            font-size: 0.65rem; color: var(--text-light);
             letter-spacing: 0.12em; text-transform: uppercase;
             display: block; margin-top: -3px;
         }
@@ -84,31 +183,31 @@ unset($_SESSION['register_error']);
             font-family: 'Cormorant Garamond', serif;
             font-size: clamp(2rem, 3vw, 2.8rem);
             font-weight: 300; line-height: 1.2;
-            color: var(--white); margin-bottom: 20px;
+            color: var(--text-dark); margin-bottom: 20px;
         }
-        .left-headline em { font-style: italic; color: var(--gold); }
+        .left-headline em { font-style: italic; color: var(--orange); }
         .left-desc {
-            font-size: 0.95rem; color: rgba(255,255,255,0.55);
+            font-size: 0.95rem; color: var(--text-mid);
             line-height: 1.8; max-width: 320px; margin-bottom: 48px;
         }
         .benefits-list { list-style: none; }
         .benefits-list li {
             display: flex; align-items: flex-start; gap: 12px;
             padding: 12px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            color: rgba(255,255,255,0.65);
+            border-bottom: 1px solid var(--border);
+            color: var(--text-mid);
             font-size: 0.88rem;
         }
         .benefits-list li:last-child { border-bottom: none; }
         .benefit-check {
             width: 20px; height: 20px; flex-shrink: 0;
-            background: var(--deep-sage); border-radius: 50%;
+            background: var(--orange); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-size: 0.65rem; color: white; margin-top: 2px;
         }
         .left-footer {
             position: relative; z-index: 1;
-            font-size: 0.78rem; color: rgba(255,255,255,0.3);
+            font-size: 0.78rem; color: var(--text-light);
         }
 
         /* ── RIGHT ── */
@@ -126,7 +225,7 @@ unset($_SESSION['register_error']);
             color: var(--text-dark); margin-bottom: 8px;
         }
         .form-header p { font-size: 0.9rem; color: var(--text-light); }
-        .form-header p a { color: var(--deep-sage); text-decoration: none; font-weight: 500; }
+        .form-header p a { color: var(--orange); text-decoration: none; font-weight: 500; }
         .form-header p a:hover { text-decoration: underline; }
 
         .error-msg {
@@ -156,7 +255,7 @@ unset($_SESSION['register_error']);
         }
         .form-group input:focus,
         .form-group select:focus {
-            border-color: var(--deep-sage); background: var(--white);
+            border-color: var(--orange); background: var(--white);
         }
         .form-group input::placeholder { color: var(--warm-gray); }
         .pw-wrapper { position: relative; }
@@ -186,9 +285,9 @@ unset($_SESSION['register_error']);
         }
         .role-option label .icon { font-size: 1.4rem; }
         .role-option input:checked + label {
-            border-color: var(--deep-sage);
+            border-color: var(--orange);
             background: rgba(212,98,42,0.06);
-            color: var(--deep-sage);
+            color: var(--orange);
         }
         .role-option label:hover { border-color: var(--muted-sage); }
 
@@ -201,12 +300,12 @@ unset($_SESSION['register_error']);
             width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px;
             accent-color: #D4622A; cursor: pointer;
         }
-        .terms-row a { color: var(--deep-sage); text-decoration: none; }
+        .terms-row a { color: var(--orange); text-decoration: none; }
         .terms-row a:hover { text-decoration: underline; }
 
         .btn-submit {
             width: 100%; padding: 14px;
-            background: var(--deep-sage); color: var(--white);
+            background: var(--orange); color: var(--text-dark);
             border: none; border-radius: 10px;
             font-family: 'Jost', sans-serif; font-size: 0.95rem; font-weight: 500;
             letter-spacing: 0.04em; cursor: pointer; transition: all 0.25s;
@@ -228,14 +327,14 @@ unset($_SESSION['register_error']);
             font-size: 0.88rem; color: var(--text-mid); text-decoration: none; transition: all 0.2s;
         }
         .donate-link-btn:hover {
-            border-color: var(--gold); color: var(--text-dark);
+            border-color: var(--orange); color: var(--text-dark);
             background: rgba(240,160,80,0.06);
         }
         .back-link {
             text-align: center; margin-top: 20px; font-size: 0.83rem;
         }
         .back-link a { color: var(--text-light); text-decoration: none; }
-        .back-link a:hover { color: var(--deep-sage); }
+        .back-link a:hover { color: var(--orange); }
 
         @media (max-width: 768px) {
             body { grid-template-columns: 1fr; }
@@ -306,8 +405,8 @@ unset($_SESSION['register_error']);
         <?php endif; ?>
 
         <form method="POST" action="register.php">
-            <?php if (function_exists('csrf_token')): ?>
-            <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+            <?php if (function_exists('csrfField')): ?>
+            <?php csrfField(); ?>
             <?php endif; ?>
 
             <div class="form-row">
@@ -366,10 +465,10 @@ unset($_SESSION['register_error']);
                         </label>
                     </div>
                     <div class="role-option">
-                        <input type="radio" name="role" id="role_admin" value="admin">
-                        <label for="role_admin">
-                            <span class="icon">⚙️</span>
-                            Admin
+                        <input type="radio" name="role" id="role_monk" value="monk">
+                        <label for="role_monk">
+                            <span class="icon">☸️</span>
+                            Monk
                         </label>
                     </div>
                 </div>

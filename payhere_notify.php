@@ -43,11 +43,13 @@ if (verifyPayHereNotification($post_data)) {
         // Default category (you can customize this)
         $category_id = !empty($custom_1) ? intval($custom_1) : 1;  // Default to first donation category
         
-        // Save donation to database
-        $stmt = $conn->prepare("INSERT INTO donations (donor_name, donor_email, donor_phone, amount, category_id, payment_method, reference_number, notes, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, 'payhere', ?, ?, 'verified', 1, NOW())");
-        
+        // Save donation to database (current schema uses method/order_id/txn_ref/raw_payload_json)
+        $stmt = $conn->prepare("INSERT INTO donations (donor_name, donor_email, donor_phone, amount, category_id, method, gateway_name, order_id, txn_ref, raw_payload_json, notes, status, created_at) VALUES (?, ?, ?, ?, ?, 'card_sandbox', 'PayHere', ?, ?, ?, ?, 'verified', NOW())");
+
+        $txn_ref = $_POST['payment_id'] ?? $order_id;
+        $raw_payload_json = json_encode($post_data, JSON_UNESCAPED_UNICODE);
         $notes = "PayHere Payment - Order ID: $order_id, Method: $method, Card: $card_no";
-        $stmt->bind_param("sssdiss", $donor_name, $donor_email, $donor_phone, $payhere_amount, $category_id, $order_id, $notes);
+        $stmt->bind_param("sssdissss", $donor_name, $donor_email, $donor_phone, $payhere_amount, $category_id, $order_id, $txn_ref, $raw_payload_json, $notes);
         
         if ($stmt->execute()) {
             $donation_id = $stmt->insert_id;
