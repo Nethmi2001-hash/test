@@ -46,7 +46,7 @@ if ($report_type == 'financial') {
         FROM bills b
         JOIN categories c ON b.category_id = c.category_id
         WHERE b.bill_date BETWEEN '$start_date' AND '$end_date'
-        AND b.status = 'approved'
+            AND b.status = 'paid'
         GROUP BY c.category_id, c.name
         ORDER BY total DESC
     ");
@@ -430,12 +430,12 @@ new Chart(donationsCtx, {
         datasets: [{
             data: <?= json_encode(array_column($donations_by_category, 'total')) ?>,
             backgroundColor: [
-                '#6E8662',
-                '#4F6645',
-                '#8A5A3B',
-                '#2E7D32',
-                '#5D7C51',
-                '#9A6D4F'
+                '#f97316',
+                '#ea580c',
+                '#fb923c',
+                '#c2410c',
+                '#fdba74',
+                '#9a3412'
             ],
             borderWidth: 2,
             borderColor: '#ffffff',
@@ -483,12 +483,12 @@ new Chart(expensesCtx, {
         datasets: [{
             data: <?= json_encode(array_column($expenses_by_category, 'total')) ?>,
             backgroundColor: [
-                '#8A5A3B',
-                '#6E8662',
-                '#A67951',
-                '#C08860',
-                '#7A4E34',
-                '#4F6645'
+                '#fb923c',
+                '#f97316',
+                '#ea580c',
+                '#fdba74',
+                '#c2410c',
+                '#9a3412'
             ],
             borderWidth: 2,
             borderColor: '#ffffff',

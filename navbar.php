@@ -88,9 +88,6 @@ $isMonk = ($userRole === 'Monk');
     <a class="sidebar-link <?= isActivePage('reports.php', $currentPage) ?>" href="reports.php">
       <i class="bi bi-bar-chart-line"></i> <?= __('reports') ?>
     </a>
-    <a class="sidebar-link <?= isActivePage('chatbot.php', $currentPage) ?>" href="chatbot.php">
-      <i class="bi bi-robot"></i> <?= __('ai_assistant') ?>
-    </a>
 
     <div class="sidebar-section-label"><?= __('manage') ?></div>
     <a class="sidebar-link <?= isActivePage('monk_management.php', $currentPage) ?>" href="monk_management.php">
@@ -142,14 +139,8 @@ $isMonk = ($userRole === 'Monk');
     <?php elseif ($isDonor): ?>
     <!-- Donor: Donations, Transparency -->
     <div class="sidebar-section-label">My Donations</div>
-    <a class="sidebar-link <?= isActivePage('donation_management.php', $currentPage) ?>" href="donation_management.php">
-      <i class="bi bi-cash-coin"></i> <?= __('donations') ?>
-    </a>
-    <a class="sidebar-link <?= isActivePage('public_donate.php', $currentPage) ?>" href="public_donate.php">
+    <a class="sidebar-link" href="#" data-bs-toggle="modal" data-bs-target="#donateModal">
       <i class="bi bi-heart"></i> Make Donation
-    </a>
-    <a class="sidebar-link <?= isActivePage('public_transparency.php', $currentPage) ?>" href="public_transparency.php">
-      <i class="bi bi-shield-check"></i> Transparency
     </a>
 
     <div class="sidebar-section-label">Tools</div>
@@ -165,11 +156,6 @@ $isMonk = ($userRole === 'Monk');
     </a>
     <a class="sidebar-link <?= isActivePage('doctor_management.php', $currentPage) ?>" href="doctor_management.php">
       <i class="bi bi-person-badge"></i> View Doctors
-    </a>
-
-    <div class="sidebar-section-label">Tools</div>
-    <a class="sidebar-link <?= isActivePage('chatbot.php', $currentPage) ?>" href="chatbot.php">
-      <i class="bi bi-robot"></i> Health Assistant
     </a>
     <?php endif; ?>
   </nav>
