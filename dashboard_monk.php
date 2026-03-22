@@ -14,6 +14,7 @@ $userName = $_SESSION['username'] ?? 'Monk';
 $userEmail = $_SESSION['email'] ?? '';
 $error = '';
 $success = '';
+$openProfileModal = isset($_GET['edit_profile']) && $_GET['edit_profile'] === '1';
 
 // Try to find linked monk profile by name match
 $monk = null;
@@ -220,12 +221,7 @@ if ($monk_id) {
     <!-- Health Summary Card -->
     <div class="modern-card mb-4 animate-fade-in">
         <div class="card-header-modern">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;width:100%;">
-                <h6><i class="bi bi-clipboard2-pulse me-2"></i>Health Summary</h6>
-                <button type="button" class="btn-modern btn-outline-modern btn-sm-modern" data-bs-toggle="modal" data-bs-target="#editHealthModal">
-                    <i class="bi bi-pencil-square"></i> Update My Details
-                </button>
-            </div>
+            <h6><i class="bi bi-clipboard2-pulse me-2"></i>Health Summary</h6>
         </div>
         <div class="card-body-modern" style="padding:24px;">
             <div class="row g-4">
@@ -504,6 +500,17 @@ if ($monk_id) {
 <?php include 'includes/footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<?php if ($openProfileModal && $monk_id): ?>
+<script>
+window.addEventListener('load', function () {
+    var modalEl = document.getElementById('editHealthModal');
+    if (modalEl) {
+        var healthModal = new bootstrap.Modal(modalEl);
+        healthModal.show();
+    }
+});
+</script>
+<?php endif; ?>
 </body>
 </html>
 <?php $conn->close(); ?>
