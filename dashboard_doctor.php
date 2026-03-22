@@ -12,6 +12,9 @@ $conn = getDBConnection();
 $userEmail = $_SESSION['email'] ?? '';
 $userName = $_SESSION['username'] ?? 'Doctor';
 $userId = $_SESSION['user_id'] ?? 0;
+$profile_error = '';
+$profile_success = '';
+$openProfileModal = isset($_GET['edit_profile']) && $_GET['edit_profile'] === '1';
 
 // Find linked doctor profile by email
 $doctor = null;
@@ -55,6 +58,41 @@ if (!$doctor) {
 
 if ($doctor) {
     $doctor_id = $doctor['doctor_id'];
+}
+
+// Doctor can update own profile details from dashboard.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_name']) && $_POST['form_name'] === 'update_my_profile' && $doctor_id) {
+    $full_name = trim($_POST['full_name'] ?? '');
+    $specialization = trim($_POST['specialization'] ?? 'General');
+    $contact = trim($_POST['contact'] ?? '');
+    $license_number = trim($_POST['license_number'] ?? '');
+
+    $valid_specs = ['Ayurvedic', 'Western', 'General'];
+    if (!in_array($specialization, $valid_specs, true)) {
+        $specialization = 'General';
+    }
+
+    if ($full_name === '') {
+        $profile_error = 'Full name is required.';
+    } else {
+        $stmt = $conn->prepare("UPDATE doctors SET full_name = ?, specialization = ?, contact = ?, license_number = ?, updated_at = NOW() WHERE doctor_id = ?");
+        $stmt->bind_param("ssssi", $full_name, $specialization, $contact, $license_number, $doctor_id);
+        if ($stmt->execute()) {
+            $profile_success = 'Your profile was updated successfully.';
+
+            $refreshStmt = $conn->prepare("SELECT * FROM doctors WHERE doctor_id = ? LIMIT 1");
+            $refreshStmt->bind_param("i", $doctor_id);
+            $refreshStmt->execute();
+            $refreshResult = $refreshStmt->get_result();
+            if ($refreshResult) {
+                $doctor = $refreshResult->fetch_assoc() ?: $doctor;
+            }
+            $refreshStmt->close();
+        } else {
+            $profile_error = 'Unable to update profile. Please try again.';
+        }
+        $stmt->close();
+    }
 }
 
 // Stats
@@ -158,6 +196,18 @@ if ($doctor_id) {
         <p>Your account could not be linked to a doctor profile. Please contact the administrator if this message continues.</p>
     </div>
 <?php else: ?>
+
+    <?php if ($profile_error): ?>
+        <div class="alert alert-danger" style="margin:12px 24px;">
+            <i class="bi bi-exclamation-triangle me-2"></i><?= htmlspecialchars($profile_error) ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($profile_success): ?>
+        <div class="alert alert-success" style="margin:12px 24px;">
+            <i class="bi bi-check-circle me-2"></i><?= htmlspecialchars($profile_success) ?>
+        </div>
+    <?php endif; ?>
 
     <!-- Welcome -->
     <div class="welcome-card animate-fade-in">
@@ -405,6 +455,56 @@ if ($doctor_id) {
         </div>
     </div>
 
+    <div class="modal fade" id="editDoctorProfileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-person-gear me-2"></i>Update My Profile</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="form_name" value="update_my_profile">
+
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" name="full_name" value="<?= htmlspecialchars($doctor['full_name'] ?? '') ?>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Specialization</label>
+                            <select class="form-select" name="specialization" required>
+                                <?php $doc_spec = $doctor['specialization'] ?? 'General'; ?>
+                                <option value="General" <?= $doc_spec === 'General' ? 'selected' : '' ?>>General</option>
+                                <option value="Ayurvedic" <?= $doc_spec === 'Ayurvedic' ? 'selected' : '' ?>>Ayurvedic</option>
+                                <option value="Western" <?= $doc_spec === 'Western' ? 'selected' : '' ?>>Western</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Contact</label>
+                            <input type="text" class="form-control" name="contact" value="<?= htmlspecialchars($doctor['contact'] ?? '') ?>" placeholder="Phone number">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">License Number</label>
+                            <input type="text" class="form-control" name="license_number" value="<?= htmlspecialchars($doctor['license_number'] ?? '') ?>" placeholder="Medical license number">
+                        </div>
+
+                        <div class="mb-0">
+                            <label class="form-label">Login Email</label>
+                            <input type="email" class="form-control" value="<?= htmlspecialchars($userEmail) ?>" readonly>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Profile</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- <div class="text-center mb-4" style="color:var(--text-muted);font-size:12px;">
         <i class="bi bi-dot"></i> End of Doctor Dashboard <i class="bi bi-dot"></i>
     </div> -->
@@ -443,6 +543,17 @@ new Chart(weeklyCtx, {
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<?php if ($openProfileModal && $doctor_id): ?>
+<script>
+window.addEventListener('load', function () {
+    var modalEl = document.getElementById('editDoctorProfileModal');
+    if (modalEl) {
+        var profileModal = new bootstrap.Modal(modalEl);
+        profileModal.show();
+    }
+});
+</script>
+<?php endif; ?>
 </body>
 </html>
 <?php $conn->close(); ?>

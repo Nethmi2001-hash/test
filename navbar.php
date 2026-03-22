@@ -202,6 +202,9 @@ $isMonk = ($userRole === 'Monk');
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
           <li><a class="dropdown-item" href="dashboard.php"><i class="bi bi-grid me-2"></i> Dashboard</a></li>
+          <?php if ($isDoctor): ?>
+          <li><a class="dropdown-item" href="dashboard_doctor.php?edit_profile=1"><i class="bi bi-pencil-square me-2"></i> Update My Profile</a></li>
+          <?php endif; ?>
           <li><hr class="dropdown-divider"></li>
           <li><a class="dropdown-item text-danger" href="logout.php"><i class="bi bi-box-arrow-right me-2"></i> <?= __('logout') ?></a></li>
         </ul>
