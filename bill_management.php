@@ -177,6 +177,14 @@ if ($result) {
     <title>Bills & Expenses - Seela Suwa Herath Bikshu Gilan Arana</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .category-chart-wrap {
+            width: 280px;
+            max-width: 100%;
+            height: 280px;
+            margin: 0 auto;
+        }
+    </style>
 </head>
 <body>
 
@@ -263,8 +271,10 @@ if ($result) {
         <div class="modern-table-header">
             <h5><i class="bi bi-pie-chart me-2"></i>Category-wise Expenses (This Month)</h5>
         </div>
-        <div class="p-4">
-            <canvas id="categoryChart" height="80"></canvas>
+        <div class="p-4 d-flex justify-content-center">
+            <div class="category-chart-wrap">
+                <canvas id="categoryChart"></canvas>
+            </div>
         </div>
     </div>
 
@@ -557,7 +567,7 @@ function editBill(bill) {
 // Category-wise Expenses Chart
 const categoryCtx = document.getElementById('categoryChart').getContext('2d');
 new Chart(categoryCtx, {
-    type: 'doughnut',
+    type: 'pie',
     data: {
         labels: <?= json_encode(array_column($category_expenses, 'name')) ?>,
         datasets: [{
@@ -576,10 +586,17 @@ new Chart(categoryCtx, {
     },
     options: {
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: {
-                position: 'right'
+                position: 'bottom',
+                labels: {
+                    boxWidth: 12,
+                    padding: 10,
+                    font: {
+                        size: 11
+                    }
+                }
             }
         }
     }
