@@ -1,16 +1,17 @@
 <?php
-if (!isset($_SESSION['logged_in']) || (basename($_SERVER['PHP_SELF']) === 'dashboard_doctor.php')) {
-    if (session_status() === PHP_SESSION_NONE) session_start();
-    if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-        header("Location: login.php");
-        exit();
-    }
+if (session_status() === PHP_SESSION_NONE) session_start();
+
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header("Location: login.php");
+    exit();
 }
+
 require_once __DIR__ . '/includes/db_config.php';
 $conn = getDBConnection();
 
 $userEmail = $_SESSION['email'] ?? '';
 $userName = $_SESSION['username'] ?? 'Doctor';
+$userId = $_SESSION['user_id'] ?? 0;
 
 // Find linked doctor profile by email
 $doctor = null;
@@ -25,6 +26,29 @@ $stmt->close();
 if ($doctor) {
     $doctor_id = $doctor['doctor_id'];
 }
+
+// Get doctor's donation data
+$donation_stats = [
+    'total_donated' => 0,
+    'donation_count' => 0,
+    'this_month' => 0
+];
+
+$stmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total, COUNT(*) as cnt FROM donations WHERE (donor_user_id = ? OR donor_email = ?) AND status IN ('paid', 'verified')");
+$stmt->bind_param("is", $userId, $userEmail);
+$stmt->execute();
+$result = $stmt->get_result();
+if ($result) {
+    $row = $result->fetch_assoc();
+    $donation_stats['total_donated'] = $row['total'];
+    $donation_stats['donation_count'] = $row['cnt'];
+}
+
+$stmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE (donor_user_id = ? OR donor_email = ?) AND status IN ('paid', 'verified') AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())");
+$stmt->bind_param("is", $userId, $userEmail);
+$stmt->execute();
+$result = $stmt->get_result();
+if ($result) $donation_stats['this_month'] = $result->fetch_assoc()['total'];
 
 // Stats
 $stats = [
@@ -165,8 +189,8 @@ if ($doctor_id) {
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="--stat-color: #059669;">
-                <div class="stat-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-check2-circle"></i></div>
+            <div class="stat-card" style="--stat-color: #f97316;">
+                <div class="stat-icon" style="background:#fff7ed;color:#f97316;"><i class="bi bi-check2-circle"></i></div>
                 <div class="stat-info">
                     <div class="stat-label">Completed (Month)</div>
                     <div class="stat-value"><?= $stats['month_completed'] ?></div>
@@ -179,6 +203,62 @@ if ($doctor_id) {
                 <div class="stat-info">
                     <div class="stat-label">Total Patients</div>
                     <div class="stat-value"><?= $stats['total_patients'] ?></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Donation Summary for Doctor -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="modern-card animate-fade-in">
+                <div class="card-header-modern">
+                    <h6><i class="bi bi-heart me-2"></i>My Monastery Support</h6>
+                    <a href="public_donate.php" class="btn btn-sm" style="background:#f97316;color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;">
+                        <i class="bi bi-plus-circle me-1"></i>Make Donation
+                    </a>
+                </div>
+                <div class="card-body-modern" style="padding:20px;">
+                    <div class="row g-3">
+                        <div class="col-md-4 text-center">
+                            <div style="font-size:24px;font-weight:700;color:#f97316;">Rs.<?= number_format($donation_stats['total_donated']) ?></div>
+                            <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">Total Donations</div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div style="font-size:24px;font-weight:700;color:#0284c7;"><?= $donation_stats['donation_count'] ?></div>
+                            <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">Donations Made</div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div style="font-size:24px;font-weight:700;color:#7c3aed;">Rs.<?= number_format($donation_stats['this_month']) ?></div>
+                            <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">This Month</div>
+                        </div>
+                    </div>
+                    <?php if ($donation_stats['donation_count'] == 0): ?>
+                        <div style="text-align:center;padding:20px 0;">
+                            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Support the monastery's healthcare mission with your contribution</p>
+                            <a href="public_donate.php" class="btn btn-sm" style="background:#f97316;color:#fff;padding:8px 20px;border-radius:8px;font-weight:600;">
+                                <i class="bi bi-heart me-1"></i>Make First Donation
+                            </a>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="modern-card animate-fade-in" style="height:100%;">
+                <div class="card-header-modern">
+                    <h6><i class="bi bi-info-circle me-2"></i>Quick Links</h6>
+                </div>
+                <div class="card-body-modern" style="padding:16px;">
+                    <a href="public_transparency.php" class="btn btn-outline-primary btn-sm" style="width:100%;margin-bottom:8px;">
+                        <i class="bi bi-shield-check me-1"></i>View Transparency Report
+                    </a>
+                    <a href="donation_management.php" class="btn btn-outline-secondary btn-sm" style="width:100%;margin-bottom:8px;">
+                        <i class="bi bi-list-ul me-1"></i>All Donations
+                    </a>
+                    <a href="chatbot.php" class="btn btn-outline-info btn-sm" style="width:100%;">
+                        <i class="bi bi-robot me-1"></i>AI Assistant
+                    </a>
                 </div>
             </div>
         </div>
@@ -360,7 +440,7 @@ if ($doctor_id) {
         </div>
         <div class="col-xl-3 col-md-6">
             <a href="doctor_availability.php" class="quick-action-card">
-                <div class="quick-action-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-clock-history"></i></div>
+                <div class="quick-action-icon" style="background:#fff7ed;color:#f97316;"><i class="bi bi-clock-history"></i></div>
                 <span class="quick-action-label">My Availability</span>
             </a>
         </div>

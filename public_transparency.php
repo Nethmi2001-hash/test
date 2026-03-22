@@ -202,7 +202,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
             gap: 10px;
             font-weight: 700;
             font-size: 1.05rem;
-            color: var(--primary-700, #047857);
+            color: var(--primary-700, #c2410c);
             text-decoration: none;
         }
         .top-nav .brand .brand-icon {
@@ -215,7 +215,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
         }
         .top-nav .nav-actions { display: flex; align-items: center; gap: 10px; }
         .btn-cta {
-            background: linear-gradient(135deg, var(--primary-500, #10b981), var(--primary-700, #047857));
+            background: linear-gradient(135deg, var(--primary-500, #f97316), var(--primary-700, #c2410c));
             color: #fff;
             border: none;
             padding: 8px 20px;
@@ -243,7 +243,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
 
         /* ---- Hero ---- */
         .hero {
-            background: linear-gradient(135deg, var(--primary-800, #065f46) 0%, var(--primary-900, #064e3b) 60%, var(--slate-900, #0f172a) 100%);
+            background: linear-gradient(135deg, var(--primary-800, #9a3412) 0%, var(--primary-900, #7c2d12) 60%, var(--slate-900, #0f172a) 100%);
             color: #fff;
             padding: 64px 0 72px;
             text-align: center;
@@ -253,7 +253,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
         .hero::before {
             content: '';
             position: absolute; inset: 0;
-            background: radial-gradient(circle at 30% 20%, rgba(16,185,129,.15) 0, transparent 50%),
+            background: radial-gradient(circle at 30% 20%, rgba(249,115,22,.15) 0, transparent 50%),
                         radial-gradient(circle at 80% 80%, rgba(251,191,36,.08) 0, transparent 40%);
             pointer-events: none;
         }
@@ -298,7 +298,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
             width: 72px; height: 72px;
             object-fit: cover;
             border-radius: var(--border-radius, 12px);
-            border: 3px solid var(--primary-100, #d1fae5);
+            border: 3px solid var(--primary-100, #ffedd5);
             flex-shrink: 0;
         }
         .founder-strip h6 {
@@ -351,7 +351,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
             display: flex; align-items: center; justify-content: center;
             font-size: 22px; flex-shrink: 0;
         }
-        .s-icon.emerald { background: var(--primary-100, #d1fae5); color: var(--primary-700, #047857); }
+        .s-icon.emerald { background: var(--primary-100, #ffedd5); color: var(--primary-700, #c2410c); }
         .s-icon.rose { background: #ffe4e6; color: #be123c; }
         .s-icon.blue { background: #dbeafe; color: #1d4ed8; }
         .s-icon.amber { background: var(--accent-100, #fef3c7); color: var(--accent-700, #b45309); }
@@ -393,7 +393,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
             display: flex; align-items: center; gap: 8px;
         }
         .chart-card .card-title i {
-            color: var(--primary-500, #10b981);
+            color: var(--primary-500, #f97316);
         }
 
         /* ---- Activity Items ---- */
@@ -404,7 +404,7 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
             border-radius: var(--border-radius, 12px);
             margin-bottom: 10px;
             transition: all var(--transition);
-            border-left: 4px solid var(--primary-400, #34d399);
+            border-left: 4px solid var(--primary-400, #fb923c);
         }
         .activity-item:hover { box-shadow: var(--shadow-sm); transform: translateX(2px); }
         .activity-item.expense { border-left-color: var(--danger, #dc2626); }
@@ -444,9 +444,9 @@ $balance = ($donations_stats['total'] ?? 0) - ($expenses_stats['total'] ?? 0);
             display: inline-flex; align-items: center; gap: 8px;
             text-decoration: none;
             transition: all var(--transition);
-            box-shadow: 0 4px 14px rgba(5,150,105,.3);
+            box-shadow: 0 4px 14px rgba(249,115,22,.3);
         }
-        .btn-cta-lg:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(5,150,105,.35); color: #fff; }
+        .btn-cta-lg:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(249,115,22,.35); color: #fff; }
 
         /* ---- Footer ---- */
         .site-footer {
@@ -627,7 +627,7 @@ new Chart(donationsCtx, {
         ?>],
         datasets: [{
             data: [<?= implode(',', $data) ?>],
-            backgroundColor: ['#059669','#10b981','#34d399','#6ee7b7','#f59e0b','#fbbf24'],
+            backgroundColor: ['#ea580c','#f97316','#fb923c','#fdba74','#f59e0b','#fbbf24'],
             borderWidth: 0,
             hoverOffset: 6
         }]
@@ -689,11 +689,11 @@ new Chart(monthlyCtx, {
         datasets: [{
             label: 'Donations (Rs.)',
             data: monthlyData,
-            borderColor: '#059669',
-            backgroundColor: 'rgba(5, 150, 105, 0.08)',
+            borderColor: '#f97316',
+            backgroundColor: 'rgba(249, 115, 22, 0.08)',
             tension: 0.4,
             fill: true,
-            pointBackgroundColor: '#059669',
+            pointBackgroundColor: '#f97316',
             pointBorderColor: '#fff',
             pointBorderWidth: 2,
             pointRadius: 5,

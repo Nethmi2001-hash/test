@@ -1,25 +1,78 @@
 <?php
-if (!isset($_SESSION['logged_in']) || (basename($_SERVER['PHP_SELF']) === 'dashboard_monk.php')) {
-    if (session_status() === PHP_SESSION_NONE) session_start();
-    if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-        header("Location: login.php");
-        exit();
-    }
+if (session_status() === PHP_SESSION_NONE) session_start();
+
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header("Location: login.php");
+    exit();
 }
+
 require_once __DIR__ . '/includes/db_config.php';
 $conn = getDBConnection();
 
 $userId = $_SESSION['user_id'] ?? 0;
 $userName = $_SESSION['username'] ?? 'Monk';
 $userEmail = $_SESSION['email'] ?? '';
+$error = '';
+$success = '';
 
 // Try to find linked monk profile by name match
 $monk = null;
 $monk_id = null;
-$r = $conn->query("SELECT * FROM monks WHERE full_name LIKE '%" . $conn->real_escape_string($userName) . "%' AND status = 'active' LIMIT 1");
-if ($r && $r->num_rows > 0) {
-    $monk = $r->fetch_assoc();
+$stmt = $conn->prepare("SELECT * FROM monks WHERE full_name LIKE ? AND status = 'active' LIMIT 1");
+$searchName = "%{$userName}%";
+$stmt->bind_param("s", $searchName);
+$stmt->execute();
+$result = $stmt->get_result();
+if ($result && $result->num_rows > 0) {
+    $monk = $result->fetch_assoc();
     $monk_id = $monk['monk_id'];
+}
+$stmt->close();
+
+// Auto-create a monk profile for monk users if no match exists.
+if (!$monk) {
+    $stmt = $conn->prepare("INSERT INTO monks (full_name, status, notes) VALUES (?, 'active', ?)");
+    $autoNote = 'Auto-created from monk user login for dashboard flow';
+    $stmt->bind_param("ss", $userName, $autoNote);
+    if ($stmt->execute()) {
+        $newId = (int)$stmt->insert_id;
+        $fetch = $conn->prepare("SELECT * FROM monks WHERE monk_id = ? LIMIT 1");
+        $fetch->bind_param("i", $newId);
+        $fetch->execute();
+        $res = $fetch->get_result();
+        if ($res && $res->num_rows > 0) {
+            $monk = $res->fetch_assoc();
+            $monk_id = $monk['monk_id'];
+        }
+        $fetch->close();
+    }
+    $stmt->close();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form_name'] ?? '') === 'update_my_health' && $monk_id) {
+    $dob = trim($_POST['dob'] ?? '');
+    $blood_group = trim($_POST['blood_group'] ?? '');
+    $allergies = trim($_POST['allergies'] ?? '');
+    $chronic_conditions = trim($_POST['chronic_conditions'] ?? '');
+
+    $dob = ($dob !== '') ? $dob : null;
+    $blood_group = ($blood_group !== '') ? $blood_group : null;
+    $allergies = ($allergies !== '') ? $allergies : null;
+    $chronic_conditions = ($chronic_conditions !== '') ? $chronic_conditions : null;
+
+    $stmt = $conn->prepare("UPDATE monks SET dob = ?, blood_group = ?, allergies = ?, chronic_conditions = ? WHERE monk_id = ?");
+    $stmt->bind_param("ssssi", $dob, $blood_group, $allergies, $chronic_conditions, $monk_id);
+
+    if ($stmt->execute()) {
+        $success = 'Your health details were updated successfully.';
+        $monk['dob'] = $dob;
+        $monk['blood_group'] = $blood_group;
+        $monk['allergies'] = $allergies;
+        $monk['chronic_conditions'] = $chronic_conditions;
+    } else {
+        $error = 'Failed to update health details: ' . $stmt->error;
+    }
+    $stmt->close();
 }
 
 // Stats
@@ -108,16 +161,30 @@ if ($monk_id) {
 
 <?php include 'navbar.php'; ?>
 
+<?php if ($error): ?>
+    <div class="alert-modern alert-danger-modern">
+        <i class="bi bi-exclamation-triangle"></i>
+        <span><?= htmlspecialchars($error) ?></span>
+    </div>
+<?php endif; ?>
+
+<?php if ($success): ?>
+    <div class="alert-modern alert-success-modern">
+        <i class="bi bi-check-circle"></i>
+        <span><?= htmlspecialchars($success) ?></span>
+    </div>
+<?php endif; ?>
+
 <?php if (!$monk): ?>
     <!-- No Monk Profile Linked -->
     <div class="welcome-card animate-fade-in" style="border-left: 4px solid var(--accent-500);">
         <h2><i class="bi bi-exclamation-triangle me-2"></i>Profile Not Linked</h2>
-        <p>Your account (<strong><?= htmlspecialchars($userName) ?></strong>) hasn't been linked to a monk profile yet. Please contact the administrator to link your account.</p>
+        <p>Your account (<strong><?= htmlspecialchars($userName) ?></strong>) has no monk profile. Please contact admin if this message continues.</p>
     </div>
 
     <!-- General Monastery Info -->
     <div class="row g-4 mb-4">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="modern-card animate-fade-in">
                 <div class="card-header-modern"><h6><i class="bi bi-info-circle me-2"></i>About the System</h6></div>
                 <div class="card-body-modern" style="padding:24px;">
@@ -133,13 +200,6 @@ if ($monk_id) {
                     </ul>
                 </div>
             </div>
-        </div>
-        <div class="col-md-6">
-            <a href="chatbot.php" class="quick-action-card" style="height:100%;min-height:200px;">
-                <div class="quick-action-icon" style="background:#cffafe;color:#0891b2;width:56px;height:56px;font-size:24px;"><i class="bi bi-robot"></i></div>
-                <span class="quick-action-label" style="font-size:15px;">Ask AI Assistant</span>
-                <span style="font-size:12px;color:var(--text-secondary);">Get help with health queries</span>
-            </a>
         </div>
     </div>
 <?php else: ?>
@@ -160,7 +220,12 @@ if ($monk_id) {
     <!-- Health Summary Card -->
     <div class="modern-card mb-4 animate-fade-in">
         <div class="card-header-modern">
-            <h6><i class="bi bi-clipboard2-pulse me-2"></i>Health Summary</h6>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;width:100%;">
+                <h6><i class="bi bi-clipboard2-pulse me-2"></i>Health Summary</h6>
+                <button type="button" class="btn-modern btn-outline-modern btn-sm-modern" data-bs-toggle="modal" data-bs-target="#editHealthModal">
+                    <i class="bi bi-pencil-square"></i> Update My Details
+                </button>
+            </div>
         </div>
         <div class="card-body-modern" style="padding:24px;">
             <div class="row g-4">
@@ -223,8 +288,8 @@ if ($monk_id) {
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
-            <div class="stat-card" style="--stat-color: #059669;">
-                <div class="stat-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-check-circle"></i></div>
+            <div class="stat-card" style="--stat-color: #f97316;">
+                <div class="stat-icon" style="background:#fff7ed;color:#f97316;"><i class="bi bi-check-circle"></i></div>
                 <div class="stat-info">
                     <div class="stat-label">Completed Visits</div>
                     <div class="stat-value"><?= $stats['completed_appointments'] ?></div>
@@ -251,9 +316,9 @@ if ($monk_id) {
         </div>
     </div>
 
-    <!-- Upcoming Appointments + Chart -->
+    <!-- Upcoming Appointments -->
     <div class="row g-4 mb-4">
-        <div class="col-lg-7">
+        <div class="col-12">
             <div class="modern-card animate-fade-in" style="height:100%;">
                 <div class="card-header-modern">
                     <h6><i class="bi bi-calendar2-check me-2"></i>Upcoming Appointments</h6>
@@ -298,16 +363,6 @@ if ($monk_id) {
                 </div>
             </div>
         </div>
-
-        <div class="col-lg-5">
-            <div class="chart-card animate-fade-in" style="height:100%;">
-                <div class="chart-header">
-                    <h6><i class="bi bi-bar-chart me-2"></i>Visit History</h6>
-                    <span class="badge-modern badge-neutral">6 months</span>
-                </div>
-                <canvas id="monthlyChart" height="200"></canvas>
-            </div>
-        </div>
     </div>
 
     <!-- Medical Records -->
@@ -345,7 +400,7 @@ if ($monk_id) {
                     <?php endif; ?>
                     <?php if ($rec['medication']): ?>
                     <div class="col-md-4">
-                        <div style="font-weight:600;color:#059669;margin-bottom:4px;">Medication</div>
+                        <div style="font-weight:600;color:#f97316;margin-bottom:4px;">Medication</div>
                         <div style="color:var(--text-secondary);"><?= htmlspecialchars($rec['medication']) ?></div>
                     </div>
                     <?php endif; ?>
@@ -360,7 +415,7 @@ if ($monk_id) {
     <?php if (count($past) > 0): ?>
     <div class="modern-card mb-4 animate-fade-in">
         <div class="card-header-modern">
-            <h6><i class="bi bi-clock-history me-2"></i>Recent Visit History</h6>
+            <h6><i class="bi bi-clock-history me-2"></i>Recent Completed Visits</h6>
         </div>
         <div class="card-body-modern" style="padding:16px;">
             <?php foreach ($past as $apt): ?>
@@ -381,58 +436,72 @@ if ($monk_id) {
 
     <!-- Quick Actions -->
     <div class="row g-3 mb-4 stagger-children">
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-6 col-md-6">
             <a href="patient_appointments.php" class="quick-action-card">
                 <div class="quick-action-icon" style="background:#e0f2fe;color:#0284c7;"><i class="bi bi-calendar2-check"></i></div>
                 <span class="quick-action-label">My Appointments</span>
             </a>
         </div>
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-6 col-md-6">
             <a href="doctor_management.php" class="quick-action-card">
-                <div class="quick-action-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-person-badge"></i></div>
+                <div class="quick-action-icon" style="background:#fff7ed;color:#f97316;"><i class="bi bi-person-badge"></i></div>
                 <span class="quick-action-label">View Doctors</span>
             </a>
         </div>
-        <div class="col-xl-4 col-md-6">
-            <a href="chatbot.php" class="quick-action-card">
-                <div class="quick-action-icon" style="background:#cffafe;color:#0891b2;"><i class="bi bi-robot"></i></div>
-                <span class="quick-action-label">AI Health Assistant</span>
-            </a>
+    </div>
+
+    <!-- Edit Health Details Modal -->
+    <div class="modal fade" id="editHealthModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Update My Health Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="form_name" value="update_my_health">
+
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Date of Birth</label>
+                            <input type="date" name="dob" class="form-control-modern" value="<?= htmlspecialchars($monk['dob'] ?? '') ?>">
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Blood Group</label>
+                            <select name="blood_group" class="form-select-modern">
+                                <option value="">-- Select Blood Group --</option>
+                                <?php
+                                $bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+                                foreach ($bloodGroups as $group):
+                                ?>
+                                    <option value="<?= $group ?>" <?= (($monk['blood_group'] ?? '') === $group) ? 'selected' : '' ?>><?= $group ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Allergies</label>
+                            <textarea name="allergies" class="form-control-modern" rows="3" placeholder="List known allergies"><?= htmlspecialchars($monk['allergies'] ?? '') ?></textarea>
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Chronic Conditions</label>
+                            <textarea name="chronic_conditions" class="form-control-modern" rows="3" placeholder="List chronic conditions"><?= htmlspecialchars($monk['chronic_conditions'] ?? '') ?></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-modern btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn-modern btn-primary-modern"><i class="bi bi-save"></i> Save Details</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
 <?php endif; ?>
 
 <?php include 'includes/footer.php'; ?>
-
-<script>
-<?php if ($monk_id): ?>
-const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
-new Chart(monthlyCtx, {
-    type: 'bar',
-    data: {
-        labels: <?= json_encode(array_column($monthly_data, 'month')) ?>,
-        datasets: [{
-            label: 'Visits',
-            data: <?= json_encode(array_column($monthly_data, 'count')) ?>,
-            backgroundColor: 'rgba(124, 58, 237, 0.7)',
-            borderRadius: 8,
-            borderSkipped: false,
-            barThickness: 28
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-            y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.04)' } },
-            x: { grid: { display: false } }
-        }
-    }
-});
-<?php endif; ?>
-</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

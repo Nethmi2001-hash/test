@@ -71,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         body { font-family: 'Inter', sans-serif; margin: 0; min-height: 100vh; background: var(--bg-primary); }
         .register-layout { min-height: 100vh; display: grid; grid-template-columns: 420px 1fr; }
         .hero-panel {
-            background: linear-gradient(160deg, var(--primary-600) 0%, var(--primary-700) 60%, #5C3D2E 100%);
+            background: linear-gradient(160deg, var(--primary-600) 0%, var(--primary-700) 60%, #7c2d12 100%);
             color: #fff; padding: 48px 36px; display: flex; flex-direction: column; justify-content: center;
             position: relative; overflow: hidden;
         }
@@ -115,7 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border-radius: var(--radius-lg); font-size: 14px; font-family: inherit;
             background: var(--bg-primary); transition: all 0.2s; color: var(--text-primary);
         }
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary-500); box-shadow: 0 0 0 3px rgba(110,134,98,0.12); background: var(--bg-card); }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary-500); box-shadow: 0 0 0 3px rgba(249,115,22,0.12); background: var(--bg-card); }
         .form-group select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px; padding-right: 36px; }
         .form-hint { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
 
@@ -128,7 +128,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border: none; border-radius: var(--radius-lg); font-size: 14px; font-weight: 600;
             cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.5px;
         }
-        .btn-register:hover { background: var(--primary-700); box-shadow: 0 4px 14px rgba(110,134,98,0.3); transform: translateY(-1px); }
+        .btn-register:hover { background: var(--primary-700); box-shadow: 0 4px 14px rgba(249,115,22,0.3); transform: translateY(-1px); }
 
         .divider { height: 1px; background: var(--border-color); margin: 24px 0; }
         .login-link { text-align: center; font-size: 13px; color: var(--text-secondary); }

@@ -9,17 +9,17 @@
    1. CSS CUSTOM PROPERTIES
    ============================================ */
 :root {
-  /* Primary Colors - Emerald (Healthcare / Nature) */
-  --primary-50: #ecfdf5;
-  --primary-100: #d1fae5;
-  --primary-200: #a7f3d0;
-  --primary-300: #6ee7b7;
-  --primary-400: #34d399;
-  --primary-500: #10b981;
-  --primary-600: #059669;
-  --primary-700: #047857;
-  --primary-800: #065f46;
-  --primary-900: #064e3b;
+  /* Primary Colors - Orange (Warm / Modern) */
+  --primary-50: #fff7ed;
+  --primary-100: #ffedd5;
+  --primary-200: #fed7aa;
+  --primary-300: #fdba74;
+  --primary-400: #fb923c;
+  --primary-500: #f97316;
+  --primary-600: #ea580c;
+  --primary-700: #c2410c;
+  --primary-800: #9a3412;
+  --primary-900: #7c2d12;
 
   /* Accent Colors - Amber (Saffron / Monastic) */
   --accent-50: #fffbeb;
@@ -78,7 +78,7 @@
   --bg-card: #ffffff;
   --bg-sidebar: var(--slate-900);
   --bg-sidebar-hover: rgba(255, 255, 255, 0.08);
-  --bg-sidebar-active: rgba(16, 185, 129, 0.15);
+  --bg-sidebar-active: rgba(249, 115, 22, 0.15);
   --text-primary: var(--slate-900);
   --text-secondary: var(--slate-500);
   --text-sidebar: rgba(255, 255, 255, 0.7);
@@ -704,7 +704,7 @@ img { max-width: 100%; height: auto; }
 .table-search input:focus {
   outline: none;
   border-color: var(--primary-500);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
 }
 
 .table-search i {
@@ -750,7 +750,7 @@ img { max-width: 100%; height: auto; }
 }
 
 .modern-table tbody tr:hover {
-  background: rgba(16, 185, 129, 0.03);
+  background: rgba(249, 115, 22, 0.03);
 }
 
 .modern-table tbody tr:last-child td {
@@ -944,7 +944,7 @@ img { max-width: 100%; height: auto; }
 .form-select-modern:focus {
   outline: none;
   border-color: var(--primary-500);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
 }
 
 .form-control-modern::placeholder {
@@ -1232,7 +1232,7 @@ textarea.form-control-modern {
   right: -50%;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.15), transparent 60%);
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.15), transparent 60%);
 }
 
 .auth-hero-content {
@@ -1485,7 +1485,7 @@ textarea.form-control-modern {
 .chat-input:focus {
   outline: none;
   border-color: var(--primary-500);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
 }
 
 .chat-send-btn {
@@ -1883,7 +1883,7 @@ textarea.form-control-modern {
 .form-control:focus,
 .form-select:focus {
   border-color: var(--primary-500);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
 }
 
 .form-control,
@@ -1925,7 +1925,7 @@ textarea.form-control-modern {
 }
 
 .table-hover tbody tr:hover {
-  background-color: rgba(16, 185, 129, 0.03);
+  background-color: rgba(249, 115, 22, 0.03);
 }
 
 .badge {
