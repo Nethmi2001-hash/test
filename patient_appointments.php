@@ -64,9 +64,39 @@ $success = "";
 
 $userRole = $_SESSION['role_name'] ?? 'Admin';
 $userName = $_SESSION['username'] ?? '';
-$canManageAppointments = in_array($userRole, ['Admin', 'Doctor'], true);
-$canCreateAppointments = ($userRole === 'Doctor');
+$userEmail = $_SESSION['email'] ?? '';
+$isAdmin = ($userRole === 'Admin');
+$canManageAppointments = $isAdmin;
+$canCreateAppointments = false;
 $isMonk = ($userRole === 'Monk');
+$isDoctor = ($userRole === 'Doctor');
+$canViewIncomingRequests = $isAdmin || $isDoctor;
+
+$currentDoctorId = null;
+if ($isDoctor) {
+    if (!empty($userEmail)) {
+        $stmt = $con->prepare("SELECT doctor_id FROM doctors WHERE status='active' AND email = ? LIMIT 1");
+        $stmt->bind_param("s", $userEmail);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result && $result->num_rows > 0) {
+            $currentDoctorId = (int)$result->fetch_assoc()['doctor_id'];
+        }
+        $stmt->close();
+    }
+
+    if (!$currentDoctorId) {
+        $stmt = $con->prepare("SELECT doctor_id FROM doctors WHERE status='active' AND (full_name = ? OR REPLACE(LOWER(full_name), ' ', '') = REPLACE(LOWER(?), ' ', '') OR LOWER(full_name) LIKE LOWER(?)) ORDER BY CASE WHEN full_name = ? THEN 0 ELSE 1 END, doctor_id ASC LIMIT 1");
+        $searchName = "%{$userName}%";
+        $stmt->bind_param("ssss", $userName, $userName, $searchName, $userName);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result && $result->num_rows > 0) {
+            $currentDoctorId = (int)$result->fetch_assoc()['doctor_id'];
+        }
+        $stmt->close();
+    }
+}
 
 $currentMonkId = null;
 if ($isMonk) {
@@ -138,12 +168,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
             $error = "Only doctors can create appointments directly.";
         } else {
         $monk_id = intval($_POST['monk_id']);
-        $doctor_id = intval($_POST['doctor_id']);
+        $doctor_id = $isDoctor ? (int)$currentDoctorId : intval($_POST['doctor_id']);
         $room_slot_id = !empty($_POST['room_slot_id']) ? intval($_POST['room_slot_id']) : null;
         $app_date = $_POST['app_date'];
         $app_time = $_POST['app_time'];
         $notes = $_POST['notes'] ?? '';
         $created_by = $_SESSION['user_id'] ?? null;
+
+        if ($doctor_id <= 0) {
+            $error = "Your doctor profile is not linked. Please contact admin.";
+        } else {
 
         if ($room_slot_id) {
             $stmt = $con->prepare("INSERT INTO appointments (monk_id, doctor_id, room_slot_id, app_date, app_time, status, notes, created_by) VALUES (?, ?, ?, ?, ?, 'scheduled', ?, ?)");
@@ -160,44 +194,77 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
         }
         $stmt->close();
         }
+        }
     }
 
     if ($form_name === 'update') {
         $app_id = intval($_POST['app_id']);
         $monk_id = intval($_POST['monk_id']);
-        $doctor_id = intval($_POST['doctor_id']);
+        $doctor_id = $isDoctor ? (int)$currentDoctorId : intval($_POST['doctor_id']);
         $room_slot_id = !empty($_POST['room_slot_id']) ? intval($_POST['room_slot_id']) : null;
         $app_date = $_POST['app_date'];
         $app_time = $_POST['app_time'];
         $status = $_POST['status'];
         $notes = $_POST['notes'] ?? '';
 
-        if ($room_slot_id) {
-            $stmt = $con->prepare("UPDATE appointments SET monk_id=?, doctor_id=?, room_slot_id=?, app_date=?, app_time=?, status=?, notes=? WHERE app_id=?");
-            $stmt->bind_param("iiissssi", $monk_id, $doctor_id, $room_slot_id, $app_date, $app_time, $status, $notes, $app_id);
+        if ($doctor_id <= 0) {
+            $error = "Your doctor profile is not linked. Please contact admin.";
+        } elseif ($room_slot_id) {
+            if ($isDoctor) {
+                $stmt = $con->prepare("UPDATE appointments SET monk_id=?, doctor_id=?, room_slot_id=?, app_date=?, app_time=?, status=?, notes=? WHERE app_id=? AND doctor_id=?");
+                $stmt->bind_param("iiissssii", $monk_id, $doctor_id, $room_slot_id, $app_date, $app_time, $status, $notes, $app_id, $doctor_id);
+            } else {
+                $stmt = $con->prepare("UPDATE appointments SET monk_id=?, doctor_id=?, room_slot_id=?, app_date=?, app_time=?, status=?, notes=? WHERE app_id=?");
+                $stmt->bind_param("iiissssi", $monk_id, $doctor_id, $room_slot_id, $app_date, $app_time, $status, $notes, $app_id);
+            }
         } else {
-            $stmt = $con->prepare("UPDATE appointments SET monk_id=?, doctor_id=?, room_slot_id=NULL, app_date=?, app_time=?, status=?, notes=? WHERE app_id=?");
-            $stmt->bind_param("iissssi", $monk_id, $doctor_id, $app_date, $app_time, $status, $notes, $app_id);
+            if ($isDoctor) {
+                $stmt = $con->prepare("UPDATE appointments SET monk_id=?, doctor_id=?, room_slot_id=NULL, app_date=?, app_time=?, status=?, notes=? WHERE app_id=? AND doctor_id=?");
+                $stmt->bind_param("iissssii", $monk_id, $doctor_id, $app_date, $app_time, $status, $notes, $app_id, $doctor_id);
+            } else {
+                $stmt = $con->prepare("UPDATE appointments SET monk_id=?, doctor_id=?, room_slot_id=NULL, app_date=?, app_time=?, status=?, notes=? WHERE app_id=?");
+                $stmt->bind_param("iissssi", $monk_id, $doctor_id, $app_date, $app_time, $status, $notes, $app_id);
+            }
         }
-        
-        if ($stmt->execute()) {
-            $success = "Appointment updated successfully!";
-        } else {
-            $error = "Error: " . $stmt->error;
+
+        if (empty($error)) {
+            if ($stmt->execute()) {
+                if ($isDoctor && $stmt->affected_rows === 0) {
+                    $error = "You can update only your own appointments.";
+                } else {
+                    $success = "Appointment updated successfully!";
+                }
+            } else {
+                $error = "Error: " . $stmt->error;
+            }
+            $stmt->close();
         }
-        $stmt->close();
     }
 
     if ($form_name === 'delete') {
         $app_id = intval($_POST['app_id']);
-        $stmt = $con->prepare("DELETE FROM appointments WHERE app_id=?");
-        $stmt->bind_param("i", $app_id);
+        if ($isDoctor && (int)$currentDoctorId <= 0) {
+            $error = "Your doctor profile is not linked. Please contact admin.";
+        } elseif ($isDoctor) {
+            $stmt = $con->prepare("DELETE FROM appointments WHERE app_id=? AND doctor_id=?");
+            $stmt->bind_param("ii", $app_id, $currentDoctorId);
+        } else {
+            $stmt = $con->prepare("DELETE FROM appointments WHERE app_id=?");
+            $stmt->bind_param("i", $app_id);
+        }
+
+        if (empty($error)) {
         if ($stmt->execute()) {
-            $success = "Appointment deleted successfully!";
+            if ($isDoctor && $stmt->affected_rows === 0) {
+                $error = "You can delete only your own appointments.";
+            } else {
+                $success = "Appointment deleted successfully!";
+            }
         } else {
             $error = "Error: " . $stmt->error;
         }
         $stmt->close();
+        }
     }
 
     if ($form_name === 'assign_request') {
@@ -302,19 +369,32 @@ if ($isMonk) {
             $error = "Your account is not linked to a monk profile by name. Please ask admin to align monk profile name with your login name.";
         }
     }
+} elseif ($isDoctor) {
+    if ($currentDoctorId) {
+        $appointments_query .= " WHERE a.doctor_id = " . (int)$currentDoctorId;
+    } else {
+        $appointments_query .= " WHERE 1 = 0";
+        if (!$error) {
+            $error = "Your account is not linked to a doctor profile by name/email. Please ask admin to align your doctor profile.";
+        }
+    }
 }
 
 $appointments_query .= " ORDER BY a.app_date DESC, a.app_time DESC";
 $appointments_res = $con->query($appointments_query);
 
 $pending_requests = [];
-if ($canManageAppointments) {
+if ($canViewIncomingRequests) {
+    $pending_where = "ar.status = 'pending'";
+    if ($isDoctor) {
+        $pending_where .= " AND ar.preferred_doctor_id = " . (int)$currentDoctorId;
+    }
     $req_res = $con->query("SELECT ar.*, m.full_name AS monk_name, d.full_name AS preferred_doctor_name, d.specialization AS preferred_doctor_specialization, u.name AS requested_by_name
         FROM appointment_requests ar
         JOIN monks m ON ar.monk_id = m.monk_id
         LEFT JOIN doctors d ON ar.preferred_doctor_id = d.doctor_id
         LEFT JOIN users u ON ar.created_by = u.user_id
-        WHERE ar.status = 'pending'
+        WHERE " . $pending_where . "
         ORDER BY ar.created_at ASC");
     if ($req_res) {
         while ($row = $req_res->fetch_assoc()) {
@@ -351,7 +431,11 @@ while ($m = $monks_res->fetch_assoc()) {
 }
 
 // Fetch doctors for dropdown
-$doctors_res = $con->query("SELECT doctor_id, full_name, specialization FROM doctors WHERE status='active' ORDER BY full_name ASC");
+if ($isDoctor && $currentDoctorId) {
+    $doctors_res = $con->query("SELECT doctor_id, full_name, specialization FROM doctors WHERE status='active' AND doctor_id = " . (int)$currentDoctorId . " ORDER BY full_name ASC");
+} else {
+    $doctors_res = $con->query("SELECT doctor_id, full_name, specialization FROM doctors WHERE status='active' ORDER BY full_name ASC");
+}
 $doctors = [];
 while ($d = $doctors_res->fetch_assoc()) {
     $doctors[] = $d;
@@ -415,7 +499,7 @@ while ($row = $appointments_res->fetch_assoc()) {
         </div>
     <?php endif; ?>
 
-    <?php if ($canManageAppointments && count($pending_requests) > 0): ?>
+    <?php if ($canViewIncomingRequests): ?>
     <div class="modern-card mb-4">
         <div class="card-header-modern d-flex justify-content-between align-items-center">
             <h6><i class="bi bi-inbox me-2"></i>Incoming Appointment Requests</h6>
@@ -431,10 +515,17 @@ while ($row = $appointments_res->fetch_assoc()) {
                             <th>Preferred Date</th>
                             <th>Request Notes</th>
                             <th>Requested By</th>
-                            <th>Actions</th>
+                            <?php if ($isAdmin): ?><th>Actions</th><?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
+                        <?php if (count($pending_requests) === 0): ?>
+                            <tr>
+                                <td colspan="<?= $isAdmin ? '6' : '5' ?>" class="text-center py-4 text-muted">
+                                    <i class="bi bi-info-circle"></i> No incoming appointment requests.
+                                </td>
+                            </tr>
+                        <?php endif; ?>
                         <?php foreach ($pending_requests as $req): ?>
                             <tr>
                                 <td><?= htmlspecialchars($req['monk_name']) ?></td>
@@ -451,6 +542,7 @@ while ($row = $appointments_res->fetch_assoc()) {
                                 </td>
                                 <td><?= $req['request_notes'] ? htmlspecialchars($req['request_notes']) : '<span class="text-muted">-</span>' ?></td>
                                 <td><?= $req['requested_by_name'] ? htmlspecialchars($req['requested_by_name']) : '<span class="text-muted">System</span>' ?></td>
+                                <?php if ($isAdmin): ?>
                                 <td>
                                     <div class="d-flex gap-1">
                                         <button class="btn-icon" data-bs-toggle="modal" data-bs-target="#assignRequestModal<?= $req['request_id'] ?>" title="Assign">
@@ -465,8 +557,10 @@ while ($row = $appointments_res->fetch_assoc()) {
                                         </form>
                                     </div>
                                 </td>
+                                <?php endif; ?>
                             </tr>
 
+                            <?php if ($isAdmin): ?>
                             <div class="modal fade" id="assignRequestModal<?= $req['request_id'] ?>" tabindex="-1">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
@@ -521,6 +615,7 @@ while ($row = $appointments_res->fetch_assoc()) {
                                     </div>
                                 </div>
                             </div>
+                            <?php endif; ?>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -730,13 +825,18 @@ while ($row = $appointments_res->fetch_assoc()) {
 
                                                 <div class="form-group-modern">
                                                     <label class="form-label-modern">Doctor</label>
-                                                    <select name="doctor_id" class="form-select-modern" required>
-                                                        <?php foreach($doctors as $doctor): ?>
-                                                            <option value="<?= $doctor['doctor_id'] ?>" <?= $doctor['doctor_id'] == $row['doctor_id'] ? 'selected' : '' ?>>
-                                                                <?= htmlspecialchars($doctor['full_name']) ?> - <?= $doctor['specialization'] ?>
-                                                            </option>
-                                                        <?php endforeach; ?>
-                                                    </select>
+                                                    <?php if ($isDoctor): ?>
+                                                        <input type="hidden" name="doctor_id" value="<?= (int)$currentDoctorId ?>">
+                                                        <input type="text" class="form-control-modern" value="<?= htmlspecialchars($row['doctor_name']) ?>" readonly>
+                                                    <?php else: ?>
+                                                        <select name="doctor_id" class="form-select-modern" required>
+                                                            <?php foreach($doctors as $doctor): ?>
+                                                                <option value="<?= $doctor['doctor_id'] ?>" <?= $doctor['doctor_id'] == $row['doctor_id'] ? 'selected' : '' ?>>
+                                                                    <?= htmlspecialchars($doctor['full_name']) ?> - <?= $doctor['specialization'] ?>
+                                                                </option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    <?php endif; ?>
                                                 </div>
 
                                                 <div class="form-group-modern">
@@ -852,14 +952,19 @@ while ($row = $appointments_res->fetch_assoc()) {
 
                     <div class="form-group-modern">
                         <label class="form-label-modern">Doctor</label>
-                        <select name="doctor_id" class="form-select-modern" required>
-                            <option value="">-- Select Doctor --</option>
-                            <?php foreach($doctors as $doctor): ?>
-                                <option value="<?= $doctor['doctor_id'] ?>">
-                                    <?= htmlspecialchars($doctor['full_name']) ?> - <?= $doctor['specialization'] ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                        <?php if ($isDoctor): ?>
+                            <input type="hidden" name="doctor_id" value="<?= (int)$currentDoctorId ?>">
+                            <input type="text" class="form-control-modern" value="<?= isset($doctors[0]) ? htmlspecialchars($doctors[0]['full_name'] . ' - ' . $doctors[0]['specialization']) : 'Not linked' ?>" readonly>
+                        <?php else: ?>
+                            <select name="doctor_id" class="form-select-modern" required>
+                                <option value="">-- Select Doctor --</option>
+                                <?php foreach($doctors as $doctor): ?>
+                                    <option value="<?= $doctor['doctor_id'] ?>">
+                                        <?= htmlspecialchars($doctor['full_name']) ?> - <?= $doctor['specialization'] ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        <?php endif; ?>
                     </div>
 
                     <div class="form-group-modern">
