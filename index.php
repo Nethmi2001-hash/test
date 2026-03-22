@@ -82,23 +82,14 @@
         .gal{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:10px}
         .gal-img{border-radius:12px;overflow:hidden;background:var(--sand)}
         .gal-img img{width:100%;height:100%;object-fit:cover;display:block}
-        .gal-img.tall{grid-row:span 2;height:370px}
-        .gal-img:not(.tall){height:175px}
+        .gal-img.tall{grid-row:span 2;height:450px}
+        .gal-img:not(.tall){height:220px}
         .mission-body{font-size:.97rem;color:var(--text-mid);line-height:1.9;margin-bottom:16px}
         .mission-quote{padding:18px 22px;border-left:3px solid var(--orange);background:var(--white);border-radius:0 10px 10px 0;margin:24px 0}
         .mission-quote p{font-family:'Cormorant Garamond',serif;font-size:1.12rem;font-style:italic;color:var(--text-dark);line-height:1.6}
         .inl-stats{display:flex;gap:28px;margin-top:28px;padding-top:24px;border-top:1px solid var(--border)}
         .inl-num{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;color:var(--orange)}
         .inl-lbl{font-size:.72rem;color:var(--text-light);letter-spacing:.07em;text-transform:uppercase}
-
-        /* GALLERY STRIP */
-        .gal-strip{display:flex;height:260px;overflow:hidden}
-        .gal-strip-img{flex:1;overflow:hidden;position:relative;cursor:pointer}
-        .gal-strip-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
-        .gal-strip-img:hover img{transform:scale(1.07)}
-        .gal-strip-img .ph{width:100%;height:100%;background:var(--sand);display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--text-light);opacity:.5}
-        .gal-strip-img .ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.4),transparent);opacity:0;transition:opacity .3s}
-        .gal-strip-img:hover .ov{opacity:1}
 
         /* HOW */
         .how{padding:90px 6%;background:var(--white);border-top:1px solid var(--border)}
@@ -149,7 +140,7 @@
 
         /* RESPONSIVE */
         @media(max-width:960px){.hero-content{padding:0 6% 150px}.feat-grid{grid-template-columns:repeat(2,1fr)}.mission-inner{grid-template-columns:1fr;gap:48px}.steps{grid-template-columns:1fr}.steps::before{display:none}.foot-grid{grid-template-columns:1fr 1fr}}
-        @media(max-width:680px){.hero{min-height:760px}.hero-content{padding:0 6% 190px}.nav-links{display:none}.stats-bar{width:92%;bottom:-96px;flex-wrap:wrap}.stat-box{min-width:50%;border-bottom:1px solid var(--border)}.feat-grid{grid-template-columns:1fr}.gal-strip{height:160px}.foot-grid{grid-template-columns:1fr}.features{padding-top:180px}}
+        @media(max-width:680px){.hero{min-height:760px}.hero-content{padding:0 6% 190px}.nav-links{display:none}.stats-bar{width:92%;bottom:-96px;flex-wrap:wrap}.stat-box{min-width:50%;border-bottom:1px solid var(--border)}.feat-grid{grid-template-columns:1fr}.foot-grid{grid-template-columns:1fr}.features{padding-top:180px}}
 
         /* ANIMATIONS */
         @keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
@@ -239,17 +230,6 @@
         </div>
     </div>
 </section>
-
-<!-- GALLERY STRIP -->
-<div class="gal-strip">
-    <?php $imgs=[['img4','🛕'],['img5','🙏'],['img6','🏥'],['img7','🍚'],['img2','☸'],['img3','🌿']];
-    foreach($imgs as [$img,$ic]):?>
-    <div class="gal-strip-img">
-        <img src="images/<?=$img?>.jpeg" alt="" onerror="this.parentElement.innerHTML='<div class=ph><?=$ic?></div>'">
-        <div class="ov"></div>
-    </div>
-    <?php endforeach;?>
-</div>
 
 <!-- HOW IT WORKS -->
 <section class="how" id="how">
