@@ -1,6 +1,11 @@
 <?php
 session_start();
 
+if (empty($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header("Location: login.php");
+    exit();
+}
+
 $servername = "localhost";
 $dbusername = "root";
 $db_password = "";
@@ -9,8 +14,83 @@ $dbname = "monastery_healthcare";
 $con = new mysqli($servername, $dbusername, $db_password, $dbname);
 if ($con->connect_error) die("Connection failed: " . $con->connect_error);
 
+// Appointment requests are used for monk -> admin/doctor assignment flow.
+$con->query("CREATE TABLE IF NOT EXISTS appointment_requests (
+    request_id INT PRIMARY KEY AUTO_INCREMENT,
+    monk_id INT NOT NULL,
+    preferred_doctor_id INT NULL,
+    preferred_date DATE NOT NULL,
+    preferred_time TIME NULL,
+    request_notes TEXT,
+    status ENUM('pending','assigned','rejected') DEFAULT 'pending',
+    created_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reviewed_by INT NULL,
+    reviewed_at TIMESTAMP NULL,
+    linked_app_id INT NULL,
+    FOREIGN KEY (monk_id) REFERENCES monks(monk_id) ON DELETE CASCADE,
+    FOREIGN KEY (preferred_doctor_id) REFERENCES doctors(doctor_id) ON DELETE SET NULL,
+    FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL,
+    FOREIGN KEY (reviewed_by) REFERENCES users(user_id) ON DELETE SET NULL,
+    FOREIGN KEY (linked_app_id) REFERENCES appointments(app_id) ON DELETE SET NULL,
+    INDEX idx_status (status),
+    INDEX idx_preferred_date (preferred_date),
+    INDEX idx_monk (monk_id),
+    INDEX idx_preferred_doctor (preferred_doctor_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+// Backward-compatible migration in case appointment_requests existed before preferred_doctor_id was added.
+$doctorColRes = $con->query("SELECT COUNT(*) AS c FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'appointment_requests' AND COLUMN_NAME = 'preferred_doctor_id'");
+if ($doctorColRes && (int)$doctorColRes->fetch_assoc()['c'] === 0) {
+    $con->query("ALTER TABLE appointment_requests ADD COLUMN preferred_doctor_id INT NULL AFTER monk_id");
+    $con->query("ALTER TABLE appointment_requests ADD INDEX idx_preferred_doctor (preferred_doctor_id)");
+    $fkRes = $con->query("SELECT COUNT(*) AS c FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'appointment_requests' AND CONSTRAINT_TYPE = 'FOREIGN KEY' AND CONSTRAINT_NAME = 'fk_appointment_requests_preferred_doctor'");
+    if ($fkRes && (int)$fkRes->fetch_assoc()['c'] === 0) {
+        $con->query("ALTER TABLE appointment_requests ADD CONSTRAINT fk_appointment_requests_preferred_doctor FOREIGN KEY (preferred_doctor_id) REFERENCES doctors(doctor_id) ON DELETE SET NULL");
+    }
+}
+
+// Backward-compatible migration: preferred_time is optional now.
+$timeNullableRes = $con->query("SELECT IS_NULLABLE AS v FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'appointment_requests' AND COLUMN_NAME = 'preferred_time' LIMIT 1");
+if ($timeNullableRes) {
+    $row = $timeNullableRes->fetch_assoc();
+    if ($row && strtoupper($row['v']) === 'NO') {
+        $con->query("ALTER TABLE appointment_requests MODIFY preferred_time TIME NULL");
+    }
+}
+
 $error = "";
 $success = "";
+
+$userRole = $_SESSION['role_name'] ?? 'Admin';
+$userName = $_SESSION['username'] ?? '';
+$canManageAppointments = in_array($userRole, ['Admin', 'Doctor'], true);
+$canCreateAppointments = ($userRole === 'Doctor');
+$isMonk = ($userRole === 'Monk');
+
+$currentMonkId = null;
+if ($isMonk) {
+    $stmt = $con->prepare("SELECT monk_id FROM monks WHERE status = 'active' AND (full_name = ? OR REPLACE(LOWER(full_name), ' ', '') = REPLACE(LOWER(?), ' ', '') OR LOWER(full_name) LIKE LOWER(?)) ORDER BY CASE WHEN full_name = ? THEN 0 ELSE 1 END, monk_id ASC LIMIT 1");
+    $searchName = "%{$userName}%";
+    $stmt->bind_param("ssss", $userName, $userName, $searchName, $userName);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result && $result->num_rows > 0) {
+        $currentMonkId = (int)$result->fetch_assoc()['monk_id'];
+    }
+    $stmt->close();
+
+    // If there is no matching monk profile, create one automatically using the login name.
+    if (!$currentMonkId) {
+        $stmt = $con->prepare("INSERT INTO monks (full_name, status, notes) VALUES (?, 'active', ?)");
+        $autoNote = 'Auto-created from monk user login for appointment flow';
+        $stmt->bind_param("ss", $userName, $autoNote);
+        if ($stmt->execute()) {
+            $currentMonkId = (int)$stmt->insert_id;
+        }
+        $stmt->close();
+    }
+}
 
 $status_colors = [
     'scheduled' => 'primary',
@@ -19,11 +99,44 @@ $status_colors = [
     'no-show' => 'secondary'
 ];
 
-// Handle CREATE / UPDATE / DELETE
+// Handle appointment request + CRUD actions
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
     $form_name = $_POST['form_name'];
 
+    if ($form_name === 'submit_request') {
+        if (!$isMonk) {
+            http_response_code(403);
+            $error = "You are not authorized to submit appointment requests.";
+        } else {
+            $preferred_doctor_id = intval($_POST['preferred_doctor_id'] ?? 0);
+            $preferred_date = $_POST['preferred_date'] ?? '';
+            $request_notes = trim($_POST['request_notes'] ?? '');
+            $created_by = $_SESSION['user_id'] ?? null;
+            $requestMonkId = $currentMonkId;
+
+            if ($requestMonkId <= 0 || $preferred_doctor_id <= 0 || empty($preferred_date)) {
+                $error = "Monk profile, preferred doctor, and date are required.";
+            } else {
+                $stmt = $con->prepare("INSERT INTO appointment_requests (monk_id, preferred_doctor_id, preferred_date, preferred_time, request_notes, status, created_by) VALUES (?, ?, ?, NULL, ?, 'pending', ?)");
+                $stmt->bind_param("iissi", $requestMonkId, $preferred_doctor_id, $preferred_date, $request_notes, $created_by);
+                if ($stmt->execute()) {
+                    $success = "Appointment request submitted. Admin will assign room and confirm schedule.";
+                } else {
+                    $error = "Error: " . $stmt->error;
+                }
+                $stmt->close();
+            }
+        }
+    } elseif (!$canManageAppointments) {
+        http_response_code(403);
+        $error = "You are not authorized to modify appointments.";
+    } else {
+
     if ($form_name === 'create') {
+        if (!$canCreateAppointments) {
+            http_response_code(403);
+            $error = "Only doctors can create appointments directly.";
+        } else {
         $monk_id = intval($_POST['monk_id']);
         $doctor_id = intval($_POST['doctor_id']);
         $room_slot_id = !empty($_POST['room_slot_id']) ? intval($_POST['room_slot_id']) : null;
@@ -46,6 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
             $error = "Error: " . $stmt->error;
         }
         $stmt->close();
+        }
     }
 
     if ($form_name === 'update') {
@@ -85,6 +199,81 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
         }
         $stmt->close();
     }
+
+    if ($form_name === 'assign_request') {
+        $request_id = intval($_POST['request_id']);
+        $room_slot_id = !empty($_POST['room_slot_id']) ? intval($_POST['room_slot_id']) : null;
+        $app_date = $_POST['app_date'];
+        $admin_note = trim($_POST['admin_note'] ?? '');
+        $created_by = $_SESSION['user_id'] ?? null;
+
+        $con->begin_transaction();
+        try {
+            $stmt = $con->prepare("SELECT monk_id, preferred_doctor_id, request_notes, preferred_time FROM appointment_requests WHERE request_id = ? AND status = 'pending' LIMIT 1");
+            $stmt->bind_param("i", $request_id);
+            $stmt->execute();
+            $reqResult = $stmt->get_result();
+            $requestRow = $reqResult ? $reqResult->fetch_assoc() : null;
+            $stmt->close();
+
+            if (!$requestRow) {
+                throw new Exception("Request was already processed or not found.");
+            }
+
+            $monk_id = (int)$requestRow['monk_id'];
+            $doctor_id = (int)$requestRow['preferred_doctor_id'];
+            if ($doctor_id <= 0) {
+                throw new Exception("Requested doctor is missing for this request.");
+            }
+
+            $request_notes = trim($requestRow['request_notes'] ?? '');
+            $app_time = !empty($requestRow['preferred_time']) ? $requestRow['preferred_time'] : '09:00:00';
+            $combined_notes = trim("Monk Request: " . $request_notes . "\nAdmin Note: " . $admin_note);
+
+            if ($room_slot_id) {
+                $stmt = $con->prepare("INSERT INTO appointments (monk_id, doctor_id, room_slot_id, app_date, app_time, status, notes, created_by) VALUES (?, ?, ?, ?, ?, 'scheduled', ?, ?)");
+                $stmt->bind_param("iiisssi", $monk_id, $doctor_id, $room_slot_id, $app_date, $app_time, $combined_notes, $created_by);
+            } else {
+                $stmt = $con->prepare("INSERT INTO appointments (monk_id, doctor_id, app_date, app_time, status, notes, created_by) VALUES (?, ?, ?, ?, 'scheduled', ?, ?)");
+                $stmt->bind_param("iisssi", $monk_id, $doctor_id, $app_date, $app_time, $combined_notes, $created_by);
+            }
+
+            if (!$stmt->execute()) {
+                throw new Exception($stmt->error);
+            }
+            $new_app_id = $stmt->insert_id;
+            $stmt->close();
+
+            $stmt = $con->prepare("UPDATE appointment_requests SET status='assigned', reviewed_by=?, reviewed_at=NOW(), linked_app_id=? WHERE request_id=? AND status='pending'");
+            $reviewed_by = $_SESSION['user_id'] ?? null;
+            $stmt->bind_param("iii", $reviewed_by, $new_app_id, $request_id);
+            if (!$stmt->execute() || $stmt->affected_rows === 0) {
+                throw new Exception("Request was already processed.");
+            }
+            $stmt->close();
+
+            $con->commit();
+            $success = "Request assigned successfully. Appointment created.";
+        } catch (Exception $e) {
+            $con->rollback();
+            $error = "Error assigning request: " . $e->getMessage();
+        }
+    }
+
+    if ($form_name === 'reject_request') {
+        $request_id = intval($_POST['request_id']);
+        $stmt = $con->prepare("UPDATE appointment_requests SET status='rejected', reviewed_by=?, reviewed_at=NOW() WHERE request_id=? AND status='pending'");
+        $reviewed_by = $_SESSION['user_id'] ?? null;
+        $stmt->bind_param("ii", $reviewed_by, $request_id);
+        if ($stmt->execute()) {
+            $success = "Appointment request rejected.";
+        } else {
+            $error = "Error: " . $stmt->error;
+        }
+        $stmt->close();
+    }
+
+    }
 }
 
 // Fetch appointments with all details
@@ -102,9 +291,57 @@ $appointments_query = "
     LEFT JOIN room_slots rs ON a.room_slot_id = rs.room_slot_id
     LEFT JOIN rooms r ON rs.room_id = r.room_id
     LEFT JOIN users u ON a.created_by = u.user_id
-    ORDER BY a.app_date DESC, a.app_time DESC
 ";
+
+if ($isMonk) {
+    if ($currentMonkId) {
+        $appointments_query .= " WHERE a.monk_id = " . (int)$currentMonkId;
+    } else {
+        $appointments_query .= " WHERE 1 = 0";
+        if (!$error) {
+            $error = "Your account is not linked to a monk profile by name. Please ask admin to align monk profile name with your login name.";
+        }
+    }
+}
+
+$appointments_query .= " ORDER BY a.app_date DESC, a.app_time DESC";
 $appointments_res = $con->query($appointments_query);
+
+$pending_requests = [];
+if ($canManageAppointments) {
+    $req_res = $con->query("SELECT ar.*, m.full_name AS monk_name, d.full_name AS preferred_doctor_name, d.specialization AS preferred_doctor_specialization, u.name AS requested_by_name
+        FROM appointment_requests ar
+        JOIN monks m ON ar.monk_id = m.monk_id
+        LEFT JOIN doctors d ON ar.preferred_doctor_id = d.doctor_id
+        LEFT JOIN users u ON ar.created_by = u.user_id
+        WHERE ar.status = 'pending'
+        ORDER BY ar.created_at ASC");
+    if ($req_res) {
+        while ($row = $req_res->fetch_assoc()) {
+            $pending_requests[] = $row;
+        }
+    }
+}
+
+$my_requests = [];
+if ($isMonk && $currentMonkId) {
+    $stmt = $con->prepare("SELECT ar.*, d.full_name AS preferred_doctor_name, u.name AS reviewed_by_name
+        FROM appointment_requests ar
+        LEFT JOIN doctors d ON ar.preferred_doctor_id = d.doctor_id
+        LEFT JOIN users u ON ar.reviewed_by = u.user_id
+        WHERE ar.monk_id = ?
+        ORDER BY ar.created_at DESC
+        LIMIT 10");
+    $stmt->bind_param("i", $currentMonkId);
+    $stmt->execute();
+    $req_res = $stmt->get_result();
+    if ($req_res) {
+        while ($row = $req_res->fetch_assoc()) {
+            $my_requests[] = $row;
+        }
+    }
+    $stmt->close();
+}
 
 // Fetch monks for dropdown
 $monks_res = $con->query("SELECT monk_id, full_name FROM monks WHERE status='active' ORDER BY full_name ASC");
@@ -178,6 +415,177 @@ while ($row = $appointments_res->fetch_assoc()) {
         </div>
     <?php endif; ?>
 
+    <?php if ($canManageAppointments && count($pending_requests) > 0): ?>
+    <div class="modern-card mb-4">
+        <div class="card-header-modern d-flex justify-content-between align-items-center">
+            <h6><i class="bi bi-inbox me-2"></i>Incoming Appointment Requests</h6>
+            <span class="badge-modern badge-warning badge-dot"><?= count($pending_requests) ?> Pending</span>
+        </div>
+        <div class="card-body-modern" style="padding:16px;">
+            <div class="table-responsive-modern">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Monk</th>
+                            <th>Preferred Doctor</th>
+                            <th>Preferred Date</th>
+                            <th>Request Notes</th>
+                            <th>Requested By</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($pending_requests as $req): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($req['monk_name']) ?></td>
+                                <td>
+                                    <?php if (!empty($req['preferred_doctor_name'])): ?>
+                                        <strong><?= htmlspecialchars($req['preferred_doctor_name']) ?></strong><br>
+                                        <small class="text-muted"><?= htmlspecialchars($req['preferred_doctor_specialization'] ?? '') ?></small>
+                                    <?php else: ?>
+                                        <span class="text-muted">Not selected</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <strong><?= date('M d, Y', strtotime($req['preferred_date'])) ?></strong>
+                                </td>
+                                <td><?= $req['request_notes'] ? htmlspecialchars($req['request_notes']) : '<span class="text-muted">-</span>' ?></td>
+                                <td><?= $req['requested_by_name'] ? htmlspecialchars($req['requested_by_name']) : '<span class="text-muted">System</span>' ?></td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <button class="btn-icon" data-bs-toggle="modal" data-bs-target="#assignRequestModal<?= $req['request_id'] ?>" title="Assign">
+                                            <i class="bi bi-person-check"></i>
+                                        </button>
+                                        <form method="post" class="d-inline">
+                                            <input type="hidden" name="form_name" value="reject_request">
+                                            <input type="hidden" name="request_id" value="<?= $req['request_id'] ?>">
+                                            <button type="submit" class="btn-icon danger" onclick="return confirm('Reject this appointment request?')" title="Reject">
+                                                <i class="bi bi-x-circle"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <div class="modal fade" id="assignRequestModal<?= $req['request_id'] ?>" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form method="post">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title"><i class="bi bi-person-check me-2"></i>Assign Appointment</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <input type="hidden" name="form_name" value="assign_request">
+                                                <input type="hidden" name="request_id" value="<?= $req['request_id'] ?>">
+
+                                                <div class="form-group-modern">
+                                                    <label class="form-label-modern">Monk</label>
+                                                    <input type="text" class="form-control-modern" value="<?= htmlspecialchars($req['monk_name']) ?>" readonly>
+                                                </div>
+
+                                                <div class="form-group-modern">
+                                                    <label class="form-label-modern">Requested Doctor</label>
+                                                    <input type="text" class="form-control-modern" value="<?= htmlspecialchars(($req['preferred_doctor_name'] ?? 'Not selected') . ((empty($req['preferred_doctor_specialization']) ? '' : ' - ' . $req['preferred_doctor_specialization']))) ?>" readonly>
+                                                </div>
+
+                                                <div class="form-group-modern">
+                                                    <label class="form-label-modern">Room Slot (Optional)</label>
+                                                    <select name="room_slot_id" class="form-select-modern">
+                                                        <option value="">-- No Room --</option>
+                                                        <?php foreach($room_slots as $slot): ?>
+                                                            <option value="<?= $slot['id'] ?>"><?= htmlspecialchars($slot['label']) ?></option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="form-group-modern">
+                                                            <label class="form-label-modern">Appointment Date</label>
+                                                            <input type="date" name="app_date" class="form-control-modern" value="<?= htmlspecialchars($req['preferred_date']) ?>" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group-modern">
+                                                    <label class="form-label-modern">Admin Note (Optional)</label>
+                                                    <textarea name="admin_note" class="form-control-modern" rows="2" placeholder="Add note for this assignment..."></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn-modern btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn-modern btn-primary-modern">Assign & Create Appointment</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <?php if ($isMonk): ?>
+    <div class="modern-card mb-4">
+        <div class="card-header-modern d-flex justify-content-between align-items-center">
+            <h6><i class="bi bi-send me-2"></i>Appointment Requests</h6>
+            <button class="btn-modern btn-primary-modern btn-sm-modern" data-bs-toggle="modal" data-bs-target="#requestModal">
+                <i class="bi bi-plus-circle"></i> Request Appointment
+            </button>
+        </div>
+        <div class="card-body-modern" style="padding:16px;">
+            <?php if (!$currentMonkId): ?>
+                <div class="alert-modern alert-warning-modern mb-3">
+                    <i class="bi bi-exclamation-triangle"></i> Your account is not linked to a monk profile by name. Ask admin to align names.
+                </div>
+            <?php endif; ?>
+
+            <?php if (count($my_requests) === 0): ?>
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-inbox" style="font-size:2rem;opacity:.35;"></i>
+                    <p class="mt-2 mb-0">No appointment requests yet.</p>
+                </div>
+            <?php else: ?>
+                <div class="table-responsive-modern">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Preferred Date</th>
+                                <th>Preferred Doctor</th>
+                                <th>Notes</th>
+                                <th>Status</th>
+                                <th>Reviewed By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($my_requests as $req): ?>
+                                <?php
+                                    $req_badge = 'badge-warning';
+                                    if ($req['status'] === 'assigned') $req_badge = 'badge-success';
+                                    if ($req['status'] === 'rejected') $req_badge = 'badge-danger';
+                                ?>
+                                <tr>
+                                    <td>
+                                        <strong><?= date('M d, Y', strtotime($req['preferred_date'])) ?></strong>
+                                    </td>
+                                    <td><?= $req['preferred_doctor_name'] ? htmlspecialchars($req['preferred_doctor_name']) : '<span class="text-muted">-</span>' ?></td>
+                                    <td><?= $req['request_notes'] ? htmlspecialchars($req['request_notes']) : '<span class="text-muted">-</span>' ?></td>
+                                    <td><span class="badge-modern <?= $req_badge ?> badge-dot"><?= ucfirst($req['status']) ?></span></td>
+                                    <td><?= $req['reviewed_by_name'] ? htmlspecialchars($req['reviewed_by_name']) : '<span class="text-muted">-</span>' ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Stat Cards -->
     <div class="row g-3 mb-4">
         <div class="col-sm-6 col-xl-3">
@@ -225,10 +633,16 @@ while ($row = $appointments_res->fetch_assoc()) {
     <div id="appointments-list">
         <div class="modern-table-wrapper">
             <div class="modern-table-header">
-                <h5><i class="bi bi-calendar-check"></i> Appointment Management</h5>
-                <button class="btn-modern btn-primary-modern" data-bs-toggle="modal" data-bs-target="#addModal">
-                    <i class="bi bi-plus-circle"></i> New Appointment
-                </button>
+                <h5><i class="bi bi-calendar-check"></i> <?= $canManageAppointments ? 'Appointment Management' : 'My Appointments' ?></h5>
+                <?php if ($canCreateAppointments): ?>
+                    <button class="btn-modern btn-primary-modern" data-bs-toggle="modal" data-bs-target="#addModal">
+                        <i class="bi bi-plus-circle"></i> New Appointment
+                    </button>
+                <?php elseif ($isMonk): ?>
+                    <button class="btn-modern btn-primary-modern" data-bs-toggle="modal" data-bs-target="#requestModal">
+                        <i class="bi bi-send"></i> Request Appointment
+                    </button>
+                <?php endif; ?>
             </div>
             <div class="table-responsive-modern">
                 <table class="modern-table">
@@ -242,14 +656,15 @@ while ($row = $appointments_res->fetch_assoc()) {
                             <th>Notes</th>
                             <th>Status</th>
                             <th>Created By</th>
-                            <th>Actions</th>
+                            <?php if ($canManageAppointments): ?><th>Actions</th><?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (count($all_appointments) == 0): ?>
                             <tr>
-                                <td colspan="9" class="text-center py-4 text-muted">
-                                    <i class="bi bi-info-circle"></i> No appointments found. Click "New Appointment" to create one.
+                                <td colspan="<?= $canManageAppointments ? '9' : '8' ?>" class="text-center py-4 text-muted">
+                                    <i class="bi bi-info-circle"></i>
+                                    <?= $canManageAppointments ? 'No appointments found. Click "New Appointment" to create one.' : 'No appointments found for your profile.' ?>
                                 </td>
                             </tr>
                         <?php endif; ?>
@@ -276,6 +691,7 @@ while ($row = $appointments_res->fetch_assoc()) {
                                     <span class="badge-modern <?= $badge_class ?> badge-dot"><?= ucfirst($row['status']) ?></span>
                                 </td>
                                 <td><?= $row['created_by_name'] ? htmlspecialchars($row['created_by_name']) : '<span class="text-muted">—</span>' ?></td>
+                                <?php if ($canManageAppointments): ?>
                                 <td>
                                     <button class="btn-icon" data-bs-toggle="modal" data-bs-target="#editModal<?= $row['app_id'] ?>" title="Edit">
                                         <i class="bi bi-pencil"></i>
@@ -284,8 +700,10 @@ while ($row = $appointments_res->fetch_assoc()) {
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </td>
+                                <?php endif; ?>
                             </tr>
 
+                            <?php if ($canManageAppointments): ?>
                             <!-- Edit Modal -->
                             <div class="modal fade" id="editModal<?= $row['app_id'] ?>" tabindex="-1">
                                 <div class="modal-dialog">
@@ -399,6 +817,7 @@ while ($row = $appointments_res->fetch_assoc()) {
                                     </div>
                                 </div>
                             </div>
+                            <?php endif; ?>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -406,6 +825,7 @@ while ($row = $appointments_res->fetch_assoc()) {
         </div>
     </div><!-- END appointments-list -->
 
+<?php if ($canCreateAppointments): ?>
 <!-- Add New Appointment Modal -->
 <div class="modal fade" id="addModal" tabindex="-1">
     <div class="modal-dialog">
@@ -486,6 +906,59 @@ while ($row = $appointments_res->fetch_assoc()) {
         </div>
     </div>
 </div>
+<?php endif; ?>
+
+<?php if ($isMonk): ?>
+<div class="modal fade" id="requestModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-send"></i> Request Appointment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="form_name" value="submit_request">
+
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Preferred Doctor</label>
+                        <select name="preferred_doctor_id" class="form-select-modern" required>
+                            <option value="">-- Select Doctor --</option>
+                            <?php foreach($doctors as $doctor): ?>
+                                <option value="<?= $doctor['doctor_id'] ?>">
+                                    <?= htmlspecialchars($doctor['full_name']) ?> - <?= htmlspecialchars($doctor['specialization']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">Preferred Date</label>
+                                <input type="date" name="preferred_date" class="form-control-modern" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">Reason / Notes</label>
+                        <textarea name="request_notes" class="form-control-modern" rows="3" placeholder="Describe your medical need or request details..."></textarea>
+                    </div>
+
+                    <div class="alert-modern alert-success-modern mb-0">
+                        <i class="bi bi-info-circle"></i> Your request will appear in Admin dashboard and appointments queue for assignment.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-modern btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-modern btn-primary-modern">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
 <?php include 'includes/footer.php'; ?>
 

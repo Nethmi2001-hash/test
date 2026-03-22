@@ -18,6 +18,14 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+$monkColumns = [];
+$colResult = $conn->query("SHOW COLUMNS FROM monks");
+if ($colResult) {
+    while ($col = $colResult->fetch_assoc()) {
+        $monkColumns[$col['Field']] = true;
+    }
+}
+
 $error = "";
 $success = "";
 
@@ -42,8 +50,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
         if (empty($full_name)) {
             $error = "Monk name is required.";
         } else {
-            $stmt = $conn->prepare("INSERT INTO monks (full_name, title_id, ordination_date, birth_date, phone, emergency_contact, blood_group, allergies, chronic_conditions, current_medications, notes, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("sissssssssss", $full_name, $title_id, $ordination_date, $birth_date, $phone, $emergency_contact, $blood_group, $allergies, $chronic_conditions, $current_medications, $notes, $status);
+            // Keep compatibility with both old and new monk schemas.
+            $final_notes = $notes;
+            if (empty($monkColumns['current_medications']) && !empty($current_medications)) {
+                $final_notes = trim($final_notes . (empty($final_notes) ? '' : "\n") . "Current Medications: " . $current_medications);
+            }
+
+            $dob_value = !empty($monkColumns['dob']) ? $birth_date : null;
+            $stmt = $conn->prepare("INSERT INTO monks (full_name, title_id, dob, phone, emergency_contact, blood_group, allergies, chronic_conditions, notes, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sissssssss", $full_name, $title_id, $dob_value, $phone, $emergency_contact, $blood_group, $allergies, $chronic_conditions, $final_notes, $status);
             
             if ($stmt->execute()) {
                 $success = "Monk added successfully!";
@@ -69,8 +84,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
         $notes = trim($_POST['notes'] ?? '');
         $status = $_POST['status'];
 
-        $stmt = $conn->prepare("UPDATE monks SET full_name=?, title_id=?, ordination_date=?, birth_date=?, phone=?, emergency_contact=?, blood_group=?, allergies=?, chronic_conditions=?, current_medications=?, notes=?, status=? WHERE monk_id=?");
-        $stmt->bind_param("sissssssssssi", $full_name, $title_id, $ordination_date, $birth_date, $phone, $emergency_contact, $blood_group, $allergies, $chronic_conditions, $current_medications, $notes, $status, $monk_id);
+        $final_notes = $notes;
+        if (empty($monkColumns['current_medications']) && !empty($current_medications)) {
+            $final_notes = trim($final_notes . (empty($final_notes) ? '' : "\n") . "Current Medications: " . $current_medications);
+        }
+
+        $dob_value = !empty($monkColumns['dob']) ? $birth_date : null;
+        $stmt = $conn->prepare("UPDATE monks SET full_name=?, title_id=?, dob=?, phone=?, emergency_contact=?, blood_group=?, allergies=?, chronic_conditions=?, notes=?, status=? WHERE monk_id=?");
+        $stmt->bind_param("sissssssssi", $full_name, $title_id, $dob_value, $phone, $emergency_contact, $blood_group, $allergies, $chronic_conditions, $final_notes, $status, $monk_id);
         
         if ($stmt->execute()) {
             $success = "Monk updated successfully!";
@@ -113,6 +134,15 @@ $result = $conn->query("
 ");
 if ($result) {
     while ($row = $result->fetch_assoc()) {
+        if (!array_key_exists('birth_date', $row)) {
+            $row['birth_date'] = $row['dob'] ?? '';
+        }
+        if (!array_key_exists('ordination_date', $row)) {
+            $row['ordination_date'] = '';
+        }
+        if (!array_key_exists('current_medications', $row)) {
+            $row['current_medications'] = '';
+        }
         $monks[] = $row;
     }
 }
