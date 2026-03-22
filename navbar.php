@@ -131,11 +131,6 @@ $isMonk = ($userRole === 'Monk');
       <i class="bi bi-clock-history"></i> My Availability
     </a>
 
-    <div class="sidebar-section-label">Tools</div>
-    <a class="sidebar-link <?= isActivePage('chatbot.php', $currentPage) ?>" href="chatbot.php">
-      <i class="bi bi-robot"></i> <?= __('ai_assistant') ?>
-    </a>
-
     <?php elseif ($isDonor): ?>
     <!-- Donor: Donations, Transparency -->
     <div class="sidebar-section-label">My Donations</div>
@@ -207,6 +202,12 @@ $isMonk = ($userRole === 'Monk');
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
           <li><a class="dropdown-item" href="dashboard.php"><i class="bi bi-grid me-2"></i> Dashboard</a></li>
+          <?php if ($isDoctor): ?>
+          <li><a class="dropdown-item" href="dashboard_doctor.php?edit_profile=1"><i class="bi bi-pencil-square me-2"></i> Update My Profile</a></li>
+          <?php endif; ?>
+          <?php if ($isMonk): ?>
+          <li><a class="dropdown-item" href="dashboard_monk.php?edit_profile=1"><i class="bi bi-pencil-square me-2"></i> Update My Details</a></li>
+          <?php endif; ?>
           <li><hr class="dropdown-divider"></li>
           <li><a class="dropdown-item text-danger" href="logout.php"><i class="bi bi-box-arrow-right me-2"></i> <?= __('logout') ?></a></li>
         </ul>
