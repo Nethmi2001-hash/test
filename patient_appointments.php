@@ -204,13 +204,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
         $request_id = intval($_POST['request_id']);
         $room_slot_id = !empty($_POST['room_slot_id']) ? intval($_POST['room_slot_id']) : null;
         $app_date = $_POST['app_date'];
-        $app_time = $_POST['app_time'];
         $admin_note = trim($_POST['admin_note'] ?? '');
         $created_by = $_SESSION['user_id'] ?? null;
 
         $con->begin_transaction();
         try {
-            $stmt = $con->prepare("SELECT monk_id, preferred_doctor_id, request_notes FROM appointment_requests WHERE request_id = ? AND status = 'pending' LIMIT 1");
+            $stmt = $con->prepare("SELECT monk_id, preferred_doctor_id, request_notes, preferred_time FROM appointment_requests WHERE request_id = ? AND status = 'pending' LIMIT 1");
             $stmt->bind_param("i", $request_id);
             $stmt->execute();
             $reqResult = $stmt->get_result();
@@ -228,6 +227,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
             }
 
             $request_notes = trim($requestRow['request_notes'] ?? '');
+            $app_time = !empty($requestRow['preferred_time']) ? $requestRow['preferred_time'] : '09:00:00';
             $combined_notes = trim("Monk Request: " . $request_notes . "\nAdmin Note: " . $admin_note);
 
             if ($room_slot_id) {
@@ -500,16 +500,10 @@ while ($row = $appointments_res->fetch_assoc()) {
                                                 </div>
 
                                                 <div class="row">
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-12">
                                                         <div class="form-group-modern">
                                                             <label class="form-label-modern">Appointment Date</label>
                                                             <input type="date" name="app_date" class="form-control-modern" value="<?= htmlspecialchars($req['preferred_date']) ?>" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group-modern">
-                                                            <label class="form-label-modern">Appointment Time</label>
-                                                            <input type="time" name="app_time" class="form-control-modern" value="09:00" required>
                                                         </div>
                                                     </div>
                                                 </div>

@@ -426,12 +426,6 @@ if (count($alerts) == 0) {
                 <span class="quick-action-label">View Reports</span>
             </a>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <a href="chatbot.php" class="quick-action-card">
-                <div class="quick-action-icon" style="background:#cffafe;color:#0891b2;"><i class="bi bi-robot"></i></div>
-                <span class="quick-action-label">AI Assistant</span>
-            </a>
-        </div>
     </div>
 
 <?php include 'includes/footer.php'; ?>

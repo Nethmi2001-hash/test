@@ -30,6 +30,7 @@ $success = "";
 
 $userRole = $_SESSION['role_name'] ?? 'Admin';
 $isMonk = ($userRole === 'Monk');
+$specialization_options = ['General', 'Ayurvedic', 'Western'];
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
@@ -49,6 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
 
         if (empty($full_name) || empty($specialization)) {
             $error = "Doctor name and specialization are required.";
+        } elseif (!in_array($specialization, $specialization_options, true)) {
+            $error = "Please select a valid specialization.";
         } else {
             $stmt = $conn->prepare("INSERT INTO doctors (full_name, specialization, {$doctorPhoneColumn}, email, license_number, status) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("ssssss", $full_name, $specialization, $phone, $email, $license_number, $status);
@@ -72,15 +75,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
         $license_number = trim($_POST['license_number'] ?? '');
         $status = $_POST['status'];
 
-        $stmt = $conn->prepare("UPDATE doctors SET full_name=?, specialization=?, {$doctorPhoneColumn}=?, email=?, license_number=?, status=? WHERE doctor_id=?");
-        $stmt->bind_param("ssssssi", $full_name, $specialization, $phone, $email, $license_number, $status, $doctor_id);
-        
-        if ($stmt->execute()) {
-            $success = "Doctor updated successfully!";
+        if (!in_array($specialization, $specialization_options, true)) {
+            $error = "Please select a valid specialization.";
         } else {
-            $error = "Error: " . $stmt->error;
+            $stmt = $conn->prepare("UPDATE doctors SET full_name=?, specialization=?, {$doctorPhoneColumn}=?, email=?, license_number=?, status=? WHERE doctor_id=?");
+            $stmt->bind_param("ssssssi", $full_name, $specialization, $phone, $email, $license_number, $status, $doctor_id);
+            
+            if ($stmt->execute()) {
+                $success = "Doctor updated successfully!";
+            } else {
+                $error = "Error: " . $stmt->error;
+            }
+            $stmt->close();
         }
-        $stmt->close();
     }
 
     if ($form_name === 'delete') {
@@ -279,7 +286,12 @@ $conn->close();
                             <div class="col-md-6">
                                 <div class="form-group-modern">
                                     <label class="form-label-modern">Specialization <span class="required">*</span></label>
-                                    <input type="text" name="specialization" class="form-control-modern" placeholder="e.g., General Medicine, Cardiology" required>
+                                    <select name="specialization" class="form-control-modern form-select-modern" required>
+                                        <option value="">-- Select Specialization --</option>
+                                        <?php foreach ($specialization_options as $spec): ?>
+                                            <option value="<?= htmlspecialchars($spec) ?>"><?= htmlspecialchars($spec) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -347,7 +359,12 @@ $conn->close();
                             <div class="col-md-6">
                                 <div class="form-group-modern">
                                     <label class="form-label-modern">Specialization <span class="required">*</span></label>
-                                    <input type="text" name="specialization" id="edit_specialization" class="form-control-modern" required>
+                                    <select name="specialization" id="edit_specialization" class="form-control-modern form-select-modern" required>
+                                        <option value="">-- Select Specialization --</option>
+                                        <?php foreach ($specialization_options as $spec): ?>
+                                            <option value="<?= htmlspecialchars($spec) ?>"><?= htmlspecialchars($spec) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -399,7 +416,15 @@ $conn->close();
     function editDoctor(doctor) {
         document.getElementById('edit_doctor_id').value = doctor.doctor_id;
         document.getElementById('edit_full_name').value = doctor.full_name;
-        document.getElementById('edit_specialization').value = doctor.specialization;
+        const specSelect = document.getElementById('edit_specialization');
+        const hasOption = Array.from(specSelect.options).some(opt => opt.value === doctor.specialization);
+        if (!hasOption && doctor.specialization) {
+            const opt = document.createElement('option');
+            opt.value = doctor.specialization;
+            opt.textContent = doctor.specialization;
+            specSelect.appendChild(opt);
+        }
+        specSelect.value = doctor.specialization || '';
         document.getElementById('edit_phone').value = doctor.phone || '';
         document.getElementById('edit_email').value = doctor.email || '';
         document.getElementById('edit_license_number').value = doctor.license_number || '';
