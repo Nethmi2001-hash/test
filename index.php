@@ -1,1379 +1,310 @@
-<?php
-/**
- * Homepage - Seela Suwa Herath Bikshu Gilan Arana
- * Modern landing page for the Monastery Healthcare & Donation Management System
- */
-require_once __DIR__ . '/includes/db_config.php';
-$conn = getDBConnection();
-
-// Quick public stats
-$totalMonks = 0; $totalDoctors = 0; $totalDonations = 0; $totalAppointments = 0;
-$r = $conn->query("SELECT COUNT(*) as c FROM monks WHERE status='active'");
-if ($r) $totalMonks = $r->fetch_assoc()['c'];
-$r = $conn->query("SELECT COUNT(*) as c FROM doctors WHERE status='active'");
-if ($r) $totalDoctors = $r->fetch_assoc()['c'];
-$r = $conn->query("SELECT COALESCE(SUM(amount),0) as t FROM donations WHERE status IN ('paid','verified')");
-if ($r) $totalDonations = $r->fetch_assoc()['t'];
-$r = $conn->query("SELECT COUNT(*) as c FROM appointments WHERE status='completed'");
-if ($r) $totalAppointments = $r->fetch_assoc()['c'];
-
-$conn->close();
-
-// Check if user is logged in
-session_start();
-$isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
-?>
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seela Suwa Herath Bikshu Gilan Arana - Monastery Healthcare System</title>
-    <meta name="description" content="Comprehensive healthcare coordination and donation management for monastic communities. Seela Suwa Herath Bikshu Gilan Arana.">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <title>Seela suwa herath — Monastery Welfare & Donation</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        :root{
+            --white:#FFFFFF;--ivory:#FFFBF7;--cream:#FEF3E8;--sand:#F5E0C8;
+            --orange:#D4622A;--orange-mid:#F0864A;--orange-light:#F0A050;--orange-pale:#FDEBD8;
+            --text-dark:#1E1610;--text-mid:#5A4A3A;--text-light:#9A8070;
+            --border:rgba(210,170,130,0.28);
+        }
+        html{scroll-behavior:smooth}
+        body{font-family:'Jost',sans-serif;font-weight:300;background:var(--white);color:var(--text-dark);overflow-x:hidden}
 
-        :root {
-            --green-50: #fff7ed;
-            --green-100: #ffedd5;
-            --green-200: #fed7aa;
-            --green-400: #fb923c;
-            --green-500: #f97316;
-            --green-600: #ea580c;
-            --green-700: #c2410c;
-            --green-800: #9a3412;
-            --green-900: #7c2d12;
-            --amber-400: #fbbf24;
-            --amber-500: #f59e0b;
-            --amber-600: #d97706;
-            --slate-50: #fefcfb;
-            --slate-100: #fef7f2;
-            --slate-200: #fde8d8;
-            --slate-300: #f5cdb4;
-            --slate-400: #b08968;
-            --slate-500: #7c6354;
-            --slate-600: #5c4a40;
-            --slate-700: #4a3c34;
-            --slate-800: #3d302a;
-            --slate-900: #2d2118;
-        }
+        /* NAV */
+        nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:0 6%;height:76px;display:flex;align-items:center;justify-content:space-between;transition:background .4s,box-shadow .4s}
+        nav.scrolled{background:rgba(255,255,255,.96);backdrop-filter:blur(16px);box-shadow:0 1px 0 var(--border)}
+        .nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+        .nav-logo-mark{width:38px;height:38px;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.35);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;transition:background .4s,border-color .4s}
+        nav.scrolled .nav-logo-mark{background:linear-gradient(135deg,var(--orange),var(--orange-light));border-color:transparent}
+        .nav-logo-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--white);transition:color .4s}
+        nav.scrolled .nav-logo-name{color:var(--text-dark)}
+        .nav-logo-sub{font-size:.6rem;color:rgba(255,255,255,.55);letter-spacing:.13em;text-transform:uppercase;display:block;margin-top:-4px;transition:color .4s}
+        nav.scrolled .nav-logo-sub{color:var(--text-light)}
+        .nav-links{display:flex;align-items:center;gap:32px;list-style:none}
+        .nav-links a{text-decoration:none;color:rgba(255,255,255,.85);font-size:.83rem;font-weight:400;letter-spacing:.07em;text-transform:uppercase;transition:color .2s}
+        nav.scrolled .nav-links a{color:var(--text-mid)}
+        .nav-links a:hover{color:var(--white)}
+        nav.scrolled .nav-links a:hover{color:var(--orange)}
+        .nav-donate-btn{background:var(--white)!important;color:var(--orange)!important;padding:10px 26px!important;border-radius:40px!important;font-weight:500!important;transition:all .25s!important}
+        nav.scrolled .nav-donate-btn{background:var(--orange)!important;color:var(--white)!important}
+        .nav-donate-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(212,98,42,.3)}
 
-        html { scroll-behavior: smooth; }
+        /* HERO */
+        .hero{position:relative;height:100vh;min-height:640px;display:flex;align-items:center;overflow:visible}
+        .hero-img{position:absolute;inset:0;z-index:0;background:#2A1A0E;overflow:hidden;border-radius:0}
+        .hero-img img{width:100%;height:100%;object-fit:cover;object-position:center;opacity:.72}
+        .hero-img-fallback{position:absolute;inset:0;background:linear-gradient(160deg,#3D1F0A 0%,#7A3A1A 45%,#C06030 100%);display:none}
+        .hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(to right,rgba(15,8,3,.72) 0%,rgba(15,8,3,.45) 55%,rgba(15,8,3,.12) 100%)}
+        .hero-overlay-btm{position:absolute;bottom:0;left:0;right:0;z-index:2;height:200px;background:linear-gradient(to top,rgba(255,251,247,1) 0%,transparent 100%)}
+        .hero-content{position:relative;z-index:3;padding:0 6% 120px;max-width:700px}
+        .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(8px);padding:7px 18px;border-radius:40px;font-size:.72rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85);margin-bottom:28px}
+        .hero-badge span{color:var(--orange-light)}
+        .hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,6.5vw,5.8rem);font-weight:300;line-height:1.05;color:var(--white);margin-bottom:24px;text-shadow:0 2px 32px rgba(0,0,0,.3)}
+        .hero-title em{font-style:italic;color:var(--orange-light)}
+        .hero-desc{font-size:1.05rem;color:rgba(255,255,255,.72);max-width:480px;line-height:1.85;margin-bottom:40px}
+        .hero-btns{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+        .btn-hp{background:var(--orange);color:var(--white);padding:16px 44px;border-radius:50px;text-decoration:none;font-size:.95rem;font-weight:500;letter-spacing:.04em;transition:all .3s;border:2px solid var(--orange)}
+        .btn-hp:hover{background:var(--orange-mid);border-color:var(--orange-mid);transform:translateY(-2px);box-shadow:0 12px 36px rgba(212,98,42,.4)}
+        .btn-hg{background:rgba(255,255,255,.1);color:var(--white);padding:16px 36px;border-radius:50px;text-decoration:none;font-size:.95rem;font-weight:400;letter-spacing:.04em;transition:all .3s;border:1.5px solid rgba(255,255,255,.35);backdrop-filter:blur(6px)}
+        .btn-hg:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.6)}
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            color: var(--slate-800);
-            background: #fff;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
+        /* STATS BAR — half in hero, half in features */
+        .stats-bar{position:absolute;bottom:-52px;left:0;right:0;margin:0 auto;z-index:10;display:flex;width:88%;max-width:960px;background:var(--white);border-radius:20px;border:1px solid rgba(210,170,130,.25);box-shadow:0 20px 60px rgba(0,0,0,.14),0 4px 16px rgba(212,98,42,.08);overflow:hidden}
+        .stat-box{flex:1;padding:28px 24px;text-align:center;border-right:1px solid var(--border);position:relative}
+        .stat-box:last-child{border-right:none}
+        .stat-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--orange),var(--orange-light));opacity:0;transition:opacity .3s}
+        .stat-box:hover::before{opacity:1}
+        .stat-num{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:600;color:var(--orange);line-height:1}
+        .stat-lbl{font-size:.72rem;color:var(--text-light);letter-spacing:.08em;text-transform:uppercase;margin-top:5px}
 
-        /* ========== NAVBAR ========== */
-        .hp-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            padding: 16px 0;
-            transition: all 0.35s cubic-bezier(.4,0,.2,1);
-        }
-        .hp-nav.scrolled {
-            background: rgba(255,255,255,0.92);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04);
-            padding: 10px 0;
-        }
-        .hp-nav-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .hp-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: #fff;
-            transition: color 0.3s;
-        }
-        .hp-nav.scrolled .hp-brand { color: #ea580c; }
-        .hp-brand-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #f97316, #ea580c);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 20px;
-            flex-shrink: 0;
-            box-shadow: 0 2px 8px rgba(249,115,22,0.3);
-        }
-        .hp-brand-text {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 800;
-            font-size: 17px;
-            letter-spacing: -0.5px;
-            line-height: 1.2;
-        }
-        .hp-brand-text small {
-            display: block;
-            font-weight: 500;
-            font-size: 11px;
-            opacity: 0.7;
-            letter-spacing: 0;
-        }
-        .hp-nav-links {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .hp-nav-links a {
-            font-size: 13.5px;
-            font-weight: 600;
-            color: rgba(255,255,255,0.85);
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 10px;
-            transition: all 0.2s;
-        }
-        .hp-nav.scrolled .hp-nav-links a { color: var(--slate-600); }
-        .hp-nav-links a:hover { background: rgba(255,255,255,0.15); color: #fff; }
-        .hp-nav.scrolled .hp-nav-links a:hover { background: var(--slate-100); color: var(--slate-800); }
-        .hp-nav-cta {
-            background: #fff !important;
-            border: 1.5px solid #fff !important;
-            color: #ea580c !important;
-        }
-        .hp-nav.scrolled .hp-nav-cta {
-            background: #f97316 !important;
-            border-color: #f97316 !important;
-            color: #fff !important;
-        }
-        .hp-nav-cta:hover { background: #ffedd5 !important; color: #c2410c !important; }
-        .hp-nav.scrolled .hp-nav-cta:hover { background: #ea580c !important; }
+        /* FEATURES — extra top padding for overlapping stats bar */
+        .features{background:var(--white);padding:110px 6% 80px;position:relative;z-index:5}
+        .sec-label{font-size:.72rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);display:block;margin-bottom:14px}
+        .sec-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,3.8vw,3rem);font-weight:300;line-height:1.2;color:var(--text-dark);margin-bottom:56px}
+        .feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+        .feat-card{padding:30px 22px;border:1px solid var(--border);border-radius:16px;background:var(--white);transition:all .3s}
+        .feat-card:hover{border-color:var(--orange-light);transform:translateY(-4px);box-shadow:0 16px 48px rgba(212,98,42,.08)}
+        .feat-icon{width:54px;height:54px;background:var(--orange-pale);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:18px}
+        .feat-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--text-dark);margin-bottom:8px}
+        .feat-desc{font-size:.84rem;color:var(--text-light);line-height:1.7}
 
-        /* Mobile nav */
-        .hp-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 4px;
-        }
-        .hp-nav.scrolled .hp-menu-btn { color: var(--slate-700); }
+        /* MISSION */
+        .mission{padding:80px 6%;background:var(--ivory);border-top:1px solid var(--border)}
+        .mission-inner{max-width:1140px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+        .gal{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:10px}
+        .gal-img{border-radius:12px;overflow:hidden;background:var(--sand)}
+        .gal-img img{width:100%;height:100%;object-fit:cover;display:block}
+        .gal-img.tall{grid-row:span 2;height:370px}
+        .gal-img:not(.tall){height:175px}
+        .mission-body{font-size:.97rem;color:var(--text-mid);line-height:1.9;margin-bottom:16px}
+        .mission-quote{padding:18px 22px;border-left:3px solid var(--orange);background:var(--white);border-radius:0 10px 10px 0;margin:24px 0}
+        .mission-quote p{font-family:'Cormorant Garamond',serif;font-size:1.12rem;font-style:italic;color:var(--text-dark);line-height:1.6}
+        .inl-stats{display:flex;gap:28px;margin-top:28px;padding-top:24px;border-top:1px solid var(--border)}
+        .inl-num{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;color:var(--orange)}
+        .inl-lbl{font-size:.72rem;color:var(--text-light);letter-spacing:.07em;text-transform:uppercase}
 
-        /* ========== HERO ========== */
-        .hp-hero {
-            position: relative;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            background:
-                linear-gradient(165deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.30) 50%, rgba(0,0,0,0.50) 100%),
-                url('images/hero_bg.png') center center / cover no-repeat;
-            overflow: hidden;
-        }
-        .hp-hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: 
-                radial-gradient(ellipse at 20% 20%, rgba(255,255,255,0.2) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(251,191,36,0.2) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.05) 0%, transparent 70%);
-        }
-        .hp-hero-grid {
-            position: absolute;
-            inset: 0;
-            background-image: 
-                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
-        }
-        .hp-hero-glow {
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 70%);
-            top: -100px;
-            right: -100px;
-            animation: float 8s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-30px) scale(1.05); }
-        }
-        .hp-hero-content {
-            position: relative;
-            z-index: 2;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 100px 24px 64px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            align-items: center;
-            gap: 60px;
-        }
-        .hp-hero-left {}
-        .hp-hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.35);
-            color: #fff;
-            padding: 7px 16px;
-            border-radius: 999px;
-            font-size: 12.5px;
-            font-weight: 600;
-            margin-bottom: 24px;
-            letter-spacing: 0.3px;
-        }
-        .hp-hero-badge i { font-size: 14px; }
-        .hp-hero-title {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 900;
-            font-size: clamp(36px, 5vw, 56px);
-            color: #fff;
-            line-height: 1.1;
-            letter-spacing: -1.5px;
-            margin-bottom: 20px;
-        }
-        .hp-hero-title .highlight {
-            background: linear-gradient(135deg, #fff, #ffedd5);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .hp-hero-desc {
-            font-size: 17px;
-            line-height: 1.7;
-            color: rgba(255,255,255,0.7);
-            margin-bottom: 36px;
-            max-width: 520px;
-        }
-        .hp-hero-actions {
-            display: flex;
-            gap: 14px;
-            flex-wrap: wrap;
-        }
-        .hp-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 14px 28px;
-            border-radius: 12px;
-            font-size: 14.5px;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all 0.25s cubic-bezier(.4,0,.2,1);
-            border: none;
-            cursor: pointer;
-        }
-        .hp-btn-primary {
-            background: #fff;
-            color: #ea580c;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
-        }
-        .hp-btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-            color: #c2410c;
-        }
-        .hp-btn-secondary {
-            background: transparent;
-            color: #fff;
-            border: 2px solid #fff;
-        }
-        .hp-btn-secondary:hover {
-            background: #fff;
-            color: #ea580c;
-            border-color: #fff;
-            transform: translateY(-2px);
-        }
-        .hp-btn-accent {
-            background: #fff;
-            color: #ea580c;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
-        }
-        .hp-btn-accent:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-            color: #c2410c;
-        }
-        .hp-btn-outline {
-            background: transparent;
-            color: #f97316;
-            border: 2px solid #f97316;
-        }
-        .hp-btn-outline:hover {
-            background: #f97316;
-            color: #fff;
-            transform: translateY(-2px);
-        }
+        /* GALLERY STRIP */
+        .gal-strip{display:flex;height:260px;overflow:hidden}
+        .gal-strip-img{flex:1;overflow:hidden;position:relative;cursor:pointer}
+        .gal-strip-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+        .gal-strip-img:hover img{transform:scale(1.07)}
+        .gal-strip-img .ph{width:100%;height:100%;background:var(--sand);display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--text-light);opacity:.5}
+        .gal-strip-img .ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.4),transparent);opacity:0;transition:opacity .3s}
+        .gal-strip-img:hover .ov{opacity:1}
 
-        /* Hero image collage */
-        .hp-hero-visual {
-            position: relative;
-            display: flex;
-            justify-content: center;
-        }
-        .hp-hero-card-stack {
-            position: relative;
-            width: 420px;
-            height: 480px;
-        }
-        .hp-float-card {
-            position: absolute;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
-            animation: cardFloat 6s ease-in-out infinite;
-        }
-        .hp-float-card:nth-child(1) {
-            top: 0;
-            left: 0;
-            width: 240px;
-            z-index: 3;
-            background: #fff;
-            color: #3d302a;
-            border: 1px solid rgba(0,0,0,0.06);
-        }
-        .hp-float-card:nth-child(2) {
-            top: 170px;
-            right: 0;
-            width: 230px;
-            z-index: 2;
-            animation-delay: -2s;
-            background: #fff;
-            color: #3d302a;
-            border: 1px solid rgba(0,0,0,0.06);
-        }
-        .hp-float-card:nth-child(3) {
-            bottom: 0;
-            left: 30px;
-            width: 270px;
-            z-index: 1;
-            animation-delay: -4s;
-            background: #fff;
-            color: #3d302a;
-            border: 1px solid rgba(0,0,0,0.06);
-        }
-        @keyframes cardFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        .hp-fc-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            margin-bottom: 14px;
-        }
-        .hp-fc-title {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 700;
-            font-size: 15px;
-            margin-bottom: 6px;
-        }
-        .hp-fc-desc {
-            font-size: 12.5px;
-            opacity: 0.65;
-            line-height: 1.5;
-        }
-        .hp-fc-stat {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 800;
-            font-size: 32px;
-            letter-spacing: -1px;
-        }
-        .hp-fc-label {
-            font-size: 12px;
-            opacity: 0.65;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
+        /* HOW */
+        .how{padding:90px 6%;background:var(--white);border-top:1px solid var(--border)}
+        .how-inner{max-width:1060px;margin:0 auto}
+        .how-hd{text-align:center;margin-bottom:60px}
+        .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;position:relative}
+        .steps::before{content:'';position:absolute;top:40px;left:18%;right:18%;height:1px;background:repeating-linear-gradient(90deg,var(--border) 0,var(--border) 6px,transparent 6px,transparent 14px)}
+        .step{text-align:center;padding:0 16px}
+        .step-c{width:80px;height:80px;margin:0 auto 22px;border-radius:50%;background:var(--orange-pale);border:2px solid rgba(212,98,42,.15);display:flex;align-items:center;justify-content:center;font-size:1.7rem;position:relative;z-index:1;transition:all .3s}
+        .step:hover .step-c{background:var(--orange);border-color:var(--orange);transform:scale(1.08)}
+        .step-n{position:absolute;top:-6px;right:-6px;width:24px;height:24px;background:var(--orange);color:#fff;border-radius:50%;font-size:.7rem;font-weight:600;display:flex;align-items:center;justify-content:center}
+        .step-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--text-dark);margin-bottom:10px}
+        .step-desc{font-size:.85rem;color:var(--text-light);line-height:1.75}
 
-        /* ========== STATS BAR ========== */
-        .hp-stats-bar {
-            position: relative;
-            z-index: 10;
-            margin-top: -50px;
-        }
-        .hp-stats-inner {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-        .hp-stats-card {
-            background: #fff;
-            border-radius: 20px;
-            padding: 36px 40px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 32px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.03), 0 20px 40px rgba(0,0,0,0.06);
-            border: 1px solid rgba(0,0,0,0.04);
-        }
-        .hp-stat-item {
-            text-align: center;
-        }
-        .hp-stat-number {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 900;
-            font-size: 36px;
-            color: #f97316;
-            letter-spacing: -1px;
-            line-height: 1;
-            margin-bottom: 6px;
-        }
-        .hp-stat-label {
-            font-size: 13px;
-            color: var(--slate-500);
-            font-weight: 600;
-        }
+        /* DONATE CTA */
+        .dcta{padding:100px 6%;background:var(--white);text-align:center;position:relative;overflow:hidden}
+        .dcta::before{content:'☸';position:absolute;font-size:480px;opacity:.025;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--orange);line-height:1}
+        .dcta-inner{position:relative;z-index:1;max-width:680px;margin:0 auto}
+        .dcta .sec-title{max-width:100%;text-align:center;margin:16px auto 20px}
+        .dcta p{font-size:1.05rem;color:var(--text-mid);line-height:1.8;margin-bottom:40px}
+        .chips{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:32px}
+        .chip{background:var(--ivory);border:1.5px solid var(--border);color:var(--text-mid);padding:11px 24px;border-radius:40px;font-size:.88rem;cursor:pointer;transition:all .2s;text-decoration:none}
+        .chip:hover,.chip.active{background:var(--orange);border-color:var(--orange);color:#fff}
+        .btn-donate{display:inline-flex;align-items:center;gap:10px;background:var(--orange);color:#fff;padding:18px 56px;border-radius:50px;text-decoration:none;font-size:1.05rem;font-weight:500;letter-spacing:.04em;transition:all .3s;border:none;cursor:pointer}
+        .btn-donate:hover{background:var(--text-dark);transform:translateY(-2px);box-shadow:0 16px 48px rgba(0,0,0,.14)}
+        .dcta-note{margin-top:16px;font-size:.78rem;color:var(--text-light)}
 
-        /* ========== SECTION COMMON ========== */
-        .hp-section {
-            padding: 64px 24px;
-        }
-        .hp-section-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .hp-section-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #fff7ed;
-            color: #f97316;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
-        }
-        .hp-section-title {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 800;
-            font-size: clamp(28px, 3.5vw, 42px);
-            color: var(--slate-900);
-            letter-spacing: -1px;
-            line-height: 1.15;
-            margin-bottom: 16px;
-        }
-        .hp-section-desc {
-            font-size: 16px;
-            line-height: 1.7;
-            color: var(--slate-500);
-            max-width: 600px;
-        }
+        /* TESTIMONIAL */
+        .testi{background:var(--cream);border-top:1px solid var(--border);padding:80px 6%}
+        .testi-inner{max-width:860px;margin:0 auto;text-align:center}
+        .testi-q{font-family:'Cormorant Garamond',serif;font-size:clamp(1.4rem,2.5vw,2rem);font-weight:300;font-style:italic;color:var(--text-dark);line-height:1.55;margin-bottom:24px}
+        .testi-q::before{content:'\201C';color:var(--orange)}
+        .testi-q::after{content:'\201D';color:var(--orange)}
+        .testi-auth{font-size:.83rem;color:var(--text-light);letter-spacing:.08em;text-transform:uppercase}
+        .testi-auth strong{color:var(--text-mid);font-weight:500}
 
-        /* ========== FEATURES ========== */
-        .hp-features-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            margin-top: 56px;
-        }
-        .hp-feature-card {
-            background: #fff;
-            border: 1px solid var(--slate-200);
-            border-radius: 20px;
-            padding: 32px 28px;
-            transition: all 0.3s cubic-bezier(.4,0,.2,1);
-            position: relative;
-            overflow: hidden;
-        }
-        .hp-feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #f97316, #fb923c);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .hp-feature-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 32px rgba(0,0,0,0.08);
-            border-color: transparent;
-        }
-        .hp-feature-card:hover::before { opacity: 1; }
-        .hp-feature-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        .hp-feature-title {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 700;
-            font-size: 17px;
-            color: var(--slate-800);
-            margin-bottom: 10px;
-        }
-        .hp-feature-desc {
-            font-size: 14px;
-            line-height: 1.65;
-            color: var(--slate-500);
-        }
+        /* FOOTER */
+        footer{background:var(--text-dark);padding:60px 6% 28px}
+        .foot-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:24px}
+        .foot-brand{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:#fff;margin-bottom:12px}
+        .foot-tag{font-size:.84rem;color:rgba(255,255,255,.38);line-height:1.7;max-width:240px}
+        .foot-col h4{font-size:.68rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:14px}
+        .foot-col ul{list-style:none}
+        .foot-col ul li{margin-bottom:9px}
+        .foot-col ul a{color:rgba(255,255,255,.48);text-decoration:none;font-size:.86rem;transition:color .2s}
+        .foot-col ul a:hover{color:var(--orange-light)}
+        .foot-btm{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;font-size:.77rem;color:rgba(255,255,255,.22)}
 
-        /* ========== ABOUT / MISSION ========== */
-        .hp-about {
-            background: var(--slate-50);
-        }
-        .hp-about-grid {
-            display: grid;
-            grid-template-columns: 1.2fr 1fr; /* Give more width to the images side */
-            gap: 56px;
-            align-items: center;
-            margin-top: 42px;
-        }
-        .hp-about-images {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px; /* Slightly larger gap */
-        }
-        .hp-about-img {
-            border-radius: 20px;
-            overflow: hidden;
-            aspect-ratio: 5/4; /* Taller aspect ratio for bigger images */
-            box-shadow: 0 12px 32px rgba(0,0,0,0.12);
-        }
-        .hp-about-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-        }
-        .hp-about-img:hover img { transform: scale(1.08); }
-        .hp-about-img:first-child {
-            grid-row: span 2;
-            aspect-ratio: 3/4; /* Make the main left image much taller */
-        }
-        .hp-value-item {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        .hp-value-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-        .hp-value-title {
-            font-weight: 700;
-            font-size: 15px;
-            color: var(--slate-800);
-            margin-bottom: 4px;
-        }
-        .hp-value-desc {
-            font-size: 13.5px;
-            color: var(--slate-500);
-            line-height: 1.6;
-        }
+        /* RESPONSIVE */
+        @media(max-width:960px){.hero-content{padding:0 6% 150px}.feat-grid{grid-template-columns:repeat(2,1fr)}.mission-inner{grid-template-columns:1fr;gap:48px}.steps{grid-template-columns:1fr}.steps::before{display:none}.foot-grid{grid-template-columns:1fr 1fr}}
+        @media(max-width:680px){.hero{min-height:760px}.hero-content{padding:0 6% 190px}.nav-links{display:none}.stats-bar{width:92%;bottom:-96px;flex-wrap:wrap}.stat-box{min-width:50%;border-bottom:1px solid var(--border)}.feat-grid{grid-template-columns:1fr}.gal-strip{height:160px}.foot-grid{grid-template-columns:1fr}.features{padding-top:180px}}
 
-        /* ========== DONATE CTA ========== */
-        .hp-donate-section {
-            background: linear-gradient(165deg, #fb923c 0%, #f97316 40%, #ea580c 100%);
-            position: relative;
-            overflow: hidden;
-        }
-        .hp-donate-section::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.15), transparent 60%);
-        }
-        .hp-donate-inner {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-        .hp-donate-inner .hp-section-badge {
-            background: rgba(255,255,255,0.2);
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-        .hp-donate-inner .hp-section-title {
-            color: #fff;
-        }
-        .hp-donate-inner .hp-section-desc {
-            color: rgba(255,255,255,0.7);
-            margin: 0 auto 24px;
-        }
-
-        /* ========== ROLES ========== */
-        .hp-roles-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-top: 32px;
-        }
-        .hp-role-card {
-            text-align: center;
-            padding: 36px 24px;
-            border-radius: 20px;
-            border: 2px solid var(--slate-200);
-            background: #fff;
-            transition: all 0.3s;
-            text-decoration: none;
-            color: inherit;
-        }
-        .hp-role-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 16px 40px rgba(0,0,0,0.08);
-            border-color: #f97316;
-            color: inherit;
-        }
-        .hp-role-icon {
-            width: 64px;
-            height: 64px;
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            margin: 0 auto 18px;
-        }
-        .hp-role-title {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 700;
-            font-size: 18px;
-            margin-bottom: 8px;
-        }
-        .hp-role-desc {
-            font-size: 13px;
-            color: var(--slate-500);
-            line-height: 1.6;
-        }
-
-        /* ========== FOUNDER ========== */
-        .hp-founder {
-            background: var(--slate-50);
-        }
-        .hp-founder-card {
-            display: flex;
-            align-items: center;
-            gap: 48px;
-            background: #fff;
-            border-radius: 24px;
-            padding: 48px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02), 0 16px 40px rgba(0,0,0,0.04);
-            border: 1px solid var(--slate-200);
-            margin-top: 32px;
-        }
-        .hp-founder-img {
-            width: 200px;
-            height: 200px;
-            border-radius: 24px;
-            object-fit: cover;
-            flex-shrink: 0;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-        }
-        .hp-founder-name {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 800;
-            font-size: 24px;
-            color: var(--slate-900);
-            margin-bottom: 4px;
-        }
-        .hp-founder-role {
-            font-size: 14px;
-            color: #ea580c;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-        .hp-founder-quote {
-            font-size: 16px;
-            line-height: 1.7;
-            color: var(--slate-600);
-            font-style: italic;
-            position: relative;
-            padding-left: 20px;
-            border-left: 3px solid #f97316;
-        }
-
-        /* ========== FOOTER ========== */
-        .hp-footer {
-            background: #3d302a;
-            color: rgba(255,255,255,0.7);
-            padding: 64px 24px 32px;
-        }
-        .hp-footer-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .hp-footer-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 48px;
-            margin-bottom: 48px;
-        }
-        .hp-footer-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        .hp-footer-brand-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #f97316, #ea580c);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 18px;
-        }
-        .hp-footer-brand-text {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 700;
-            font-size: 16px;
-            color: #fff;
-        }
-        .hp-footer-desc {
-            font-size: 13.5px;
-            line-height: 1.7;
-            max-width: 340px;
-        }
-        .hp-footer-title {
-            font-weight: 700;
-            font-size: 13px;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 20px;
-        }
-        .hp-footer-links {
-            list-style: none;
-            padding: 0;
-        }
-        .hp-footer-links li { margin-bottom: 10px; }
-        .hp-footer-links a {
-            color: rgba(255,255,255,0.6);
-            text-decoration: none;
-            font-size: 13.5px;
-            transition: color 0.2s;
-        }
-        .hp-footer-links a:hover { color: #f97316; }
-        .hp-footer-bottom {
-            border-top: 1px solid rgba(255,255,255,0.08);
-            padding-top: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 12.5px;
-        }
-
-        /* ========== SCROLL ANIMATIONS ========== */
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
-        }
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .reveal-delay-1 { transition-delay: 0.1s; }
-        .reveal-delay-2 { transition-delay: 0.2s; }
-        .reveal-delay-3 { transition-delay: 0.3s; }
-        .reveal-delay-4 { transition-delay: 0.35s; }
-
-        /* ========== RESPONSIVE ========== */
-        @media (max-width: 1024px) {
-            .hp-hero-content { grid-template-columns: 1fr; text-align: center; }
-            .hp-hero-desc { margin-left: auto; margin-right: auto; }
-            .hp-hero-actions { justify-content: center; }
-            .hp-hero-visual { display: none; }
-            .hp-features-grid { grid-template-columns: repeat(2, 1fr); }
-            .hp-about-grid { grid-template-columns: 1fr; }
-            .hp-about-images { order: -1; }
-            .hp-roles-grid { grid-template-columns: repeat(2, 1fr); }
-            .hp-footer-grid { grid-template-columns: 1fr 1fr; }
-            .hp-founder-card { flex-direction: column; text-align: center; }
-            .hp-founder-quote { border-left: none; padding-left: 0; border-top: 3px solid var(--amber-400); padding-top: 16px; }
-        }
-        @media (max-width: 768px) {
-            .hp-nav-links { display: none; }
-            .hp-menu-btn { display: block; }
-            .hp-features-grid { grid-template-columns: 1fr; }
-            .hp-stats-card { grid-template-columns: repeat(2, 1fr); gap: 24px; padding: 28px 24px; }
-            .hp-roles-grid { grid-template-columns: 1fr; max-width: 360px; margin-left: auto; margin-right: auto; }
-            .hp-section { padding: 48px 16px; }
-            .hp-hero-badge { margin-left: auto; margin-right: auto; }
-            .hp-footer-grid { grid-template-columns: 1fr; gap: 32px; }
-            .hp-footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
-        }
-
-        /* Mobile Menu */
-        .hp-mobile-menu {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 9999;
-        }
-        .hp-mobile-menu.active { display: block; }
-        .hp-mobile-panel {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 280px;
-            height: 100%;
-            background: #fff;
-            padding: 24px;
-            box-shadow: -8px 0 24px rgba(0,0,0,0.15);
-        }
-        .hp-mobile-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: var(--slate-600);
-            cursor: pointer;
-            float: right;
-        }
-        .hp-mobile-nav {
-            list-style: none;
-            padding: 48px 0 0;
-            margin: 0;
-        }
-        .hp-mobile-nav li { margin-bottom: 8px; }
-        .hp-mobile-nav a {
-            display: block;
-            padding: 12px 16px;
-            color: var(--slate-700);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 15px;
-            border-radius: 10px;
-            transition: background 0.2s;
-        }
-        .hp-mobile-nav a:hover { background: var(--slate-100); }
-        .hp-mobile-nav .mob-cta {
-            background: #f97316;
-            color: #fff;
-            text-align: center;
-            margin-top: 8px;
-        }
+        /* ANIMATIONS */
+        @keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+        .hero-badge{animation:fadeUp .6s .1s both}
+        .hero-title{animation:fadeUp .7s .2s both}
+        .hero-desc{animation:fadeUp .7s .35s both}
+        .hero-btns{animation:fadeUp .7s .45s both}
+        .stats-bar{animation:fadeUp .7s .55s both}
     </style>
 </head>
 <body>
 
-<!-- ======== NAVBAR ======== -->
-<nav class="hp-nav" id="hpNav">
-    <div class="hp-nav-inner">
-        <a href="index.php" class="hp-brand">
-            <div class="hp-brand-icon"><i class="bi bi-heart-pulse"></i></div>
-            <div class="hp-brand-text">
-                Seela Suwa Herath
-                <small>Bikshu Gilan Arana</small>
-            </div>
-        </a>
-
-        <div class="hp-nav-links">
-            <a href="#features">Features</a>
-            <a href="#about">About</a>
-            <a href="public_donate.php">Donate</a>
-            <a href="public_transparency.php">Transparency</a>
-            <?php if ($isLoggedIn): ?>
-                <a href="dashboard.php" class="hp-nav-cta">Dashboard</a>
-            <?php else: ?>
-                <a href="login.php">Login</a>
-                <a href="register.php" class="hp-nav-cta">Register</a>
-            <?php endif; ?>
+<nav id="mainNav">
+    <a href="index.php" class="nav-logo">
+        <div class="nav-logo-mark">☸</div>
+        <div>
+            <span class="nav-logo-name">Seela suwa herath</span>
+            <span class="nav-logo-sub">Monastery Welfare</span>
         </div>
-
-        <button class="hp-menu-btn" onclick="document.getElementById('mobileMenu').classList.add('active')">
-            <i class="bi bi-list"></i>
-        </button>
-    </div>
+    </a>
+    <ul class="nav-links">
+        <li><a href="#mission">Our Mission</a></li>
+        <li><a href="#how">How It Works</a></li>
+        <li><a href="public_transparency.php">Transparency</a></li>
+        <li><a href="login.php">Sign In</a></li>
+        <li><a href="public_donate.php" class="nav-donate-btn">Donate Now</a></li>
+    </ul>
 </nav>
 
-<!-- Mobile Menu -->
-<div class="hp-mobile-menu" id="mobileMenu" onclick="if(event.target===this)this.classList.remove('active')">
-    <div class="hp-mobile-panel">
-        <button class="hp-mobile-close" onclick="document.getElementById('mobileMenu').classList.remove('active')">
-            <i class="bi bi-x-lg"></i>
-        </button>
-        <ul class="hp-mobile-nav">
-            <li><a href="#features" onclick="document.getElementById('mobileMenu').classList.remove('active')">Features</a></li>
-            <li><a href="#about" onclick="document.getElementById('mobileMenu').classList.remove('active')">About</a></li>
-            <li><a href="public_donate.php">Donate</a></li>
-            <li><a href="public_transparency.php">Transparency</a></li>
-            <?php if ($isLoggedIn): ?>
-                <li><a href="dashboard.php" class="mob-cta">Dashboard</a></li>
-            <?php else: ?>
-                <li><a href="login.php">Login</a></li>
-                <li><a href="register.php" class="mob-cta">Register</a></li>
-            <?php endif; ?>
-        </ul>
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-img">
+        <img src="images/hero_bg.png" alt="Monastery"
+             onerror="this.style.display='none';document.querySelector('.hero-img-fallback').style.display='block'">
+        <div class="hero-img-fallback"></div>
     </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-overlay-btm"></div>
+    <div class="hero-content">
+        <div class="hero-badge">☸ &nbsp;<span>Monastery Welfare Platform</span> &nbsp;· Sri Lanka</div>
+        <h1 class="hero-title">Caring for Those<br>Who <em>Serve</em><br>Our World</h1>
+        <p class="hero-desc">Supporting the health, welfare, and dignified living of monks and clergy through transparent, community-driven generosity.</p>
+        <div class="hero-btns">
+            <a href="public_donate.php" class="btn-hp">🙏 Donate Today</a>
+            <a href="#mission" class="btn-hg">Learn More</a>
+        </div>
+    </div>
+    <div class="stats-bar">
+        <div class="stat-box"><div class="stat-num">240+</div><div class="stat-lbl">Monks Supported</div></div>
+        <div class="stat-box"><div class="stat-num">18</div><div class="stat-lbl">Doctors on Call</div></div>
+        <div class="stat-box"><div class="stat-num">Rs. 2.4M</div><div class="stat-lbl">Raised This Year</div></div>
+        <div class="stat-box"><div class="stat-num">100%</div><div class="stat-lbl">Transparent</div></div>
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+    <span class="sec-label">What We Do</span>
+    <h2 class="sec-title">Complete Welfare for<br>Monastery Communities</h2>
+    <div class="feat-grid">
+        <div class="feat-card"><div class="feat-icon">🏥</div><div class="feat-title">Healthcare Access</div><div class="feat-desc">Professional doctors, scheduled appointments, and medical support for all residents.</div></div>
+        <div class="feat-card"><div class="feat-icon">🙏</div><div class="feat-title">Donor Community</div><div class="feat-desc">Join thousands of compassionate donors supporting monastery welfare year-round.</div></div>
+        <div class="feat-card"><div class="feat-icon">📊</div><div class="feat-title">Full Transparency</div><div class="feat-desc">Every rupee tracked and publicly reported — complete accountability to all donors.</div></div>
+        <div class="feat-card"><div class="feat-icon">🏠</div><div class="feat-title">Housing & Welfare</div><div class="feat-desc">Room management, daily needs, and ensuring dignified living conditions for monks.</div></div>
+    </div>
+</section>
+
+<!-- MISSION -->
+<section class="mission" id="mission">
+    <div class="mission-inner">
+        <div class="gal">
+            <div class="gal-img tall"><img src="images/img1.jpeg" alt="" onerror="this.parentElement.innerHTML='<div class=ph>🛕</div>'"></div>
+            <div class="gal-img"><img src="images/img2.jpeg" alt="" onerror="this.parentElement.innerHTML='<div class=ph>🙏</div>'"></div>
+            <div class="gal-img"><img src="images/img3.jpeg" alt="" onerror="this.parentElement.innerHTML='<div class=ph>🏥</div>'"></div>
+        </div>
+        <div>
+            <span class="sec-label">Our Mission</span>
+            <h2 class="sec-title">A Community Rooted<br>in Compassion & Care</h2>
+            <p class="mission-body">This platform bridges generous donors with monks and clergy who dedicate their lives to spiritual service. Our welfare system ensures they receive proper healthcare, housing, and daily support — with full transparency at every step.</p>
+            <p class="mission-body">Every donation is recorded, verified, and published. Donors receive instant receipts and the knowledge that their generosity creates real, lasting impact.</p>
+            <div class="mission-quote"><p>To give is not to lose. In generosity, we find the deepest form of abundance.</p></div>
+            <div class="inl-stats">
+                <div><div class="inl-num">98%</div><div class="inl-lbl">Funds Utilised</div></div>
+                <div><div class="inl-num">5 yrs</div><div class="inl-lbl">In Service</div></div>
+                <div><div class="inl-num">1,200+</div><div class="inl-lbl">Donors</div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- GALLERY STRIP -->
+<div class="gal-strip">
+    <?php $imgs=[['img4','🛕'],['img5','🙏'],['img6','🏥'],['img7','🍚'],['img2','☸'],['img3','🌿']];
+    foreach($imgs as [$img,$ic]):?>
+    <div class="gal-strip-img">
+        <img src="images/<?=$img?>.jpeg" alt="" onerror="this.parentElement.innerHTML='<div class=ph><?=$ic?></div>'">
+        <div class="ov"></div>
+    </div>
+    <?php endforeach;?>
 </div>
 
-<!-- ======== HERO ======== -->
-<section class="hp-hero">
-    <div class="hp-hero-grid"></div>
-    <div class="hp-hero-glow"></div>
-    
-    <div class="hp-hero-content">
-        <div class="hp-hero-left">
-            <div class="hp-hero-badge">
-                <i class="bi bi-heart-pulse-fill"></i>
-                Sacred Healthcare for Monastic Communities
-            </div>
-            <h1 class="hp-hero-title">
-                Caring for Those<br>Who <span class="highlight">Guide Us</span>
-            </h1>
-            <p class="hp-hero-desc">
-                A comprehensive digital platform for healthcare coordination, appointment management, 
-                and transparent donation tracking — serving the monastic community of Sri Lanka.
-            </p>
-            <div class="hp-hero-actions">
-                <?php if ($isLoggedIn): ?>
-                    <a href="dashboard.php" class="hp-btn hp-btn-primary">
-                        <i class="bi bi-grid-1x2"></i> Go to Dashboard
-                    </a>
-                <?php else: ?>
-                    <a href="login.php" class="hp-btn hp-btn-primary">
-                        <i class="bi bi-box-arrow-in-right"></i> Get Started
-                    </a>
-                <?php endif; ?>
-                <a href="public_donate.php" class="hp-btn hp-btn-secondary">
-                    <i class="bi bi-suit-heart"></i> Make a Donation
-                </a>
-            </div>
-        </div>
-
-        <div class="hp-hero-visual">
-            <div class="hp-hero-card-stack">
-                <!-- Floating Card 1 -->
-                <div class="hp-float-card">
-                    <div class="hp-fc-icon" style="background:#fff7ed;color:#f97316;">
-                        <i class="bi bi-calendar2-check"></i>
-                    </div>
-                    <div class="hp-fc-title">Smart Scheduling</div>
-                    <div class="hp-fc-desc">AI-powered appointment coordination with doctor availability tracking</div>
-                </div>
-                <!-- Floating Card 2 -->
-                <div class="hp-float-card">
-                    <div class="hp-fc-icon" style="background:rgba(249,115,22,0.2);color:#fb923c;">
-                        <i class="bi bi-shield-check"></i>
-                    </div>
-                    <div class="hp-fc-title">Full Transparency</div>
-                    <div class="hp-fc-desc">Every donation tracked and verified publicly</div>
-                </div>
-                <!-- Floating Card 3 -->
-                <div class="hp-float-card">
-                    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;">
-                        <div class="hp-fc-stat"><?= number_format($totalMonks) ?></div>
-                        <div class="hp-fc-label">Monks Cared For</div>
-                    </div>
-                    <div style="display:flex;align-items:baseline;gap:8px;">
-                        <div class="hp-fc-stat" style="font-size:24px;"><?= number_format($totalDoctors) ?></div>
-                        <div class="hp-fc-label">Active Doctors</div>
-                    </div>
-                    <div style="margin-top:12px;height:4px;background:rgba(255,255,255,0.15);border-radius:99px;">
-                        <div style="height:100%;width:75%;background:linear-gradient(90deg,#fb923c,#fbbf24);border-radius:99px;"></div>
-                    </div>
-                </div>
-            </div>
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+    <div class="how-inner">
+        <div class="how-hd"><span class="sec-label">Simple Process</span><h2 class="sec-title">How Your Donation Works</h2></div>
+        <div class="steps">
+            <div class="step"><div class="step-c">💝<span class="step-n">1</span></div><div class="step-title">Choose to Give</div><div class="step-desc">Select a cause — healthcare, welfare, housing, food — or make a general donation. Any amount matters.</div></div>
+            <div class="step"><div class="step-c">🔒<span class="step-n">2</span></div><div class="step-title">Secure Payment</div><div class="step-desc">Pay safely via PayHere, bank transfer, or upload a bank slip. Your personal data is always protected.</div></div>
+            <div class="step"><div class="step-c">📋<span class="step-n">3</span></div><div class="step-title">Track Your Impact</div><div class="step-desc">Receive an instant receipt. View our public transparency reports to see exactly how funds are used.</div></div>
         </div>
     </div>
 </section>
 
-<!-- ======== STATS BAR ======== -->
-<div class="hp-stats-bar reveal">
-    <div class="hp-stats-inner">
-        <div class="hp-stats-card">
-            <div class="hp-stat-item">
-                <div class="hp-stat-number" data-count="<?= $totalMonks ?>">0</div>
-                <div class="hp-stat-label">Monks Under Care</div>
-            </div>
-            <div class="hp-stat-item">
-                <div class="hp-stat-number" data-count="<?= $totalDoctors ?>">0</div>
-                <div class="hp-stat-label">Active Doctors</div>
-            </div>
-            <div class="hp-stat-item">
-                <div class="hp-stat-number" data-count="<?= $totalAppointments ?>">0</div>
-                <div class="hp-stat-label">Appointments Completed</div>
-            </div>
-            <div class="hp-stat-item">
-                <div class="hp-stat-number" data-prefix="Rs." data-count="<?= round($totalDonations) ?>">0</div>
-                <div class="hp-stat-label">Donations Received</div>
-            </div>
+<!-- DONATE CTA -->
+<section class="dcta" id="donate">
+    <div class="dcta-inner">
+        <span class="sec-label">Make a Difference Today</span>
+        <h2 class="sec-title">Your Kindness Sustains<br><em style="font-style:italic;color:var(--orange)">Sacred Service</em></h2>
+        <p>Every donation, large or small, directly supports the monks who devote their lives to our community's spiritual wellbeing.</p>
+        <div class="chips">
+            <a href="public_donate.php?amount=500" class="chip">Rs. 500</a>
+            <a href="public_donate.php?amount=1000" class="chip active">Rs. 1,000</a>
+            <a href="public_donate.php?amount=2500" class="chip">Rs. 2,500</a>
+            <a href="public_donate.php?amount=5000" class="chip">Rs. 5,000</a>
+            <a href="public_donate.php?amount=10000" class="chip">Rs. 10,000</a>
+            <a href="public_donate.php?amount=0" class="chip">Custom</a>
         </div>
-    </div>
-</div>
-
-<!-- ======== FEATURES ======== -->
-<section class="hp-section" id="features">
-    <div class="hp-section-inner">
-        <div class="reveal">
-            <div class="hp-section-badge"><i class="bi bi-lightning-fill"></i> Features</div>
-            <h2 class="hp-section-title">Everything You Need<br>In One Platform</h2>
-            <p class="hp-section-desc">Built specifically for monastic healthcare management, combining modern technology with compassionate care.</p>
-        </div>
-
-        <div class="hp-features-grid">
-            <div class="hp-feature-card reveal reveal-delay-1">
-                <div class="hp-feature-icon" style="background:#fff7ed;color:#f97316;">
-                    <i class="bi bi-calendar2-check"></i>
-                </div>
-                <div class="hp-feature-title">Appointment Management</div>
-                <div class="hp-feature-desc">Schedule, track, and manage doctor appointments with smart conflict detection and automated reminders.</div>
-            </div>
-
-            <div class="hp-feature-card reveal reveal-delay-2">
-                <div class="hp-feature-icon" style="background:#fef3c7;color:#d97706;">
-                    <i class="bi bi-cash-coin"></i>
-                </div>
-                <div class="hp-feature-title">Donation Tracking</div>
-                <div class="hp-feature-desc">Accept cash, bank transfers, and online card payments with full receipt generation and donor management.</div>
-            </div>
-
-            <div class="hp-feature-card reveal reveal-delay-3">
-                <div class="hp-feature-icon" style="background:#e0f2fe;color:#0284c7;">
-                    <i class="bi bi-file-medical"></i>
-                </div>
-                <div class="hp-feature-title">Medical Records</div>
-                <div class="hp-feature-desc">Complete health profiles including blood groups, allergies, chronic conditions, and visit history for each monk.</div>
-            </div>
-
-            <div class="hp-feature-card reveal reveal-delay-1">
-                <div class="hp-feature-icon" style="background:#f5f3ff;color:#7c3aed;">
-                    <i class="bi bi-robot"></i>
-                </div>
-                <div class="hp-feature-title">AI Assistant</div>
-                <div class="hp-feature-desc">Bilingual AI chatbot (English & Sinhala) for health queries, system help, and intelligent data insights.</div>
-            </div>
-
-            <div class="hp-feature-card reveal reveal-delay-2">
-                <div class="hp-feature-icon" style="background:#fef2f2;color:#dc2626;">
-                    <i class="bi bi-bar-chart-line"></i>
-                </div>
-                <div class="hp-feature-title">Reports & Analytics</div>
-                <div class="hp-feature-desc">Visual dashboards, exportable reports, and real-time analytics for informed decision-making.</div>
-            </div>
-
-            <div class="hp-feature-card reveal reveal-delay-3">
-                <div class="hp-feature-icon" style="background:#fff7ed;color:#f97316;">
-                    <i class="bi bi-shield-check"></i>
-                </div>
-                <div class="hp-feature-title">Public Transparency</div>
-                <div class="hp-feature-desc">Public donation transparency portal allowing anyone to verify how funds are being used.</div>
-            </div>
-        </div>
+        <a href="public_donate.php" class="btn-donate">🙏 Donate Now</a>
+        <p class="dcta-note">🔒 Secure payment &nbsp;·&nbsp; Instant receipt &nbsp;·&nbsp; 100% transparent</p>
     </div>
 </section>
 
-<!-- ======== ABOUT ======== -->
-<section class="hp-section hp-about" id="about">
-    <div class="hp-section-inner">
-        <div class="hp-about-grid">
-            <div class="hp-about-images">
-                <div class="hp-about-img reveal">
-                    <img src="images/img1.jpeg" alt="Monastery">
-                </div>
-                <div class="hp-about-img reveal reveal-delay-1">
-                    <img src="images/img2.jpeg" alt="Healthcare">
-                </div>
-                <div class="hp-about-img reveal reveal-delay-2">
-                    <img src="images/img3.jpeg" alt="Community">
-                </div>
-            </div>
-
-            <div class="reveal">
-                <div class="hp-section-badge"><i class="bi bi-info-circle"></i> About Us</div>
-                <h2 class="hp-section-title">Compassionate Care for the Sangha</h2>
-                <p class="hp-section-desc" style="margin-bottom:36px;">
-                    Seela Suwa Herath Bikshu Gilan Arana is dedicated to providing comprehensive healthcare 
-                    coordination for Buddhist monks across monasteries, combining local healthcare 
-                    traditions with modern medical services.
-                </p>
-
-                <div class="hp-value-item">
-                    <div class="hp-value-icon" style="background:#fff7ed;color:#f97316;">
-                        <i class="bi bi-heart-pulse"></i>
-                    </div>
-                    <div>
-                        <div class="hp-value-title">Holistic Healthcare</div>
-                        <div class="hp-value-desc">Both Ayurvedic and Western medicine approaches, tailored to monastic needs.</div>
-                    </div>
-                </div>
-
-                <div class="hp-value-item">
-                    <div class="hp-value-icon" style="background:#fef3c7;color:#d97706;">
-                        <i class="bi bi-people"></i>
-                    </div>
-                    <div>
-                        <div class="hp-value-title">Community Driven</div>
-                        <div class="hp-value-desc">Supported by generous donations from the community, with full financial transparency.</div>
-                    </div>
-                </div>
-
-                <div class="hp-value-item">
-                    <div class="hp-value-icon" style="background:#e0f2fe;color:#0284c7;">
-                        <i class="bi bi-gear"></i>
-                    </div>
-                    <div>
-                        <div class="hp-value-title">Technology Enabled</div>
-                        <div class="hp-value-desc">Modern digital platform for efficient management, reporting, and communication.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!-- TESTIMONIAL -->
+<section class="testi">
+    <div class="testi-inner">
+        <p class="testi-q">Knowing that my donation goes directly to the welfare of our monks — and seeing the public reports — gives me complete peace of mind. This platform has made giving so simple and trustworthy.</p>
+        <p class="testi-auth"><strong>Kamala Perera</strong> &nbsp;·&nbsp; Donor since 2021, Colombo</p>
     </div>
 </section>
 
-<!-- ======== ROLES ======== -->
-<section class="hp-section">
-    <div class="hp-section-inner" style="text-align:center;">
-        <div class="reveal">
-            <div class="hp-section-badge" style="margin-left:auto;margin-right:auto;"><i class="bi bi-people-fill"></i> User Roles</div>
-            <h2 class="hp-section-title">Designed for<br>Every Stakeholder</h2>
-            <p class="hp-section-desc" style="margin:0 auto;">Each role gets a personalized dashboard and features tailored to their needs.</p>
-        </div>
-
-        <div class="hp-roles-grid">
-            <a href="register.php" class="hp-role-card reveal reveal-delay-1">
-                <div class="hp-role-icon" style="background:#fff7ed;color:#f97316;"><i class="bi bi-shield-lock"></i></div>
-                <div class="hp-role-title">Admin</div>
-                <div class="hp-role-desc">Full system control — manage monks, doctors, appointments, donations, users, and reports.</div>
-            </a>
-
-            <a href="register.php" class="hp-role-card reveal reveal-delay-2">
-                <div class="hp-role-icon" style="background:#e0f2fe;color:#0284c7;"><i class="bi bi-bandaid"></i></div>
-                <div class="hp-role-title">Doctor</div>
-                <div class="hp-role-desc">View your schedule, manage appointments, access patient records and set availability.</div>
-            </a>
-
-            <a href="register.php" class="hp-role-card reveal reveal-delay-3">
-                <div class="hp-role-icon" style="background:#fef3c7;color:#d97706;"><i class="bi bi-suit-heart"></i></div>
-                <div class="hp-role-title">Donor</div>
-                <div class="hp-role-desc">Track your donations, download receipts, view transparency reports, and contribute online.</div>
-            </a>
-
-            <a href="register.php" class="hp-role-card reveal reveal-delay-4">
-                <div class="hp-role-icon" style="background:#f5f3ff;color:#7c3aed;"><i class="bi bi-person-hearts"></i></div>
-                <div class="hp-role-title">Monk</div>
-                <div class="hp-role-desc">View appointments, health summary, medical records, and connect with assigned doctors.</div>
-            </a>
-        </div>
+<!-- FOOTER -->
+<footer>
+    <div class="foot-grid">
+        <div><div class="foot-brand">☸ Seela suwa herath</div><p class="foot-tag">Supporting monastery welfare through community generosity, transparent governance, and compassionate care.</p></div>
+        <div class="foot-col"><h4>Platform</h4><ul><li><a href="public_donate.php">Donate</a></li><li><a href="public_transparency.php">Transparency</a></li><li><a href="register.php">Register</a></li><li><a href="login.php">Sign In</a></li></ul></div>
+        <div class="foot-col"><h4>Welfare</h4><ul><li><a href="#">Healthcare</a></li><li><a href="#">Housing</a></li><li><a href="#">Appointments</a></li><li><a href="#">Reports</a></li></ul></div>
+        <div class="foot-col"><h4>Info</h4><ul><li><a href="#">About Us</a></li><li><a href="#">Contact</a></li><li><a href="#">Privacy Policy</a></li></ul></div>
     </div>
-</section>
-
-<!-- ======== DONATE CTA ======== -->
-<section class="hp-section hp-donate-section">
-    <div class="hp-section-inner">
-        <div class="hp-donate-inner reveal">
-            <div class="hp-section-badge"><i class="bi bi-suit-heart-fill"></i> Support Our Mission</div>
-            <h2 class="hp-section-title">Every Contribution<br>Makes a Difference</h2>
-            <p class="hp-section-desc">
-                Your donations directly fund medical treatments, from consultations to essential medications, 
-                ensuring every monk receives the healthcare they deserve.
-            </p>
-            <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
-                <a href="public_donate.php" class="hp-btn hp-btn-accent">
-                    <i class="bi bi-heart-fill"></i> Donate Now
-                </a>
-                <a href="public_transparency.php" class="hp-btn hp-btn-secondary">
-                    <i class="bi bi-shield-check"></i> View Transparency Report
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ======== FOUNDER ======== -->
-<section class="hp-section hp-founder" id="founder">
-    <div class="hp-section-inner">
-        <div class="reveal">
-            <div class="hp-section-badge"><i class="bi bi-person-check"></i> Our Founder</div>
-            <h2 class="hp-section-title">Spiritual Guidance</h2>
-        </div>
-
-        <div class="hp-founder-card reveal">
-            <img src="images/img1.jpeg" alt="Ven. Solewewa Chandrasiri Thero" class="hp-founder-img">
-            <div>
-                <div class="hp-founder-name">Ven. Solewewa Chandrasiri Thero</div>
-                <div class="hp-founder-role">Founder & Spiritual Guide</div>
-                <p class="hp-founder-quote">
-                    "The health of the Sangha is the health of the Dhamma. When we care for those who have 
-                    dedicated their lives to spiritual service, we nurture the very foundation of our community. 
-                    This system ensures that every monk receives timely, compassionate healthcare while maintaining 
-                    the transparency that our generous donors deserve."
-                </p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ======== FOOTER ======== -->
-<footer class="hp-footer">
-    <div class="hp-footer-inner">
-        <div class="hp-footer-grid">
-            <div>
-                <div class="hp-footer-brand">
-                    <div class="hp-footer-brand-icon"><i class="bi bi-heart-pulse"></i></div>
-                    <div class="hp-footer-brand-text">Seela Suwa Herath</div>
-                </div>
-                <p class="hp-footer-desc">
-                    Comprehensive healthcare coordination and donation management system for monastic communities across Sri Lanka.
-                </p>
-            </div>
-
-            <div>
-                <div class="hp-footer-title">Quick Links</div>
-                <ul class="hp-footer-links">
-                    <li><a href="login.php">Login</a></li>
-                    <li><a href="register.php">Register</a></li>
-                    <li><a href="public_donate.php">Donate</a></li>
-                    <li><a href="public_transparency.php">Transparency</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <div class="hp-footer-title">Features</div>
-                <ul class="hp-footer-links">
-                    <li><a href="#features">Appointments</a></li>
-                    <li><a href="#features">Medical Records</a></li>
-                    <li><a href="#features">Donation Tracking</a></li>
-                    <li><a href="#features">AI Assistant</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <div class="hp-footer-title">Contact</div>
-                <ul class="hp-footer-links">
-                    <li><a href="mailto:info@seelasuwherath.lk"><i class="bi bi-envelope me-2"></i>info@seelasuwherath.lk</a></li>
-                    <li><a href="tel:+94112345678"><i class="bi bi-telephone me-2"></i>+94 11 234 5678</a></li>
-                    <li><a href="#"><i class="bi bi-geo-alt me-2"></i>Colombo, Sri Lanka</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="hp-footer-bottom">
-            <span>&copy; <?= date('Y') ?> Seela Suwa Herath Bikshu Gilan Arana. All rights reserved.</span>
-            <span>
-                Built with <i class="bi bi-heart-fill" style="color:#dc2626;font-size:11px;"></i> for the Sangha
-            </span>
-        </div>
-    </div>
+    <div class="foot-btm"><span>© 2026 Seela suwa herath — Monastery Welfare Platform</span><span>Made with 🙏 in Sri Lanka</span></div>
 </footer>
 
-<!-- ======== SCRIPTS ======== -->
 <script>
-// Navbar scroll effect
-const nav = document.getElementById('hpNav');
-window.addEventListener('scroll', () => {
-    nav.classList.toggle('scrolled', window.scrollY > 40);
-});
-
-// Scroll reveal animations
-const reveals = document.querySelectorAll('.reveal');
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            observer.unobserve(entry.target);
-        }
-    });
-}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
-reveals.forEach(el => observer.observe(el));
-
-// Counter animation
-function animateCounters() {
-    const counters = document.querySelectorAll('.hp-stat-number[data-count]');
-    counters.forEach(counter => {
-        const target = parseInt(counter.dataset.count);
-        const prefix = counter.dataset.prefix || '';
-        const duration = 2000;
-        const start = performance.now();
-        
-        function update(now) {
-            const elapsed = now - start;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            const current = Math.floor(eased * target);
-            
-            if (target > 10000) {
-                counter.textContent = prefix + current.toLocaleString();
-            } else {
-                counter.textContent = prefix + current.toLocaleString();
-            }
-            
-            if (progress < 1) {
-                requestAnimationFrame(update);
-            } else {
-                counter.textContent = prefix + target.toLocaleString();
-            }
-        }
-        requestAnimationFrame(update);
-    });
-}
-
-// Trigger counter when stats bar is visible
-const statsBar = document.querySelector('.hp-stats-bar');
-const statsObserver = new IntersectionObserver((entries) => {
-    if (entries[0].isIntersecting) {
-        animateCounters();
-        statsObserver.unobserve(statsBar);
-    }
-}, { threshold: 0.3 });
-statsObserver.observe(statsBar);
-
-// Smooth scroll for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            e.preventDefault();
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    });
-});
+const nav=document.getElementById('mainNav');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',window.scrollY>60));
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',function(){document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));this.classList.add('active')}));
 </script>
-
 </body>
 </html>
