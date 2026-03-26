@@ -26,6 +26,50 @@ switch ($userRole) {
 require_once __DIR__ . '/includes/db_config.php';
 $conn = getDBConnection();
 
+// Ensure appointment requests table exists for monk -> admin scheduling flow.
+$conn->query("CREATE TABLE IF NOT EXISTS appointment_requests (
+    request_id INT PRIMARY KEY AUTO_INCREMENT,
+    monk_id INT NOT NULL,
+    preferred_doctor_id INT NULL,
+    preferred_date DATE NOT NULL,
+    preferred_time TIME NULL,
+    request_notes TEXT,
+    status ENUM('pending','assigned','rejected') DEFAULT 'pending',
+    created_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reviewed_by INT NULL,
+    reviewed_at TIMESTAMP NULL,
+    linked_app_id INT NULL,
+    FOREIGN KEY (monk_id) REFERENCES monks(monk_id) ON DELETE CASCADE,
+    FOREIGN KEY (preferred_doctor_id) REFERENCES doctors(doctor_id) ON DELETE SET NULL,
+    FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL,
+    FOREIGN KEY (reviewed_by) REFERENCES users(user_id) ON DELETE SET NULL,
+    FOREIGN KEY (linked_app_id) REFERENCES appointments(app_id) ON DELETE SET NULL,
+    INDEX idx_status (status),
+    INDEX idx_preferred_date (preferred_date),
+    INDEX idx_monk (monk_id),
+    INDEX idx_preferred_doctor (preferred_doctor_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+// Schema compatibility updates for older databases.
+$doctorColRes = $conn->query("SELECT COUNT(*) AS c FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'appointment_requests' AND COLUMN_NAME = 'preferred_doctor_id'");
+if ($doctorColRes && (int)$doctorColRes->fetch_assoc()['c'] === 0) {
+    $conn->query("ALTER TABLE appointment_requests ADD COLUMN preferred_doctor_id INT NULL AFTER monk_id");
+    $conn->query("ALTER TABLE appointment_requests ADD INDEX idx_preferred_doctor (preferred_doctor_id)");
+    $fkRes = $conn->query("SELECT COUNT(*) AS c FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'appointment_requests' AND CONSTRAINT_TYPE = 'FOREIGN KEY' AND CONSTRAINT_NAME = 'fk_appointment_requests_preferred_doctor' ");
+    if ($fkRes && (int)$fkRes->fetch_assoc()['c'] === 0) {
+        $conn->query("ALTER TABLE appointment_requests ADD CONSTRAINT fk_appointment_requests_preferred_doctor FOREIGN KEY (preferred_doctor_id) REFERENCES doctors(doctor_id) ON DELETE SET NULL");
+    }
+}
+
+$timeNullableRes = $conn->query("SELECT IS_NULLABLE AS v FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'appointment_requests' AND COLUMN_NAME = 'preferred_time' LIMIT 1");
+if ($timeNullableRes) {
+    $row = $timeNullableRes->fetch_assoc();
+    if ($row && strtoupper($row['v']) === 'NO') {
+        $conn->query("ALTER TABLE appointment_requests MODIFY preferred_time TIME NULL");
+    }
+}
+
 // Get dashboard statistics
 $stats = [
     'total_monks' => 0,
@@ -33,6 +77,7 @@ $stats = [
     'total_appointments' => 0,
     'total_donations' => 0,
     'pending_appointments' => 0,
+    'incoming_requests' => 0,
     'completed_appointments' => 0,
     'monthly_donation_amount' => 0
 ];
@@ -52,6 +97,24 @@ if ($result) $stats['total_appointments'] = $result->fetch_assoc()['count'];
 // Get pending appointments
 $result = $conn->query("SELECT COUNT(*) as count FROM appointments WHERE status = 'scheduled'");
 if ($result) $stats['pending_appointments'] = $result->fetch_assoc()['count'];
+
+// Get incoming appointment requests from monks
+$result = $conn->query("SELECT COUNT(*) as count FROM appointment_requests WHERE status = 'pending'");
+if ($result) $stats['incoming_requests'] = $result->fetch_assoc()['count'];
+
+$incoming_requests_preview = [];
+$result = $conn->query("SELECT ar.request_id, ar.preferred_date, ar.preferred_time, m.full_name AS monk_name, d.full_name AS doctor_name
+    FROM appointment_requests ar
+    JOIN monks m ON ar.monk_id = m.monk_id
+    LEFT JOIN doctors d ON ar.preferred_doctor_id = d.doctor_id
+    WHERE ar.status = 'pending'
+    ORDER BY ar.created_at ASC
+    LIMIT 5");
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $incoming_requests_preview[] = $row;
+    }
+}
 
 // Get completed appointments
 $result = $conn->query("SELECT COUNT(*) as count FROM appointments WHERE status = 'completed' AND MONTH(app_date) = MONTH(CURRENT_DATE())");
@@ -118,6 +181,16 @@ if ($result) {
             'link' => 'patient_appointments.php'
         ];
     }
+}
+
+// Check for incoming monk requests that need assignment
+if ($stats['incoming_requests'] > 0) {
+    $alerts[] = [
+        'type' => 'warning',
+        'icon' => 'bi-inbox',
+        'message' => "You have {$stats['incoming_requests']} incoming appointment request(s) to assign",
+        'link' => 'patient_appointments.php'
+    ];
 }
 
 // Check for appointments scheduled for tomorrow
@@ -221,6 +294,36 @@ if (count($alerts) == 0) {
         </div>
     </div>
 
+    <?php if ($stats['incoming_requests'] > 0): ?>
+    <div class="modern-card mb-4 animate-fade-in">
+        <div class="card-body-modern" style="padding:16px 24px;">
+            <a href="patient_appointments.php" class="alert-modern alert-warning-modern" style="text-decoration:none;display:flex;align-items:center;gap:12px;">
+                <i class="bi bi-inbox"></i>
+                <span><?= $stats['incoming_requests'] ?> incoming monk appointment request(s) waiting for doctor/room assignment</span>
+                <i class="bi bi-chevron-right ms-auto" style="font-size:12px;opacity:0.6;"></i>
+            </a>
+
+            <?php if (!empty($incoming_requests_preview)): ?>
+            <div style="margin-top:12px;display:grid;gap:8px;">
+                <?php foreach ($incoming_requests_preview as $req): ?>
+                <div style="padding:10px 12px;border:1px solid var(--border-color);border-radius:10px;background:var(--bg-card);display:flex;justify-content:space-between;align-items:center;gap:12px;">
+                    <div>
+                        <div style="font-weight:600;font-size:13px;"><?= htmlspecialchars($req['monk_name']) ?></div>
+                        <div style="font-size:12px;color:var(--text-secondary);">
+                            Preferred: <?= date('M d, Y', strtotime($req['preferred_date'])) ?>
+                            <?php if (!empty($req['preferred_time'])): ?> at <?= date('g:i A', strtotime($req['preferred_time'])) ?><?php endif; ?>
+                            <?php if (!empty($req['doctor_name'])): ?> &bull; Dr. <?= htmlspecialchars($req['doctor_name']) ?><?php endif; ?>
+                        </div>
+                    </div>
+                    <a href="patient_appointments.php" class="btn-modern btn-outline-modern" style="padding:6px 12px;font-size:12px;">Open</a>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Alerts -->
     <?php if (!empty($alerts)): ?>
     <div class="modern-card mb-4 animate-fade-in">
@@ -295,8 +398,8 @@ if (count($alerts) == 0) {
     <div class="row g-3 mb-4 stagger-children">
         <div class="col-xl-2 col-md-4 col-6">
             <a href="patient_appointments.php" class="quick-action-card">
-                <div class="quick-action-icon" style="background:var(--primary-100);color:var(--primary-700);"><i class="bi bi-calendar-plus"></i></div>
-                <span class="quick-action-label">New Appointment</span>
+                <div class="quick-action-icon" style="background:var(--primary-100);color:var(--primary-700);"><i class="bi bi-inbox"></i></div>
+                <span class="quick-action-label">Incoming Requests</span>
             </a>
         </div>
         <div class="col-xl-2 col-md-4 col-6">
@@ -321,12 +424,6 @@ if (count($alerts) == 0) {
             <a href="reports.php" class="quick-action-card">
                 <div class="quick-action-icon" style="background:#dbeafe;color:#1d4ed8;"><i class="bi bi-graph-up-arrow"></i></div>
                 <span class="quick-action-label">View Reports</span>
-            </a>
-        </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <a href="chatbot.php" class="quick-action-card">
-                <div class="quick-action-icon" style="background:#cffafe;color:#0891b2;"><i class="bi bi-robot"></i></div>
-                <span class="quick-action-label">AI Assistant</span>
             </a>
         </div>
     </div>

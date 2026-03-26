@@ -46,7 +46,7 @@ if ($report_type == 'financial') {
         FROM bills b
         JOIN categories c ON b.category_id = c.category_id
         WHERE b.bill_date BETWEEN '$start_date' AND '$end_date'
-        AND b.status = 'approved'
+            AND b.status = 'paid'
         GROUP BY c.category_id, c.name
         ORDER BY total DESC
     ");

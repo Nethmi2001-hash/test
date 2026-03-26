@@ -204,29 +204,14 @@ for ($month = 5; $month >= 0; $month--) {
         $description = $bill_descriptions[array_rand($bill_descriptions)];
         $amount = rand(2000, 30000);
         $bill_cat = $bill_cats[array_rand($bill_cats)];
-        $vendor = $vendors[array_rand($vendors)];
+        $vendor_name = $vendors[array_rand($vendors)];
         
         $bill_date = date('Y-m-d', strtotime("-$month months -" . rand(1, 28) . " days"));
         
+        $stmt = $conn->prepare("INSERT INTO bills (description, amount, category_id, bill_date, vendor_name, invoice_number, status, created_by, paid_by, paid_date) VALUES (?, ?, ?, ?, ?, ?, 'paid', 1, 1, ?)");
+        
         $invoice = 'INV' . rand(1000, 9999);
-        $bill_cols = [];
-        $bill_types = '';
-        $bill_vals = [];
-
-        add_col($bill_cols, $bill_types, $bill_vals, $bill_columns, 'description', 's', $description);
-        add_col($bill_cols, $bill_types, $bill_vals, $bill_columns, 'amount', 'd', $amount);
-        add_col($bill_cols, $bill_types, $bill_vals, $bill_columns, 'category_id', 'i', $bill_cat['category_id']);
-        add_col($bill_cols, $bill_types, $bill_vals, $bill_columns, 'bill_date', 's', $bill_date);
-        add_col($bill_cols, $bill_types, $bill_vals, $bill_columns, 'vendor', 's', $vendor);
-        add_col($bill_cols, $bill_types, $bill_vals, $bill_columns, 'vendor_name', 's', $vendor);
-        add_col($bill_cols, $bill_types, $bill_vals, $bill_columns, 'invoice_number', 's', $invoice);
-        add_col($bill_cols, $bill_types, $bill_vals, $bill_columns, 'status', 's', 'approved');
-        add_col($bill_cols, $bill_types, $bill_vals, $bill_columns, 'created_by', 'i', 1);
-
-        $bill_placeholders = implode(',', array_fill(0, count($bill_cols), '?'));
-        $bill_sql = "INSERT INTO bills (" . implode(',', $bill_cols) . ") VALUES ($bill_placeholders)";
-        $stmt = $conn->prepare($bill_sql);
-        $stmt->bind_param($bill_types, ...$bill_vals);
+        $stmt->bind_param("sdisss", $description, $amount, $bill_cat['category_id'], $bill_date, $vendor, $invoice);
         
         if ($stmt->execute()) {
             $bill_count++;

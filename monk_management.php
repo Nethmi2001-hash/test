@@ -18,12 +18,61 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+$monkColumns = [];
+$colResult = $conn->query("SHOW COLUMNS FROM monks");
+if ($colResult) {
+    while ($col = $colResult->fetch_assoc()) {
+        $monkColumns[$col['Field']] = true;
+    }
+}
+
 $error = "";
 $success = "";
+
+$userRole = $_SESSION['role_name'] ?? 'Admin';
+$userName = $_SESSION['username'] ?? '';
+$userEmail = $_SESSION['email'] ?? '';
+$isDoctor = ($userRole === 'Doctor');
+$canManageMonks = !$isDoctor;
+
+$currentDoctorId = null;
+if ($isDoctor) {
+    if (!empty($userEmail)) {
+        $stmt = $conn->prepare("SELECT doctor_id FROM doctors WHERE status='active' AND email = ? LIMIT 1");
+        $stmt->bind_param("s", $userEmail);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        if ($res && $res->num_rows > 0) {
+            $currentDoctorId = (int)$res->fetch_assoc()['doctor_id'];
+        }
+        $stmt->close();
+    }
+
+    if (!$currentDoctorId) {
+        $stmt = $conn->prepare("SELECT doctor_id FROM doctors WHERE status='active' AND (full_name = ? OR REPLACE(LOWER(full_name), ' ', '') = REPLACE(LOWER(?), ' ', '') OR LOWER(full_name) LIKE LOWER(?)) ORDER BY CASE WHEN full_name = ? THEN 0 ELSE 1 END, doctor_id ASC LIMIT 1");
+        $searchName = "%{$userName}%";
+        $stmt->bind_param("ssss", $userName, $userName, $searchName, $userName);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        if ($res && $res->num_rows > 0) {
+            $currentDoctorId = (int)$res->fetch_assoc()['doctor_id'];
+        }
+        $stmt->close();
+    }
+
+    if (!$currentDoctorId && empty($error)) {
+        $error = "Your account is not linked to an active doctor profile.";
+    }
+}
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
     $form_name = $_POST['form_name'];
+
+    if (!$canManageMonks) {
+        http_response_code(403);
+        $error = "Doctors can only view their own patient records.";
+    } else {
 
     if ($form_name === 'create') {
         $full_name = trim($_POST['full_name']);
@@ -42,8 +91,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
         if (empty($full_name)) {
             $error = "Monk name is required.";
         } else {
-            $stmt = $conn->prepare("INSERT INTO monks (full_name, title_id, ordination_date, birth_date, phone, emergency_contact, blood_group, allergies, chronic_conditions, current_medications, notes, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("sissssssssss", $full_name, $title_id, $ordination_date, $birth_date, $phone, $emergency_contact, $blood_group, $allergies, $chronic_conditions, $current_medications, $notes, $status);
+            // Keep compatibility with both old and new monk schemas.
+            $final_notes = $notes;
+            if (empty($monkColumns['current_medications']) && !empty($current_medications)) {
+                $final_notes = trim($final_notes . (empty($final_notes) ? '' : "\n") . "Current Medications: " . $current_medications);
+            }
+
+            $dob_value = !empty($monkColumns['dob']) ? $birth_date : null;
+            $stmt = $conn->prepare("INSERT INTO monks (full_name, title_id, dob, phone, emergency_contact, blood_group, allergies, chronic_conditions, notes, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sissssssss", $full_name, $title_id, $dob_value, $phone, $emergency_contact, $blood_group, $allergies, $chronic_conditions, $final_notes, $status);
             
             if ($stmt->execute()) {
                 $success = "Monk added successfully!";
@@ -69,8 +125,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
         $notes = trim($_POST['notes'] ?? '');
         $status = $_POST['status'];
 
-        $stmt = $conn->prepare("UPDATE monks SET full_name=?, title_id=?, ordination_date=?, birth_date=?, phone=?, emergency_contact=?, blood_group=?, allergies=?, chronic_conditions=?, current_medications=?, notes=?, status=? WHERE monk_id=?");
-        $stmt->bind_param("sissssssssssi", $full_name, $title_id, $ordination_date, $birth_date, $phone, $emergency_contact, $blood_group, $allergies, $chronic_conditions, $current_medications, $notes, $status, $monk_id);
+        $final_notes = $notes;
+        if (empty($monkColumns['current_medications']) && !empty($current_medications)) {
+            $final_notes = trim($final_notes . (empty($final_notes) ? '' : "\n") . "Current Medications: " . $current_medications);
+        }
+
+        $dob_value = !empty($monkColumns['dob']) ? $birth_date : null;
+        $stmt = $conn->prepare("UPDATE monks SET full_name=?, title_id=?, dob=?, phone=?, emergency_contact=?, blood_group=?, allergies=?, chronic_conditions=?, notes=?, status=? WHERE monk_id=?");
+        $stmt->bind_param("sissssssssi", $full_name, $title_id, $dob_value, $phone, $emergency_contact, $blood_group, $allergies, $chronic_conditions, $final_notes, $status, $monk_id);
         
         if ($stmt->execute()) {
             $success = "Monk updated successfully!";
@@ -92,6 +154,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
         }
         $stmt->close();
     }
+
+    }
 }
 
 // Get titles for dropdown
@@ -105,23 +169,55 @@ if ($title_result) {
 
 // Get all monks with title info
 $monks = [];
-$result = $conn->query("
-    SELECT m.*, t.title_name 
-    FROM monks m 
-    LEFT JOIN titles t ON m.title_id = t.title_id 
-    ORDER BY m.full_name ASC
-");
+if ($isDoctor && $currentDoctorId) {
+    $result = $conn->query("
+        SELECT DISTINCT m.*, t.title_name 
+        FROM monks m 
+        JOIN appointments a ON a.monk_id = m.monk_id
+        LEFT JOIN titles t ON m.title_id = t.title_id 
+        WHERE a.doctor_id = " . (int)$currentDoctorId . "
+        ORDER BY m.full_name ASC
+    ");
+} elseif ($isDoctor) {
+    $result = $conn->query("SELECT m.*, t.title_name FROM monks m LEFT JOIN titles t ON m.title_id = t.title_id WHERE 1 = 0");
+} else {
+    $result = $conn->query("
+        SELECT m.*, t.title_name 
+        FROM monks m 
+        LEFT JOIN titles t ON m.title_id = t.title_id 
+        ORDER BY m.full_name ASC
+    ");
+}
 if ($result) {
     while ($row = $result->fetch_assoc()) {
+        if (!array_key_exists('birth_date', $row)) {
+            $row['birth_date'] = $row['dob'] ?? '';
+        }
+        if (!array_key_exists('ordination_date', $row)) {
+            $row['ordination_date'] = '';
+        }
+        if (!array_key_exists('current_medications', $row)) {
+            $row['current_medications'] = '';
+        }
         $monks[] = $row;
     }
 }
 
 // Get statistics
 $stats = [];
-$stats['total'] = $conn->query("SELECT COUNT(*) as count FROM monks")->fetch_assoc()['count'];
-$stats['active'] = $conn->query("SELECT COUNT(*) as count FROM monks WHERE status='active'")->fetch_assoc()['count'];
-$stats['inactive'] = $conn->query("SELECT COUNT(*) as count FROM monks WHERE status='inactive'")->fetch_assoc()['count'];
+if ($isDoctor && $currentDoctorId) {
+    $stats['total'] = $conn->query("SELECT COUNT(DISTINCT m.monk_id) as count FROM monks m JOIN appointments a ON a.monk_id = m.monk_id WHERE a.doctor_id = " . (int)$currentDoctorId)->fetch_assoc()['count'];
+    $stats['active'] = $conn->query("SELECT COUNT(DISTINCT m.monk_id) as count FROM monks m JOIN appointments a ON a.monk_id = m.monk_id WHERE a.doctor_id = " . (int)$currentDoctorId . " AND m.status='active'")->fetch_assoc()['count'];
+    $stats['inactive'] = $conn->query("SELECT COUNT(DISTINCT m.monk_id) as count FROM monks m JOIN appointments a ON a.monk_id = m.monk_id WHERE a.doctor_id = " . (int)$currentDoctorId . " AND m.status='inactive'")->fetch_assoc()['count'];
+} elseif ($isDoctor) {
+    $stats['total'] = 0;
+    $stats['active'] = 0;
+    $stats['inactive'] = 0;
+} else {
+    $stats['total'] = $conn->query("SELECT COUNT(*) as count FROM monks")->fetch_assoc()['count'];
+    $stats['active'] = $conn->query("SELECT COUNT(*) as count FROM monks WHERE status='active'")->fetch_assoc()['count'];
+    $stats['inactive'] = $conn->query("SELECT COUNT(*) as count FROM monks WHERE status='inactive'")->fetch_assoc()['count'];
+}
 
 $conn->close();
 ?>
@@ -187,11 +283,13 @@ $conn->close();
     <!-- Monks Table -->
     <div class="modern-table-wrapper">
         <div class="modern-table-header">
-            <h5><i class="bi bi-person-hearts me-2"></i>Monk Records</h5>
+            <h5><i class="bi bi-person-hearts me-2"></i><?= $isDoctor ? 'My Patients' : 'Monk Records' ?></h5>
             <div style="display:flex;gap:10px;align-items:center;">
+                <?php if ($canManageMonks): ?>
                 <button class="btn-modern btn-primary-modern btn-sm-modern" data-bs-toggle="modal" data-bs-target="#addModal">
                     <i class="bi bi-plus-circle"></i> Add Monk
                 </button>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -209,7 +307,7 @@ $conn->close();
                         <th>Blood Group</th>
                         <th>Medical Info</th>
                         <th>Status</th>
-                        <th>Actions</th>
+                        <?php if ($canManageMonks): ?><th>Actions</th><?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -271,6 +369,7 @@ $conn->close();
                                     <?php $status_badge = $monk['status'] == 'active' ? 'badge-success' : 'badge-neutral'; ?>
                                     <span class="badge-modern <?= $status_badge ?> badge-dot"><?= ucfirst($monk['status']) ?></span>
                                 </td>
+                                <?php if ($canManageMonks): ?>
                                 <td>
                                     <div class="table-actions" style="display:flex;gap:6px;">
                                         <button class="btn-icon" onclick="editMonk(<?= htmlspecialchars(json_encode($monk)) ?>)" title="Edit">
@@ -285,14 +384,15 @@ $conn->close();
                                         </form>
                                     </div>
                                 </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="8" style="text-align:center;padding:48px 20px;">
+                            <td colspan="<?= $canManageMonks ? '8' : '7' ?>" style="text-align:center;padding:48px 20px;">
                                 <div style="color:var(--text-secondary);">
                                     <i class="bi bi-person-hearts" style="font-size:36px;display:block;margin-bottom:12px;opacity:0.4;"></i>
-                                    No monk records found. Click "Add Monk" to get started.
+                                    <?= $isDoctor ? 'No patient records found for your appointments yet.' : 'No monk records found. Click "Add Monk" to get started.' ?>
                                 </div>
                             </td>
                         </tr>
@@ -302,6 +402,7 @@ $conn->close();
         </div>
     </div>
 
+    <?php if ($canManageMonks): ?>
     <!-- Add Monk Modal -->
     <div class="modal fade" id="addModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
@@ -546,6 +647,7 @@ $conn->close();
             </div>
         </div>
     </div>
+    <?php endif; ?>
 
 <?php include 'includes/footer.php'; ?>
 
