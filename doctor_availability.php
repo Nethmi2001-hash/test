@@ -1,6 +1,11 @@
 <?php
 session_start();
 
+if (empty($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header("Location: login.php");
+    exit();
+}
+
 $servername = "localhost";
 $dbusername = "root";
 $db_password = "";
@@ -12,6 +17,38 @@ if ($con->connect_error) die("Connection failed: " . $con->connect_error);
 $error = "";
 $success = "";
 
+$userRole = $_SESSION['role_name'] ?? 'Admin';
+$userName = $_SESSION['username'] ?? '';
+$userEmail = $_SESSION['email'] ?? '';
+$isDoctor = ($userRole === 'Doctor');
+$canManageAllDoctors = ($userRole === 'Admin');
+
+$currentDoctorId = null;
+if ($isDoctor) {
+    if (!empty($userEmail)) {
+        $stmt = $con->prepare("SELECT doctor_id FROM doctors WHERE status='active' AND email = ? LIMIT 1");
+        $stmt->bind_param("s", $userEmail);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        if ($res && $res->num_rows > 0) {
+            $currentDoctorId = (int)$res->fetch_assoc()['doctor_id'];
+        }
+        $stmt->close();
+    }
+
+    if (!$currentDoctorId) {
+        $stmt = $con->prepare("SELECT doctor_id FROM doctors WHERE status='active' AND (full_name = ? OR REPLACE(LOWER(full_name), ' ', '') = REPLACE(LOWER(?), ' ', '') OR LOWER(full_name) LIKE LOWER(?)) ORDER BY CASE WHEN full_name = ? THEN 0 ELSE 1 END, doctor_id ASC LIMIT 1");
+        $searchName = "%{$userName}%";
+        $stmt->bind_param("ssss", $userName, $userName, $searchName, $userName);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        if ($res && $res->num_rows > 0) {
+            $currentDoctorId = (int)$res->fetch_assoc()['doctor_id'];
+        }
+        $stmt->close();
+    }
+}
+
 $days_map = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 // Handle CREATE/UPDATE/DELETE
@@ -19,61 +56,115 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['form_name'])) {
     $form_name = $_POST['form_name'];
 
     if ($form_name === 'create') {
-        $doctor_id = intval($_POST['doctor_id']);
+        $doctor_id = $isDoctor ? (int)$currentDoctorId : intval($_POST['doctor_id']);
         $day_of_week = intval($_POST['day_of_week']);
         $start_time = $_POST['start_time'];
         $end_time = $_POST['end_time'];
 
-        $stmt = $con->prepare("INSERT INTO doctor_availability (doctor_id, day_of_week, start_time, end_time, is_active) VALUES (?, ?, ?, ?, 1)");
-        $stmt->bind_param("iiss", $doctor_id, $day_of_week, $start_time, $end_time);
-        if ($stmt->execute()) {
-            $success = "Availability added successfully!";
+        if ($doctor_id <= 0) {
+            $error = "Your doctor profile is not linked. Please contact admin.";
         } else {
-            $error = "Error: " . $stmt->error;
+            $stmt = $con->prepare("INSERT INTO doctor_availability (doctor_id, day_of_week, start_time, end_time, is_active) VALUES (?, ?, ?, ?, 1)");
+            $stmt->bind_param("iiss", $doctor_id, $day_of_week, $start_time, $end_time);
+            if ($stmt->execute()) {
+                $success = "Availability added successfully!";
+            } else {
+                $error = "Error: " . $stmt->error;
+            }
+            $stmt->close();
         }
-        $stmt->close();
     }
 
     if ($form_name === 'update') {
         $avail_id = intval($_POST['avail_id']);
-        $doctor_id = intval($_POST['doctor_id']);
+        $doctor_id = $isDoctor ? (int)$currentDoctorId : intval($_POST['doctor_id']);
         $day_of_week = intval($_POST['day_of_week']);
         $start_time = $_POST['start_time'];
         $end_time = $_POST['end_time'];
         $is_active = isset($_POST['is_active']) ? 1 : 0;
 
-        $stmt = $con->prepare("UPDATE doctor_availability SET doctor_id=?, day_of_week=?, start_time=?, end_time=?, is_active=? WHERE avail_id=?");
-        $stmt->bind_param("iissii", $doctor_id, $day_of_week, $start_time, $end_time, $is_active, $avail_id);
-        if ($stmt->execute()) {
-            $success = "Availability updated successfully!";
+        if ($doctor_id <= 0) {
+            $error = "Your doctor profile is not linked. Please contact admin.";
+        } elseif ($isDoctor) {
+            $stmt = $con->prepare("UPDATE doctor_availability SET doctor_id=?, day_of_week=?, start_time=?, end_time=?, is_active=? WHERE avail_id=? AND doctor_id=?");
+            $stmt->bind_param("iissiii", $doctor_id, $day_of_week, $start_time, $end_time, $is_active, $avail_id, $doctor_id);
+            if ($stmt->execute()) {
+                if ($stmt->affected_rows === 0) {
+                    $error = "You can update only your own availability records.";
+                } else {
+                    $success = "Availability updated successfully!";
+                }
+            } else {
+                $error = "Error: " . $stmt->error;
+            }
+            $stmt->close();
         } else {
-            $error = "Error: " . $stmt->error;
+            $stmt = $con->prepare("UPDATE doctor_availability SET doctor_id=?, day_of_week=?, start_time=?, end_time=?, is_active=? WHERE avail_id=?");
+            $stmt->bind_param("iissii", $doctor_id, $day_of_week, $start_time, $end_time, $is_active, $avail_id);
+            if ($stmt->execute()) {
+                $success = "Availability updated successfully!";
+            } else {
+                $error = "Error: " . $stmt->error;
+            }
+            $stmt->close();
         }
-        $stmt->close();
     }
 
     if ($form_name === 'delete') {
         $avail_id = intval($_POST['avail_id']);
-        $stmt = $con->prepare("DELETE FROM doctor_availability WHERE avail_id=?");
-        $stmt->bind_param("i", $avail_id);
-        if ($stmt->execute()) {
-            $success = "Availability deleted successfully!";
+
+        if ($isDoctor && (int)$currentDoctorId <= 0) {
+            $error = "Your doctor profile is not linked. Please contact admin.";
+        } elseif ($isDoctor) {
+            $stmt = $con->prepare("DELETE FROM doctor_availability WHERE avail_id=? AND doctor_id=?");
+            $stmt->bind_param("ii", $avail_id, $currentDoctorId);
+            if ($stmt->execute()) {
+                if ($stmt->affected_rows === 0) {
+                    $error = "You can delete only your own availability records.";
+                } else {
+                    $success = "Availability deleted successfully!";
+                }
+            } else {
+                $error = "Error: " . $stmt->error;
+            }
+            $stmt->close();
         } else {
-            $error = "Error: " . $stmt->error;
+            $stmt = $con->prepare("DELETE FROM doctor_availability WHERE avail_id=?");
+            $stmt->bind_param("i", $avail_id);
+            if ($stmt->execute()) {
+                $success = "Availability deleted successfully!";
+            } else {
+                $error = "Error: " . $stmt->error;
+            }
+            $stmt->close();
         }
-        $stmt->close();
     }
 }
 
 // Fetch all availabilities
 $avail_query = "SELECT da.*, d.full_name, d.specialization 
                 FROM doctor_availability da 
-                JOIN doctors d ON da.doctor_id = d.doctor_id 
-                ORDER BY d.full_name, da.day_of_week, da.start_time";
+                JOIN doctors d ON da.doctor_id = d.doctor_id";
+if ($isDoctor) {
+    if ($currentDoctorId) {
+        $avail_query .= " WHERE da.doctor_id = " . (int)$currentDoctorId;
+    } else {
+        $avail_query .= " WHERE 1 = 0";
+        if (!$error) {
+            $error = "Your account is not linked to an active doctor profile.";
+        }
+    }
+}
+$avail_query .= " ORDER BY d.full_name, da.day_of_week, da.start_time";
 $avail_res = $con->query($avail_query);
 
 // Fetch doctors for dropdown
-$doctors_res = $con->query("SELECT doctor_id, full_name, specialization FROM doctors WHERE status='active' ORDER BY full_name ASC");
+$doctors_query = "SELECT doctor_id, full_name, specialization FROM doctors WHERE status='active'";
+if ($isDoctor && $currentDoctorId) {
+    $doctors_query .= " AND doctor_id = " . (int)$currentDoctorId;
+}
+$doctors_query .= " ORDER BY full_name ASC";
+$doctors_res = $con->query($doctors_query);
 $doctors = [];
 while ($d = $doctors_res->fetch_assoc()) {
     $doctors[] = $d;
@@ -93,8 +184,8 @@ while ($d = $doctors_res->fetch_assoc()) {
 
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1"><i class="bi bi-calendar-week"></i> Doctor Availability Management</h2>
-            <p class="text-muted mb-0">Manage weekly schedules for doctors</p>
+            <h2 class="mb-1"><i class="bi bi-calendar-week"></i> <?= $isDoctor ? 'My Availability' : 'Doctor Availability Management' ?></h2>
+            <p class="text-muted mb-0"><?= $isDoctor ? 'Manage your own weekly schedule' : 'Manage weekly schedules for doctors' ?></p>
         </div>
         <div class="mt-2 mt-md-0">
             <button class="btn-modern btn-primary-modern" data-bs-toggle="modal" data-bs-target="#addModal">
@@ -189,13 +280,18 @@ while ($d = $doctors_res->fetch_assoc()) {
                                             
                                             <div class="form-group-modern">
                                                 <label class="form-label-modern">Doctor</label>
-                                                <select name="doctor_id" class="form-select-modern" required>
-                                                    <?php foreach($doctors as $doc): ?>
-                                                        <option value="<?= $doc['doctor_id'] ?>" <?= $doc['doctor_id'] == $row['doctor_id'] ? 'selected' : '' ?>>
-                                                            <?= htmlspecialchars($doc['full_name']) ?> - <?= $doc['specialization'] ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
+                                                <?php if ($isDoctor): ?>
+                                                    <input type="hidden" name="doctor_id" value="<?= (int)$row['doctor_id'] ?>">
+                                                    <input type="text" class="form-control-modern" value="<?= htmlspecialchars($row['full_name']) ?> - <?= htmlspecialchars($row['specialization']) ?>" readonly>
+                                                <?php else: ?>
+                                                    <select name="doctor_id" class="form-select-modern" required>
+                                                        <?php foreach($doctors as $doc): ?>
+                                                            <option value="<?= $doc['doctor_id'] ?>" <?= $doc['doctor_id'] == $row['doctor_id'] ? 'selected' : '' ?>>
+                                                                <?= htmlspecialchars($doc['full_name']) ?> - <?= $doc['specialization'] ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                <?php endif; ?>
                                             </div>
 
                                             <div class="form-group-modern">
@@ -292,14 +388,19 @@ while ($d = $doctors_res->fetch_assoc()) {
                     
                     <div class="form-group-modern">
                         <label class="form-label-modern">Doctor</label>
-                        <select name="doctor_id" class="form-select-modern" required>
-                            <option value="">-- Select Doctor --</option>
-                            <?php foreach($doctors as $doc): ?>
-                                <option value="<?= $doc['doctor_id'] ?>">
-                                    <?= htmlspecialchars($doc['full_name']) ?> - <?= $doc['specialization'] ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                        <?php if ($isDoctor): ?>
+                            <input type="hidden" name="doctor_id" value="<?= (int)$currentDoctorId ?>">
+                            <input type="text" class="form-control-modern" value="<?= isset($doctors[0]) ? htmlspecialchars($doctors[0]['full_name'] . ' - ' . $doctors[0]['specialization']) : 'Not linked' ?>" readonly>
+                        <?php else: ?>
+                            <select name="doctor_id" class="form-select-modern" required>
+                                <option value="">-- Select Doctor --</option>
+                                <?php foreach($doctors as $doc): ?>
+                                    <option value="<?= $doc['doctor_id'] ?>">
+                                        <?= htmlspecialchars($doc['full_name']) ?> - <?= $doc['specialization'] ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        <?php endif; ?>
                     </div>
 
                     <div class="form-group-modern">
