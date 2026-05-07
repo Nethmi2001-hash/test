@@ -80,6 +80,9 @@ $isMonk = ($userRole === 'Monk');
     <a class="sidebar-link <?= isActivePage('donation_management.php', $currentPage) ?>" href="donation_management.php">
       <i class="bi bi-cash-coin"></i> <?= __('donations') ?>
     </a>
+    <a class="sidebar-link <?= isActivePage('donation_date_requests.php', $currentPage) ?>" href="donation_date_requests.php">
+      <i class="bi bi-calendar-event"></i> Donation Dates
+    </a>
     <a class="sidebar-link <?= isActivePage('bill_management.php', $currentPage) ?>" href="bill_management.php">
       <i class="bi bi-receipt-cutoff"></i> <?= __('bills') ?>
     </a>

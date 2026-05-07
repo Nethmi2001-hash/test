@@ -1,9 +1,41 @@
 <?php
 session_start();
 require_once __DIR__ . '/includes/csrf.php';
+require_once __DIR__ . '/includes/db_config.php';
 $amount = isset($_GET['amount']) ? (int)$_GET['amount'] : 1000;
 $errorMsg = trim((string)($_GET['error'] ?? ''));
 $successRef = trim((string)($_GET['success_ref'] ?? ''));
+$dateError = trim((string)($_GET['date_error'] ?? ''));
+$dateSuccess = trim((string)($_GET['date_success'] ?? ''));
+$todayDate = date('Y-m-d');
+
+$blockedDates = [];
+$conn = getDBConnection();
+$conn->query("CREATE TABLE IF NOT EXISTS donation_date_requests (
+    request_id INT PRIMARY KEY AUTO_INCREMENT,
+    donor_name VARCHAR(120) NOT NULL,
+    donor_email VARCHAR(160) NOT NULL,
+    donor_phone VARCHAR(40) NOT NULL,
+    requested_date DATE NOT NULL,
+    meal_type VARCHAR(20) NOT NULL DEFAULT 'lunch',
+    status ENUM('pending','approved','rejected') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reviewed_by INT NULL,
+    reviewed_at TIMESTAMP NULL,
+    INDEX idx_status (status),
+    INDEX idx_requested_date (requested_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+$mealColRes = $conn->query("SELECT COUNT(*) AS c FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'donation_date_requests' AND COLUMN_NAME = 'meal_type'");
+if ($mealColRes && (int)$mealColRes->fetch_assoc()['c'] === 0) {
+    $conn->query("ALTER TABLE donation_date_requests ADD COLUMN meal_type VARCHAR(20) NOT NULL DEFAULT 'lunch' AFTER requested_date");
+}
+$blockedRes = $conn->query("SELECT requested_date FROM donation_date_requests WHERE status IN ('pending','approved') ORDER BY requested_date ASC");
+if ($blockedRes) {
+    while ($row = $blockedRes->fetch_assoc()) {
+        $blockedDates[] = $row['requested_date'];
+    }
+}
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -125,12 +157,64 @@ $successRef = trim((string)($_GET['success_ref'] ?? ''));
             align-items: start;
         }
 
+        .donate-left {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .donate-wide {
+            max-width: 1060px;
+            margin: 0 auto;
+            padding: 36px 5% 0;
+        }
+
         /* ── FORM PANEL ── */
         .form-panel {
             background: var(--white);
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 40px;
+        }
+
+        .date-request-panel {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px 40px;
+        }
+
+        .date-request-panel p {
+            color: var(--text-mid);
+            font-size: 0.92rem;
+        }
+
+        .date-request-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+
+        .date-request-help {
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .date-request-list {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .date-chip {
+            border: 1px solid var(--border);
+            background: var(--ivory);
+            color: var(--text-mid);
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 0.82rem;
         }
         .panel-section {
             margin-bottom: 36px;
@@ -547,6 +631,92 @@ $successRef = trim((string)($_GET['success_ref'] ?? ''));
     <p>Support the welfare, healthcare, and dignified living of our monastery community</p>
 </div>
 
+<!-- DATE RESERVATION -->
+<div class="donate-wide">
+    <div class="date-request-panel" id="date-request">
+        <div class="panel-section-title">
+            <span class="panel-section-num">1</span>
+            Reserve a Donation Date
+        </div>
+        <p>Select a donation date. Once requested, that date is held and others cannot choose it until approved or rejected by the admin.</p>
+
+        <?php if ($dateError !== ''): ?>
+        <div style="background:rgba(185,64,64,0.08);border:1px solid rgba(185,64,64,0.28);color:#9f2f2f;padding:12px 14px;border-radius:10px;margin:14px 0;font-size:.86rem;">
+            ⚠ <?= htmlspecialchars($dateError) ?>
+        </div>
+        <?php endif; ?>
+
+                <?php if ($dateSuccess !== ''): ?>
+                <div id="dateSuccessMsg" style="background:rgba(46,125,82,0.08);border:1px solid rgba(46,125,82,0.28);color:#2f7a46;padding:12px 14px;border-radius:10px;margin:14px 0;font-size:.86rem;">
+            ✓ Date request submitted. Admin will review it soon.
+        </div>
+                <script>
+                    setTimeout(function() {
+                        var msg = document.getElementById('dateSuccessMsg');
+                        if (!msg) return;
+                        msg.style.transition = 'opacity 0.3s ease';
+                        msg.style.opacity = '0';
+                        setTimeout(function() {
+                            if (msg && msg.parentNode) {
+                                msg.remove();
+                            }
+                        }, 350);
+                    }, 3000);
+                </script>
+        <?php endif; ?>
+
+        <form method="POST" action="process_donation_date_request.php" id="dateRequestForm">
+            <?php if (function_exists('csrfField')): ?>
+            <?php csrfField(); ?>
+            <?php endif; ?>
+
+            <div class="date-request-grid">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label for="date_full_name">Full Name</label>
+                    <input type="text" id="date_full_name" name="donor_name" placeholder="Perera Saman" required>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label for="date_phone">Phone</label>
+                    <input type="tel" id="date_phone" name="donor_phone" placeholder="+94 77 000 0000" required>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label for="date_email">Email</label>
+                    <input type="email" id="date_email" name="donor_email" placeholder="you@example.com" required>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label for="donation_date">Donation Date</label>
+                    <input type="date" id="donation_date" name="requested_date" min="<?= htmlspecialchars($todayDate) ?>" required>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label for="meal_type">Meal</label>
+                    <select id="meal_type" name="meal_type" required>
+                        <option value="morning_food">Morning Food</option>
+                        <option value="lunch" selected>Lunch</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="date-request-help" id="dateHelp"></div>
+
+            <div class="date-request-list" aria-live="polite">
+                <?php if (count($blockedDates) === 0): ?>
+                    <span class="date-chip">No reserved dates yet</span>
+                <?php else: ?>
+                    <?php foreach ($blockedDates as $blocked): ?>
+                        <span class="date-chip"><?= htmlspecialchars(date('M d, Y', strtotime($blocked))) ?></span>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+
+            <div class="submit-row" style="margin-top:18px;">
+                <button type="submit" class="btn-donate" style="width:auto; padding:12px 22px;">
+                    📅 Request Date
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- MAIN CONTENT -->
 <div class="donate-main">
 
@@ -625,6 +795,7 @@ $successRef = trim((string)($_GET['success_ref'] ?? ''));
                     <span class="panel-section-num">2</span>
                     Donation Purpose
                 </div>
+                <p style="margin:6px 0 12px;color:#6b7280;font-size:.85rem;">Support with heart and intention.</p>
                 <div class="category-grid">
                     <div class="cat-option">
                         <input type="radio" name="category" id="cat_general" value="general" checked>
@@ -729,6 +900,7 @@ $successRef = trim((string)($_GET['success_ref'] ?? ''));
             </div>
         </form>
     </div>
+
 
     <!-- SUMMARY -->
     <div class="summary-panel">
@@ -839,6 +1011,20 @@ document.querySelectorAll('input[name="category"]').forEach(r => {
         document.getElementById('summaryCategory').textContent = labels[this.value] || this.value;
     });
 });
+
+const blockedDates = <?= json_encode($blockedDates) ?>;
+const dateInput = document.getElementById('donation_date');
+const dateHelp = document.getElementById('dateHelp');
+if (dateInput) {
+    dateInput.addEventListener('change', function() {
+        if (blockedDates.includes(this.value)) {
+            dateHelp.textContent = 'That date is already reserved. Please choose another.';
+            this.value = '';
+        } else {
+            dateHelp.textContent = '';
+        }
+    });
+}
 
 const chatbotPanel = document.getElementById('chatbotPanel');
 const chatbotFab = document.getElementById('chatbotFab');
