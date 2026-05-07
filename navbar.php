@@ -52,7 +52,8 @@ $isMonk = ($userRole === 'Monk');
 ?>
 
 <!-- Modern Design System -->
-<link rel="stylesheet" href="assets/css/modern-design.css">
+<?php $modernCssVer = @filemtime(__DIR__ . '/assets/css/modern-design.css') ?: time(); ?>
+<link rel="stylesheet" href="assets/css/modern-design.css?v=<?= $modernCssVer ?>">
 <script src="assets/js/modern-app.js"></script>
 
 <!-- Sidebar -->
