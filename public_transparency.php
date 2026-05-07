@@ -158,6 +158,14 @@ if ($qRecent) {
         $recentDonorRows[] = $row;
     }
 }
+
+$acceptedDatesRows = [];
+$qAcceptedDates = $conn->query("SELECT request_id, donor_name, donor_email, requested_date, meal_type, reviewed_at FROM donation_date_requests WHERE status='approved' ORDER BY requested_date DESC");
+if ($qAcceptedDates) {
+    while ($row = $qAcceptedDates->fetch_assoc()) {
+        $acceptedDatesRows[] = $row;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -508,6 +516,47 @@ if ($qRecent) {
             <?php if (empty($expenseRows)): ?>
             <div style="font-size:.88rem;color:var(--text-light)">No expenditure records available yet.</div>
             <?php endif; ?>
+        </div>
+
+        <!-- ACCEPTED DONATION DATES -->
+        <div class="card">
+            <div class="card-title"><span>📅</span> Accepted Donation Dates</div>
+            
+            <div style="font-size:.8rem;color:var(--text-light);margin-bottom:16px">Upcoming approved donation dates from community members.</div>
+
+            <div class="table-wrap">
+                <table class="dtable">
+                    <thead>
+                        <tr>
+                            <th>Donor Name</th>
+                            <th>Email</th>
+                            <th>Donation Date</th>
+                            <th>Meal Type</th>
+                            <th>Approved On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach($acceptedDatesRows as $row): ?>
+                        <tr>
+                            <td><span class="donor-name"><?= htmlspecialchars($row['donor_name']) ?></span></td>
+                            <td style="font-size:.82rem;color:var(--text-mid)"><?= htmlspecialchars($row['donor_email']) ?></td>
+                            <td>
+                                <strong style="color:var(--orange)"><?= date('d M Y', strtotime((string)$row['requested_date'])) ?></strong>
+                            </td>
+                            <td style="font-size:.82rem">
+                                <span class="category-tag"><?= ucfirst(htmlspecialchars($row['meal_type'])) ?></span>
+                            </td>
+                            <td style="font-size:.75rem;color:var(--text-light)"><?= !empty($row['reviewed_at']) ? date('d M Y', strtotime((string)$row['reviewed_at'])) : '—' ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                        <?php if (empty($acceptedDatesRows)): ?>
+                        <tr>
+                            <td colspan="5" style="text-align:center;color:var(--text-light)">No approved donation dates scheduled yet.</td>
+                        </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
     </div><!-- end left col -->
