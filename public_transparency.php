@@ -366,7 +366,7 @@ if ($qAcceptedDates) {
     <div class="page-header-inner">
         <div class="page-header-eyebrow">Open Books · Public Accountability</div>
         <h1>Full <em>Transparency</em><br>Reports</h1>
-        <p>Every donation received and every rupee spent is recorded here — publicly, permanently, and honestly.</p>
+        <p>Every donation received and every rupee spent is recorded here publicly, permanently, and honestly.</p>
     </div>
 </div>
 
@@ -658,7 +658,7 @@ if ($qAcceptedDates) {
             <li><a href="login.php">Sign In</a></li>
             <li><a href="#">Contact</a></li>
         </ul>
-        <div class="foot-copy">© 2026 Seela suwa herath — Monastery Welfare Platform · Made with 🙏 in Sri Lanka</div>
+        <div class="foot-copy">© 2026 Seela suwa herath Monastery Welfare Platform · Made with 🙏 in Sri Lanka</div>
     </div>
 </footer>
 

@@ -203,7 +203,7 @@
     <div class="feat-grid">
         <div class="feat-card"><div class="feat-icon">🏥</div><div class="feat-title">Healthcare Access</div><div class="feat-desc">Professional doctors, scheduled appointments, and medical support for all residents.</div></div>
         <div class="feat-card"><div class="feat-icon">🙏</div><div class="feat-title">Donor Community</div><div class="feat-desc">Join thousands of compassionate donors supporting monastery welfare year-round.</div></div>
-        <div class="feat-card"><div class="feat-icon">📊</div><div class="feat-title">Full Transparency</div><div class="feat-desc">Every rupee tracked and publicly reported — complete accountability to all donors.</div></div>
+        <div class="feat-card"><div class="feat-icon">📊</div><div class="feat-title">Full Transparency</div><div class="feat-desc">Every rupee tracked and publicly reported complete accountability to all donors.</div></div>
         <div class="feat-card"><div class="feat-icon">🏠</div><div class="feat-title">Housing & Welfare</div><div class="feat-desc">Room management, daily needs, and ensuring dignified living conditions for monks.</div></div>
     </div>
 </section>
@@ -219,7 +219,7 @@
         <div>
             <span class="sec-label">Our Mission</span>
             <h2 class="sec-title">A Community Rooted<br>in Compassion & Care</h2>
-            <p class="mission-body">This platform bridges generous donors with monks and clergy who dedicate their lives to spiritual service. Our welfare system ensures they receive proper healthcare, housing, and daily support — with full transparency at every step.</p>
+            <p class="mission-body">This platform bridges generous donors with monks and clergy who dedicate their lives to spiritual service. Our welfare system ensures they receive proper healthcare, housing, and daily support with full transparency at every step.</p>
             <p class="mission-body">Every donation is recorded, verified, and published. Donors receive instant receipts and the knowledge that their generosity creates real, lasting impact.</p>
             <div class="mission-quote"><p>To give is not to lose. In generosity, we find the deepest form of abundance.</p></div>
             <div class="inl-stats">
@@ -265,7 +265,7 @@
 <!-- TESTIMONIAL -->
 <section class="testi">
     <div class="testi-inner">
-        <p class="testi-q">Knowing that my donation goes directly to the welfare of our monks — and seeing the public reports — gives me complete peace of mind. This platform has made giving so simple and trustworthy.</p>
+        <p class="testi-q">Knowing that my donation goes directly to the welfare of our monks and seeing the public reports gives me complete peace of mind. This platform has made giving so simple and trustworthy.</p>
         <p class="testi-auth"><strong>Kamala Perera</strong> &nbsp;·&nbsp; Donor since 2021, Colombo</p>
     </div>
 </section>
@@ -278,7 +278,7 @@
         <div class="foot-col"><h4>Welfare</h4><ul><li><a href="#">Healthcare</a></li><li><a href="#">Housing</a></li><li><a href="#">Appointments</a></li><li><a href="#">Reports</a></li></ul></div>
         <div class="foot-col"><h4>Info</h4><ul><li><a href="#">About Us</a></li><li><a href="#">Contact</a></li><li><a href="#">Privacy Policy</a></li></ul></div>
     </div>
-    <div class="foot-btm"><span>© 2026 Seela suwa herath — Monastery Welfare Platform</span><span>Made with 🙏 in Sri Lanka</span></div>
+    <div class="foot-btm"><span>© 2026 Seela suwa herath Monastery Welfare Platform</span><span>Made with 🙏 in Sri Lanka</span></div>
 </footer>
 
 <script>
