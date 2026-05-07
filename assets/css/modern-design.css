@@ -156,6 +156,20 @@
   color: var(--text-primary);
 }
 
+[data-theme="dark"] .topbar-user {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  color: #0f172a;
+}
+
+[data-theme="dark"] .topbar-user-name {
+  color: #0f172a;
+}
+
+[data-theme="dark"] .topbar-user-role {
+  color: #334155;
+}
+
 /* ============================================
    2. RESET & BASE
    ============================================ */

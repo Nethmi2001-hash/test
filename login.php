@@ -8,6 +8,65 @@ $error = $_SESSION['login_error'] ?? '';
 $success = '';
 unset($_SESSION['login_error']);
 
+function ensureDefaultAdminAccount(mysqli $conn): void {
+    $adminEmail = 'admin@monastery.lk';
+    $adminPassword = 'admin123';
+
+    $stmt = $conn->prepare(
+        "SELECT u.user_id
+         FROM users u
+         JOIN roles r ON u.role_id = r.role_id
+         WHERE u.email = ? AND r.role_name = 'Admin'
+         LIMIT 1"
+    );
+
+    if (!$stmt) {
+        return;
+    }
+
+    $stmt->bind_param('s', $adminEmail);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $adminExists = $result && $result->num_rows > 0;
+    $stmt->close();
+
+    if ($adminExists) {
+        return;
+    }
+
+    $roleStmt = $conn->prepare('SELECT role_id FROM roles WHERE role_name = "Admin" LIMIT 1');
+    if (!$roleStmt) {
+        return;
+    }
+
+    $roleStmt->execute();
+    $roleResult = $roleStmt->get_result();
+    $roleRow = $roleResult ? $roleResult->fetch_assoc() : null;
+    $roleStmt->close();
+
+    if (!$roleRow) {
+        return;
+    }
+
+    $passwordHash = password_hash($adminPassword, PASSWORD_BCRYPT);
+    $insertStmt = $conn->prepare(
+        "INSERT INTO users (name, email, password_hash, role_id, status)
+         VALUES (?, ?, ?, ?, 'active')"
+    );
+
+    if (!$insertStmt) {
+        return;
+    }
+
+    $name = 'System Administrator';
+    $roleId = (int)$roleRow['role_id'];
+    $insertStmt->bind_param('sssi', $name, $adminEmail, $passwordHash, $roleId);
+    $insertStmt->execute();
+    $insertStmt->close();
+}
+
+ensureDefaultAdminAccount($conn);
+
 if (isset($_GET['registered']) && $_GET['registered'] === '1') {
     $success = 'Registration successful. Please sign in.';
 }
@@ -444,6 +503,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="form-header">
             <h1>Sign In</h1>
             <p>New here? <a href="register.php">Create an account</a></p>
+        </div>
+
+        <div class="success-msg" style="margin-bottom: 20px;">
+            Admin sign-in: admin@monastery.lk / admin123
         </div>
 
         <?php if (!empty($success)): ?>
