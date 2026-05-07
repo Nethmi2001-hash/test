@@ -730,6 +730,17 @@ img { max-width: 100%; height: auto; }
   font-size: 14px;
 }
 
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 1;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: #cbd5e1;
+}
+
 .modern-table {
   width: 100%;
   border-collapse: collapse;
@@ -2029,6 +2040,38 @@ textarea.form-control-modern {
 .filter-bar .btn {
   font-size: 13px;
   padding: 8px 16px;
+}
+
+[data-theme="dark"] .advanced-search-panel {
+  background: #1b2332 !important;
+  border: 1px solid #2d3a4d;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35) !important;
+}
+
+[data-theme="dark"] .advanced-search-panel .form-label {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .advanced-search-panel .form-control,
+[data-theme="dark"] .advanced-search-panel .form-select {
+  background: #121a2a;
+  border-color: #2d3a4d;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .advanced-search-panel .form-control:focus,
+[data-theme="dark"] .advanced-search-panel .form-select:focus {
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+}
+
+[data-theme="dark"] .advanced-search-panel .btn-outline-secondary {
+  color: #e2e8f0;
+  border-color: #475569;
+}
+
+[data-theme="dark"] .advanced-search-panel .btn-outline-secondary:hover {
+  background: #334155;
 }
 
 /* ============================================
