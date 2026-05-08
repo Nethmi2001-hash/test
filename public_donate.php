@@ -636,7 +636,7 @@ $conn->close();
     <div class="date-request-panel" id="date-request">
         <div class="panel-section-title">
             <span class="panel-section-num">1</span>
-            Reserve a Donation Date
+            Sponsor Daily Alms
         </div>
         <p>Select a donation date. Once requested, that date is held and others cannot choose it until approved or rejected by the admin.</p>
 
