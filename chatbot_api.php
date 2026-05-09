@@ -1,12 +1,13 @@
 <?php
 /**
- * RULE-BASED CHATBOT - MONASTERY DONATION ASSISTANT
+ * AI CHATBOT - MONASTERY DONATION ASSISTANT
  * Bilingual: English & Sinhala
- * No external APIs - completely self-contained
+ * Powered by Google Gemini API + Rule-Based Fallback
  */
 
 header('Content-Type: application/json');
 require_once __DIR__ . '/includes/db_config.php';
+require_once __DIR__ . '/includes/gemini_config.php';
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
@@ -25,13 +26,31 @@ if ($language === 'auto') {
 }
 
 $context = getSystemContext();
-$response = processQuery($message, $language, $context);
+
+// Try Gemini API first
+$response = null;
+$mode = 'rule-based'; // Default mode
+
+if (defined('GEMINI_ENABLED') && GEMINI_ENABLED) {
+    $response = callGeminiAPI($message, $context);
+    if ($response) {
+        $mode = 'gemini-ai';
+    }
+}
+
+// Fallback to rule-based system if Gemini fails or is disabled
+if (!$response) {
+    $response = processQuery($message, $language, $context);
+    $mode = 'rule-based';
+}
+
 logConversation($message, $response, $language);
 
 echo json_encode([
     'success' => true,
     'response' => $response,
     'language' => $language,
+    'mode' => $mode,
     'suggestions' => getSuggestions($language)
 ]);
 
