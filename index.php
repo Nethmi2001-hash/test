@@ -221,10 +221,10 @@
         </div>
         <div>
             <span class="sec-label">Our Mission</span>
-            <h2 class="sec-title">A Community Rooted<br>in Compassion & Care</h2>
-            <p class="mission-body">This platform bridges generous donors with monks and clergy who dedicate their lives to spiritual service. Our welfare system ensures they receive proper healthcare, housing, and daily support with full transparency at every step.</p>
-            <p class="mission-body">Every donation is recorded, verified, and published. Donors receive instant receipts and the knowledge that their generosity creates real, lasting impact.</p>
-            <div class="mission-quote"><p>To give is not to lose. In generosity, we find the deepest form of abundance.</p></div>
+            <h2 class="sec-title">Protecting the Protectors<br>of Dhamma</h2>
+            <p class="mission-body">We believe that those who devote their lives to spiritual teaching and mental cultivation require a secure foundation of physical well-being.</p>
+            <p class="mission-body">Our sanctuary provides the essential bridge between our supporters and monastic needs.</p>
+            <div class="mission-quote"><p>"Health is the greatest gift, contentment the greatest wealth, faithfulness the best relationship."</p></div>
             <div class="inl-stats">
                 <div><div class="inl-num">98%</div><div class="inl-lbl">Funds Utilised</div></div>
                 <div><div class="inl-num">5 yrs</div><div class="inl-lbl">In Service</div></div>
@@ -243,25 +243,6 @@
             <div class="step"><div class="step-c">🔒<span class="step-n">2</span></div><div class="step-title">Secure Payment</div><div class="step-desc">Pay safely via PayHere, bank transfer, or upload a bank slip. Your personal data is always protected.</div></div>
             <div class="step"><div class="step-c">📋<span class="step-n">3</span></div><div class="step-title">Track Your Impact</div><div class="step-desc">Receive an instant receipt. View our public transparency reports to see exactly how funds are used.</div></div>
         </div>
-    </div>
-</section>
-
-<!-- DONATE CTA -->
-<section class="dcta" id="donate">
-    <div class="dcta-inner">
-        <span class="sec-label">Make a Difference Today</span>
-        <h2 class="sec-title">Your Kindness Sustains<br><em style="font-style:italic;color:var(--orange)">Sacred Service</em></h2>
-        <p>Every donation, large or small, directly supports the monks who devote their lives to our community's spiritual wellbeing.</p>
-        <div class="chips">
-            <a href="public_donate.php?amount=500" class="chip">Rs. 500</a>
-            <a href="public_donate.php?amount=1000" class="chip active">Rs. 1,000</a>
-            <a href="public_donate.php?amount=2500" class="chip">Rs. 2,500</a>
-            <a href="public_donate.php?amount=5000" class="chip">Rs. 5,000</a>
-            <a href="public_donate.php?amount=10000" class="chip">Rs. 10,000</a>
-            <a href="public_donate.php?amount=0" class="chip">Custom</a>
-        </div>
-        <a href="public_donate.php" class="btn-donate">🙏 Donate Now</a>
-        <p class="dcta-note">🔒 Secure payment &nbsp;·&nbsp; Instant receipt &nbsp;·&nbsp; 100% transparent</p>
     </div>
 </section>
 
