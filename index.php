@@ -56,25 +56,24 @@
         .btn-hg{background:rgba(255,255,255,.1);color:var(--white);padding:16px 36px;border-radius:50px;text-decoration:none;font-size:.95rem;font-weight:400;letter-spacing:.04em;transition:all .3s;border:1.5px solid rgba(255,255,255,.35);backdrop-filter:blur(6px)}
         .btn-hg:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.6)}
 
-        /* STATS BAR — half in hero, half in features */
-        .stats-bar{position:absolute;bottom:-58px;left:50%;transform:translateX(-50%);z-index:10;display:flex;width:88%;max-width:960px;background:var(--white);border-radius:20px;border:1px solid rgba(210,170,130,.25);box-shadow:0 20px 60px rgba(0,0,0,.14),0 4px 16px rgba(212,98,42,.08);overflow:visible}
-        .stat-box{flex:1;padding:28px 24px;text-align:center;border-right:1px solid var(--border);position:relative}
-        .stat-box:last-child{border-right:none}
-        .stat-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--orange),var(--orange-light));opacity:0;transition:opacity .3s}
-        .stat-box:hover::before{opacity:1}
-        .stat-num{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:600;color:var(--orange);line-height:1}
-        .stat-lbl{font-size:.72rem;color:var(--text-light);letter-spacing:.08em;text-transform:uppercase;margin-top:5px}
+        /* STATS BAR — separate section after hero */
+        .stats-bar{display:flex;width:100%;background:transparent;padding:40px 6%;justify-content:center;align-items:center;position:relative;z-index:5}
+        .stats-wrapper{display:flex;width:100%;max-width:1200px;gap:24px;flex-wrap:wrap;justify-content:center;margin:0 auto}
+        .stat-box{flex:0 1 calc(25% - 18px);min-width:200px;padding:36px 28px;text-align:center;background:var(--cream);border-radius:50px;border:1.5px solid rgba(212,98,42,.12);position:relative;transition:all .3s}
+        .stat-box:hover{border-color:var(--orange-light);transform:translateY(-4px);box-shadow:0 12px 36px rgba(212,98,42,.12)}
+        .stat-num{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:600;color:var(--orange);line-height:1}
+        .stat-lbl{font-size:.75rem;color:var(--text-light);letter-spacing:.09em;text-transform:uppercase;margin-top:8px;font-weight:500}
 
         /* FEATURES — extra top padding for overlapping stats bar */
-        .features{background:var(--white);padding:120px 6% 80px;position:relative;z-index:5}
+        .features{background:var(--white);padding:60px 6% 80px;position:relative;z-index:5;text-align:center}
         .sec-label{font-size:.72rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);display:block;margin-bottom:14px}
-        .sec-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,3.8vw,3rem);font-weight:300;line-height:1.2;color:var(--text-dark);margin-bottom:56px}
-        .feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
-        .feat-card{padding:30px 22px;border:1px solid var(--border);border-radius:16px;background:var(--white);transition:all .3s}
-        .feat-card:hover{border-color:var(--orange-light);transform:translateY(-4px);box-shadow:0 16px 48px rgba(212,98,42,.08)}
-        .feat-icon{width:54px;height:54px;background:var(--orange-pale);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:18px}
-        .feat-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--text-dark);margin-bottom:8px}
-        .feat-desc{font-size:.84rem;color:var(--text-light);line-height:1.7}
+        .sec-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,3.8vw,3rem);font-weight:300;line-height:1.2;color:var(--text-dark);margin-bottom:56px;background:transparent;padding:0;border-radius:0;border:none;display:block}
+        .feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+        .feat-card{padding:32px 24px;border:1.5px solid rgba(210,170,130,.18);border-radius:12px;background:var(--white);transition:all .3s;text-align:left}
+        .feat-card:hover{border-color:var(--orange-light);transform:translateY(-4px);box-shadow:0 12px 36px rgba(212,98,42,.1)}
+        .feat-icon{width:48px;height:48px;background:rgba(212,98,42,.08);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin-bottom:16px}
+        .feat-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--text-dark);margin-bottom:10px}
+        .feat-desc{font-size:.82rem;color:var(--text-light);line-height:1.65}
 
         /* MISSION */
         .mission{padding:80px 6%;background:var(--ivory);border-top:1px solid var(--border)}
@@ -139,8 +138,8 @@
         .foot-btm{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;font-size:.77rem;color:rgba(255,255,255,.22)}
 
         /* RESPONSIVE */
-        @media(max-width:960px){.hero-content{padding:0 6% 150px}.feat-grid{grid-template-columns:repeat(2,1fr)}.mission-inner{grid-template-columns:1fr;gap:48px}.steps{grid-template-columns:1fr}.steps::before{display:none}.foot-grid{grid-template-columns:1fr 1fr}}
-        @media(max-width:680px){.hero{min-height:760px}.hero-content{padding:0 6% 200px}.nav-links{display:none}.stats-bar{width:92%;bottom:-110px;flex-wrap:wrap}.stat-box{flex:1;min-width:50%;border-bottom:1px solid var(--border)}.stat-box:nth-child(odd){border-right:1px solid var(--border)}.stat-box:nth-child(even){border-right:none}.feat-grid{grid-template-columns:1fr}.features{padding-top:200px}.foot-grid{grid-template-columns:1fr}}
+        @media(max-width:960px){.hero-content{padding:0 6% 150px}.feat-grid{grid-template-columns:repeat(2,1fr)}.mission-inner{grid-template-columns:1fr;gap:48px}.steps{grid-template-columns:1fr}.steps::before{display:none}.foot-grid{grid-template-columns:1fr 1fr}.stat-box{flex:0 1 calc(50% - 12px)}}
+        @media(max-width:680px){.hero{min-height:760px}.hero-content{padding:0 6% 120px}.nav-links{display:none}.stats-bar{padding:40px 6%}.stats-wrapper{flex-direction:column}.stat-box{flex:0 1 100%;min-width:100%}.feat-grid{grid-template-columns:1fr}.foot-grid{grid-template-columns:1fr}}
 
         /* ANIMATIONS */
         @keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
@@ -188,10 +187,14 @@
             <a href="#mission" class="btn-hg">Learn More</a>
         </div>
     </div>
-    <div class="stats-bar">
+</section>
+
+<!-- STATS -->
+<section class="stats-bar">
+    <div class="stats-wrapper">
         <div class="stat-box"><div class="stat-num">240+</div><div class="stat-lbl">Monks Supported</div></div>
         <div class="stat-box"><div class="stat-num">18</div><div class="stat-lbl">Doctors on Call</div></div>
-        <div class="stat-box"><div class="stat-num">Rs. 2.4M</div><div class="stat-lbl">Raised This Year</div></div>
+        <div class="stat-box"><div class="stat-num">Rs. 2.4M</div><div class="stat-lbl">RS. Raised</div></div>
         <div class="stat-box"><div class="stat-num">100%</div><div class="stat-lbl">Transparent</div></div>
     </div>
 </section>
@@ -199,7 +202,7 @@
 <!-- FEATURES -->
 <section class="features">
     <span class="sec-label">What We Do</span>
-    <h2 class="sec-title">Complete Welfare for<br>Monastery Communities</h2>
+    <h2 class="sec-title">Sanctuary Services</h2>
     <div class="feat-grid">
         <div class="feat-card"><div class="feat-icon">🏥</div><div class="feat-title">Healthcare Access</div><div class="feat-desc">Professional doctors, scheduled appointments, and medical support for all residents.</div></div>
         <div class="feat-card"><div class="feat-icon">🙏</div><div class="feat-title">Donor Community</div><div class="feat-desc">Join thousands of compassionate donors supporting monastery welfare year-round.</div></div>
