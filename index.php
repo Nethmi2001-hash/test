@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seela suwa herath — Monastery Welfare & Donation</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         :root{
@@ -16,7 +16,7 @@
             --border:rgba(210,170,130,0.28);
         }
         html{scroll-behavior:smooth}
-        body{font-family:'Jost',sans-serif;font-weight:300;background:var(--white);color:var(--text-dark);overflow-x:hidden;padding-top:76px}
+        body{font-family:'Raleway',sans-serif;font-weight:400;background:var(--white);color:var(--text-dark);overflow-x:hidden;padding-top:76px}
 
         /* NAV */
         nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:0 6%;height:76px;display:flex;align-items:center;justify-content:space-between;transition:background .4s,box-shadow .4s;background:rgba(0,0,0,.3);backdrop-filter:blur(6px)}
@@ -24,7 +24,7 @@
         .nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
         .nav-logo-mark{width:38px;height:38px;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.35);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;transition:background .4s,border-color .4s}
         nav.scrolled .nav-logo-mark{background:linear-gradient(135deg,var(--orange),var(--orange-light));border-color:transparent}
-        .nav-logo-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--white);transition:color .4s}
+        .nav-logo-name{font-family:'EB Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--white);transition:color .4s}
         nav.scrolled .nav-logo-name{color:var(--text-dark)}
         .nav-logo-sub{font-size:.6rem;color:rgba(255,255,255,.55);letter-spacing:.13em;text-transform:uppercase;display:block;margin-top:-4px;transition:color .4s}
         nav.scrolled .nav-logo-sub{color:var(--text-light)}
@@ -44,10 +44,10 @@
         .hero-img-fallback{position:absolute;inset:0;background:linear-gradient(160deg,#3D1F0A 0%,#7A3A1A 45%,#C06030 100%);display:none}
         .hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(to right,rgba(15,8,3,.72) 0%,rgba(15,8,3,.45) 55%,rgba(15,8,3,.12) 100%)}
         .hero-overlay-btm{position:absolute;bottom:0;left:0;right:0;z-index:2;height:200px;background:linear-gradient(to top,rgba(255,251,247,1) 0%,transparent 100%)}
-        .hero-content{position:relative;z-index:3;padding:0 6% 120px;max-width:700px}
+        .hero-content{position:relative;z-index:3;padding:80px 6% 120px;max-width:700px}
         .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(8px);padding:7px 18px;border-radius:40px;font-size:.72rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85);margin-bottom:28px}
         .hero-badge span{color:var(--orange-light)}
-        .hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,6.5vw,5.8rem);font-weight:300;line-height:1.05;color:var(--white);margin-bottom:24px;text-shadow:0 2px 32px rgba(0,0,0,.3)}
+        .hero-title{font-family:'EB Garamond',serif;font-size:clamp(3rem,6.5vw,5.8rem);font-weight:500;line-height:1.05;color:var(--white);margin-bottom:24px;text-shadow:0 2px 32px rgba(0,0,0,.3)}
         .hero-title em{font-style:italic;color:var(--orange-light)}
         .hero-desc{font-size:1.05rem;color:rgba(255,255,255,.72);max-width:480px;line-height:1.85;margin-bottom:40px}
         .hero-btns{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
@@ -61,18 +61,18 @@
         .stats-wrapper{display:flex;width:100%;max-width:1200px;gap:24px;flex-wrap:wrap;justify-content:center;margin:0 auto}
         .stat-box{flex:0 1 calc(25% - 18px);min-width:200px;padding:36px 28px;text-align:center;background:var(--cream);border-radius:50px;border:1.5px solid rgba(212,98,42,.12);position:relative;transition:all .3s}
         .stat-box:hover{border-color:var(--orange-light);transform:translateY(-4px);box-shadow:0 12px 36px rgba(212,98,42,.12)}
-        .stat-num{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:600;color:var(--orange);line-height:1}
+        .stat-num{font-family:'EB Garamond',serif;font-size:2.4rem;font-weight:600;color:var(--orange);line-height:1}
         .stat-lbl{font-size:.75rem;color:var(--text-light);letter-spacing:.09em;text-transform:uppercase;margin-top:8px;font-weight:500}
 
         /* FEATURES — extra top padding for overlapping stats bar */
         .features{background:var(--white);padding:60px 6% 80px;position:relative;z-index:5;text-align:center}
         .sec-label{font-size:.72rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);display:block;margin-bottom:14px}
-        .sec-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,3.8vw,3rem);font-weight:300;line-height:1.2;color:var(--text-dark);margin-bottom:56px;background:transparent;padding:0;border-radius:0;border:none;display:block}
+        .sec-title{font-family:'EB Garamond',serif;font-size:clamp(2rem,3.8vw,3rem);font-weight:600;line-height:1.2;color:var(--text-dark);margin-bottom:56px;background:transparent;padding:0;border-radius:0;border:none;display:block}
         .feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
         .feat-card{padding:32px 24px;border:1.5px solid rgba(210,170,130,.18);border-radius:12px;background:var(--white);transition:all .3s;text-align:left}
         .feat-card:hover{border-color:var(--orange-light);transform:translateY(-4px);box-shadow:0 12px 36px rgba(212,98,42,.1)}
         .feat-icon{width:48px;height:48px;background:rgba(212,98,42,.08);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin-bottom:16px}
-        .feat-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--text-dark);margin-bottom:10px}
+        .feat-title{font-family:'EB Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--text-dark);margin-bottom:10px}
         .feat-desc{font-size:.82rem;color:var(--text-light);line-height:1.65}
 
         /* MISSION */
@@ -85,9 +85,9 @@
         .gal-img:not(.tall){height:220px}
         .mission-body{font-size:.97rem;color:var(--text-mid);line-height:1.9;margin-bottom:16px}
         .mission-quote{padding:18px 22px;border-left:3px solid var(--orange);background:var(--white);border-radius:0 10px 10px 0;margin:24px 0}
-        .mission-quote p{font-family:'Cormorant Garamond',serif;font-size:1.12rem;font-style:italic;color:var(--text-dark);line-height:1.6}
+        .mission-quote p{font-family:'EB Garamond',serif;font-size:1.5rem;font-style:italic;color:var(--text-dark);line-height:1.6;font-weight:400}
         .inl-stats{display:flex;gap:28px;margin-top:28px;padding-top:24px;border-top:1px solid var(--border)}
-        .inl-num{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;color:var(--orange)}
+        .inl-num{font-family:'EB Garamond',serif;font-size:1.8rem;font-weight:600;color:var(--orange)}
         .inl-lbl{font-size:.72rem;color:var(--text-light);letter-spacing:.07em;text-transform:uppercase}
 
         /* HOW */
@@ -100,7 +100,7 @@
         .step-c{width:80px;height:80px;margin:0 auto 22px;border-radius:50%;background:var(--orange-pale);border:2px solid rgba(212,98,42,.15);display:flex;align-items:center;justify-content:center;font-size:1.7rem;position:relative;z-index:1;transition:all .3s}
         .step:hover .step-c{background:var(--orange);border-color:var(--orange);transform:scale(1.08)}
         .step-n{position:absolute;top:-6px;right:-6px;width:24px;height:24px;background:var(--orange);color:#fff;border-radius:50%;font-size:.7rem;font-weight:600;display:flex;align-items:center;justify-content:center}
-        .step-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--text-dark);margin-bottom:10px}
+        .step-title{font-family:'EB Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--text-dark);margin-bottom:10px}
         .step-desc{font-size:.85rem;color:var(--text-light);line-height:1.75}
 
         /* DONATE CTA */
@@ -119,16 +119,16 @@
         /* TESTIMONIAL */
         .testi{background:var(--cream);border-top:1px solid var(--border);padding:80px 6%}
         .testi-inner{max-width:860px;margin:0 auto;text-align:center}
-        .testi-q{font-family:'Cormorant Garamond',serif;font-size:clamp(1.4rem,2.5vw,2rem);font-weight:300;font-style:italic;color:var(--text-dark);line-height:1.55;margin-bottom:24px}
+        .testi-q{font-family:'EB Garamond',serif;font-size:clamp(1.4rem,2.5vw,2rem);font-weight:400;font-style:italic;color:var(--text-dark);line-height:1.55;margin-bottom:24px}
         .testi-q::before{content:'\201C';color:var(--orange)}
         .testi-q::after{content:'\201D';color:var(--orange)}
         .testi-auth{font-size:.83rem;color:var(--text-light);letter-spacing:.08em;text-transform:uppercase}
         .testi-auth strong{color:var(--text-mid);font-weight:500}
 
         /* FOOTER */
-        footer{background:var(--text-dark);padding:60px 6% 28px}
+        footer{background:#4A3B32;padding:60px 6% 28px}
         .foot-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:24px}
-        .foot-brand{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:#fff;margin-bottom:12px}
+        .foot-brand{font-family:'EB Garamond',serif;font-size:1.5rem;color:#fff;margin-bottom:12px;font-weight:600}
         .foot-tag{font-size:.84rem;color:rgba(255,255,255,.38);line-height:1.7;max-width:240px}
         .foot-col h4{font-size:.68rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:14px}
         .foot-col ul{list-style:none}
@@ -222,8 +222,7 @@
         <div>
             <span class="sec-label">Our Mission</span>
             <h2 class="sec-title">Protecting the Protectors<br>of Dhamma</h2>
-            <p class="mission-body">We believe that those who devote their lives to spiritual teaching and mental cultivation require a secure foundation of physical well-being.</p>
-            <p class="mission-body">Our sanctuary provides the essential bridge between our supporters and monastic needs.</p>
+            <p class="mission-body">We believe that those who devote their lives to spiritual teaching and mental cultivation require a secure foundation of physical well-being. Our sanctuary provides the essential bridge between our supporters and monastic needs.</p>
             <div class="mission-quote"><p>"Health is the greatest gift, contentment the greatest wealth, faithfulness the best relationship."</p></div>
             <div class="inl-stats">
                 <div><div class="inl-num">98%</div><div class="inl-lbl">Funds Utilised</div></div>
