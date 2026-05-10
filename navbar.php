@@ -59,12 +59,12 @@ $isMonk = ($userRole === 'Monk');
 <!-- Sidebar -->
 <aside class="app-sidebar" id="appSidebar">
   <a href="index.php" class="sidebar-header" style="text-decoration:none;color:inherit;">
-    <div class="sidebar-logo">
-      <i class="bi bi-heart-pulse"></i>
+    <div class="sidebar-logo" style="font-size: 20px;">
+      ☸
     </div>
     <div class="sidebar-brand">
-      Seela Suwa
-      <small>Healthcare Management</small>
+      Seela suwa herath
+      <small>Monastery Welfare</small>
     </div>
   </a>
 
@@ -81,7 +81,7 @@ $isMonk = ($userRole === 'Monk');
       <i class="bi bi-cash-coin"></i> <?= __('donations') ?>
     </a>
     <a class="sidebar-link <?= isActivePage('donation_date_requests.php', $currentPage) ?>" href="donation_date_requests.php">
-      <i class="bi bi-calendar-event"></i> Donation Dates
+      <i class="bi bi-calendar-event"></i> Alms Dates
     </a>
     <a class="sidebar-link <?= isActivePage('bill_management.php', $currentPage) ?>" href="bill_management.php">
       <i class="bi bi-receipt-cutoff"></i> <?= __('bills') ?>

@@ -2113,7 +2113,7 @@ textarea.form-control-modern {
    27. WELCOME CARD
    ============================================ */
 .welcome-card {
-  background: linear-gradient(135deg, var(--primary-600), var(--primary-800));
+  background: linear-gradient(135deg, #D4622A, #A54620);
   border-radius: var(--border-radius-xl);
   padding: 32px;
   color: white;

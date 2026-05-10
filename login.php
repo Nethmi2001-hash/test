@@ -451,6 +451,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         .back-link a:hover { color: var(--deep-sage); }
 
+        /* FOOTER */
+        footer{background:#4A3B32;padding:60px 6% 28px;grid-column:1 / -1;width:100%}
+        .foot-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:24px}
+        .foot-brand{font-family:'EB Garamond',serif;font-size:1.5rem;color:#fff;margin-bottom:12px;font-weight:600}
+        .foot-tag{font-size:.84rem;color:rgba(255,255,255,.38);line-height:1.7;max-width:240px}
+        .foot-col h4{font-size:.68rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:14px}
+        .foot-col ul{list-style:none}
+        .foot-col ul li{margin-bottom:9px}
+        .foot-col ul a{color:rgba(255,255,255,.48);text-decoration:none;font-size:.86rem;transition:color .2s}
+        .foot-col ul a:hover{color:var(--orange-light)}
+        .foot-btm{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;font-size:.77rem;color:rgba(255,255,255,.22)}
+
         @media (max-width: 768px) {
             .nav-links { display: none; }
             body { grid-template-columns: 1fr; }
@@ -591,6 +603,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 </div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="foot-grid">
+        <div><div class="foot-brand">☸ Seela suwa herath</div><p class="foot-tag">Supporting monastery welfare through community generosity, transparent governance, and compassionate care.</p></div>
+        <div class="foot-col"><h4>Platform</h4><ul><li><a href="public_donate.php">Donate</a></li><li><a href="public_transparency.php">Transparency</a></li><li><a href="register.php">Register</a></li><li><a href="login.php">Sign In</a></li></ul></div>
+        <div class="foot-col"><h4>Welfare</h4><ul><li><a href="#">Healthcare</a></li><li><a href="#">Housing</a></li><li><a href="#">Appointments</a></li><li><a href="#">Reports</a></li></ul></div>
+        <div class="foot-col"><h4>Info</h4><ul><li><a href="#">About Us</a></li><li><a href="#">Contact</a></li><li><a href="#">Privacy Policy</a></li></ul></div>
+    </div>
+    <div class="foot-btm"><span>© 2026 Seela suwa herath Monastery Welfare Platform</span><span>Made with in Sri Lanka</span></div>
+</footer>
 
 <script>
 function togglePw() {
