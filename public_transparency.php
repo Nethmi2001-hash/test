@@ -202,9 +202,9 @@ if ($qAcceptedDates) {
         .nav-donate:hover{background:var(--text-dark)!important}
 
         /* ── PAGE HEADER ── */
-        .page-header{background:transparent;padding:80px 6% 50px;position:relative;overflow:visible;text-align:center}
+        .page-header{background:transparent;padding:36px 6% 42px;position:relative;overflow:visible;text-align:center}
         .page-header::before{display:none}
-        .page-header-inner{position:relative;z-index:1;max-width:850px;margin:0 auto;background:var(--sand);border-radius:24px;padding:56px 52px;box-shadow:0 8px 32px rgba(0,0,0,.06)}
+        .page-header-inner{position:relative;z-index:1;max-width:1160px;margin:0 auto;background:var(--sand);border-radius:24px;padding:56px 52px;box-shadow:0 8px 32px rgba(0,0,0,.06)}
         .page-header-eyebrow{font-size:.74rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--text-light);margin-bottom:16px}
         .page-header h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.3rem,4.5vw,3.3rem);font-weight:300;color:var(--text-dark);line-height:1.15;margin-bottom:18px}
         .page-header h1 em{font-style:italic;color:var(--orange-light);font-weight:400}
@@ -222,7 +222,7 @@ if ($qAcceptedDates) {
         .s-card-sub{font-size:.80rem;color:var(--text-mid);margin-top:8px;line-height:1.4}
 
         /* ── MAIN LAYOUT ── */
-        .main{max-width:1160px;margin:0 auto;padding:0 6% 100px;display:grid;grid-template-columns:1fr 340px;gap:44px;align-items:start}
+        .main{width:88%;max-width:1160px;margin:0 auto 100px;padding:0;display:grid;grid-template-columns:1fr 340px;gap:44px;align-items:start}
 
         /* ── SECTION TITLES ── */
         .sec-label{font-size:.72rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);display:block;margin-bottom:10px}
@@ -329,7 +329,7 @@ if ($qAcceptedDates) {
 
         /* ── RESPONSIVE ── */
         @media(max-width:960px){.main{grid-template-columns:1fr}.summary-cards{grid-template-columns:repeat(2,1fr)}.sidebar{display:grid;grid-template-columns:1fr 1fr;gap:28px}.page-header-inner{padding:48px 40px}}
-        @media(max-width:600px){.summary-cards{grid-template-columns:1fr 1fr}.nav-links{display:none}.filter-bar{flex-direction:column;align-items:stretch}.sidebar{grid-template-columns:1fr}.page-header-inner{padding:40px 28px}.main{padding:0 6% 80px}}
+        @media(max-width:600px){.summary-cards{grid-template-columns:1fr 1fr}.nav-links{display:none}.filter-bar{flex-direction:column;align-items:stretch}.sidebar{grid-template-columns:1fr}.page-header-inner{padding:40px 28px}.main{margin-bottom:80px}}
 
         /* ── ANIMATIONS ── */
         @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
@@ -365,7 +365,7 @@ if ($qAcceptedDates) {
 <div class="page-header">
     <div class="page-header-inner">
         <div class="page-header-eyebrow">Open Books · Public Accountability</div>
-        <h1>Full <em>Transparency</em><br>Reports</h1>
+        <h1>Full <em>Transparency</em> Reports</h1>
         <p>Every donation received and every rupee spent is recorded here publicly, permanently, and honestly.</p>
     </div>
 </div>
