@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/db_config.php';
@@ -42,9 +42,9 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Make a Donation — Seela suwa herath</title>
+    <title>Make a Donation &mdash; Seela suwa herath</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=EB+Garamond:wght@600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
@@ -70,60 +70,29 @@ $conn->close();
             color: var(--text-dark);
         }
 
-        /* ── TOP BAR ── */
-        .topbar {
-            background: var(--white);
-            border-bottom: 1px solid var(--border);
-            padding: 0 5%;
-            height: 64px;
-            display: flex; align-items: center; justify-content: space-between;
-            position: sticky; top: 0; z-index: 50;
-        }
-        .topbar-brand {
-            display: flex; align-items: center; gap: 10px;
-            text-decoration: none;
-        }
-        .topbar-mark {
-            width: 32px; height: 32px;
-            background: linear-gradient(135deg, #D4622A, #F0A050);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 14px; color: white;
-        }
-        .topbar-name {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.15rem; font-weight: 600;
-            color: var(--text-dark);
-        }
-        .topbar-right {
-            display: flex; align-items: center; gap: 16px;
-            font-size: 0.83rem;
-        }
-        .topbar-right a { color: var(--text-mid); text-decoration: none; }
-        .topbar-right a:hover { color: var(--deep-sage); }
-        .topbar-login {
-            padding: 8px 20px;
-            border: 1.5px solid var(--border);
-            border-radius: 40px;
-            color: var(--text-mid) !important;
-            transition: all 0.2s;
-        }
-        .topbar-login:hover {
-            border-color: var(--deep-sage);
-            color: var(--deep-sage) !important;
-        }
+        /* â”€â”€ TOP BAR â”€â”€ */
+        nav{position:sticky;top:0;left:0;right:0;z-index:200;padding:0 6%;height:72px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+        .nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+        .nav-logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--deep-sage),var(--gold));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff}
+        .nav-logo-name{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--text-dark)}
+        .nav-logo-sub{font-size:.6rem;color:var(--text-light);letter-spacing:.13em;text-transform:uppercase;display:block;margin-top:-4px}
+        .nav-links{display:flex;align-items:center;gap:28px;list-style:none}
+        .nav-links a{text-decoration:none;color:var(--text-mid);font-size:.83rem;font-weight:400;letter-spacing:.06em;text-transform:uppercase;transition:color .2s}
+        .nav-links a:hover,.nav-links a.active{color:var(--deep-sage)}
+        .nav-donate{background:var(--deep-sage)!important;color:#fff!important;padding:9px 24px!important;border-radius:40px!important;font-weight:500!important}
+        .nav-donate:hover{background:var(--text-dark)!important}
 
-        /* ── HERO STRIP ── */
+        /* â”€â”€ HERO STRIP â”€â”€ */
         .donate-hero {
-            background: linear-gradient(to right, var(--deep-sage), #C05520);
-            color: var(--white);
-            padding: 40px 5%;
+            background: #EDE6DC;
+            color: var(--text-dark);
+            padding: 36px 6%;
             text-align: center;
             position: relative;
             overflow: hidden;
         }
         .donate-hero::before {
-            content: '☸';
+            content: '\2638';
             position: absolute;
             font-size: 220px;
             opacity: 0.04;
@@ -133,24 +102,25 @@ $conn->close();
         .donate-hero-eyebrow {
             font-size: 0.72rem; font-weight: 500;
             letter-spacing: 0.18em; text-transform: uppercase;
-            color: rgba(255,255,255,0.55); margin-bottom: 12px;
+            color: var(--text-light); margin-bottom: 12px;
         }
         .donate-hero h1 {
             font-family: 'Cormorant Garamond', serif;
             font-size: clamp(2rem, 4vw, 3rem);
             font-weight: 300; line-height: 1.2;
         }
-        .donate-hero h1 em { font-style: italic; color: var(--gold); }
+        .donate-hero h1 em { font-style: italic; color: var(--deep-sage); }
         .donate-hero p {
             margin-top: 12px;
-            font-size: 0.95rem; color: rgba(255,255,255,0.65);
+            font-size: 0.95rem; color: var(--text-mid);
         }
 
-        /* ── MAIN LAYOUT ── */
+        /* â”€â”€ MAIN LAYOUT â”€â”€ */
         .donate-main {
-            max-width: 1060px;
-            margin: 0 auto;
-            padding: 56px 5% 80px;
+            width: 88%;
+            max-width: 1160px;
+            margin: 0 auto 80px;
+            padding: 56px 0 0;
             display: grid;
             grid-template-columns: 1fr 380px;
             gap: 40px;
@@ -164,12 +134,13 @@ $conn->close();
         }
 
         .donate-wide {
-            max-width: 1060px;
+            width: 88%;
+            max-width: 1160px;
             margin: 0 auto;
-            padding: 36px 5% 0;
+            padding: 36px 0 0;
         }
 
-        /* ── FORM PANEL ── */
+        /* â”€â”€ FORM PANEL â”€â”€ */
         .form-panel {
             background: var(--white);
             border: 1px solid var(--border);
@@ -366,7 +337,7 @@ $conn->close();
             display: flex; align-items: center; justify-content: center;
         }
         .pay-option input:checked + label .pay-check::after {
-            content: '✓'; color: white; font-size: 0.7rem;
+            content: '\2713'; color: white; font-size: 0.7rem;
         }
 
         /* Bank slip upload (conditional) */
@@ -384,7 +355,7 @@ $conn->close();
         }
         .bank-slip-section strong { color: var(--text-dark); }
 
-        /* ── SUBMIT BUTTON ── */
+        /* â”€â”€ SUBMIT BUTTON â”€â”€ */
         .submit-row { margin-top: 32px; }
         .btn-donate {
             width: 100%; padding: 16px;
@@ -404,7 +375,7 @@ $conn->close();
             display: flex; align-items: center; justify-content: center; gap: 6px;
         }
 
-        /* ── SUMMARY PANEL ── */
+        /* â”€â”€ SUMMARY PANEL â”€â”€ */
         .summary-panel {
             position: sticky; top: 80px;
         }
@@ -467,15 +438,33 @@ $conn->close();
         }
         .transparency-link:hover { background: rgba(212,98,42,0.06); }
 
+        /* Footer */
+        footer{background:#4A3B32;padding:60px 6% 28px}
+        .foot-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:24px}
+        .foot-brand{font-family:'EB Garamond',serif;font-size:1.5rem;color:#fff;margin-bottom:12px;font-weight:600}
+        .foot-tag{font-size:.84rem;color:rgba(255,255,255,.38);line-height:1.7;max-width:240px}
+        .foot-col h4{font-size:.68rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:14px}
+        .foot-col ul{list-style:none}
+        .foot-col ul li{margin-bottom:9px}
+        .foot-col ul a{color:rgba(255,255,255,.48);text-decoration:none;font-size:.86rem;transition:color .2s}
+        .foot-col ul a:hover{color:var(--gold)}
+        .foot-btm{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;font-size:.77rem;color:rgba(255,255,255,.22)}
+
         @media (max-width: 900px) {
             .donate-main { grid-template-columns: 1fr; }
             .summary-panel { position: static; }
+            .foot-grid{grid-template-columns:1fr 1fr}
         }
         @media (max-width: 600px) {
+            .nav-links { display: none; }
             .form-panel { padding: 24px; }
+            .date-request-panel { padding: 24px; }
+            .date-request-grid { grid-template-columns: 1fr; }
             .amount-grid { grid-template-columns: repeat(2, 1fr); }
             .category-grid { grid-template-columns: 1fr; }
             .form-row-2 { grid-template-columns: 1fr; }
+            .foot-grid{grid-template-columns:1fr}
+            .foot-btm{flex-direction:column;gap:8px}
         }
 
         /* Floating chatbot */
@@ -612,17 +601,24 @@ $conn->close();
 </head>
 <body>
 
-<!-- TOP BAR -->
-<div class="topbar">
-    <a href="index.php" class="topbar-brand">
-        <div class="topbar-mark">☸</div>
-        <span class="topbar-name">Seela suwa herath</span>
+<!-- NAV -->
+<nav>
+    <a href="index.php" class="nav-logo">
+        <div class="nav-logo-mark">☸</div>
+        <div>
+            <span class="nav-logo-name">Seela suwa herath</span>
+            <span class="nav-logo-sub">Monastery Welfare</span>
+        </div>
     </a>
-    <div class="topbar-right">
-        <a href="public_transparency.php">View Reports</a>
-        <a href="login.php" class="topbar-login">Sign In</a>
-    </div>
-</div>
+    <ul class="nav-links">
+        <li><a href="index.php#mission">Our Mission</a></li>
+        <li><a href="index.php#how">How It Works</a></li>
+        <li><a href="public_transparency.php">Transparency</a></li>
+        <li><a href="login.php">Sign In</a></li>
+        <li><a href="public_donate.php" class="nav-donate active">Donate Now</a></li>
+    </ul>
+</nav>
+
 
 <!-- HERO STRIP -->
 <div class="donate-hero">
@@ -642,13 +638,13 @@ $conn->close();
 
         <?php if ($dateError !== ''): ?>
         <div style="background:rgba(185,64,64,0.08);border:1px solid rgba(185,64,64,0.28);color:#9f2f2f;padding:12px 14px;border-radius:10px;margin:14px 0;font-size:.86rem;">
-            ⚠ <?= htmlspecialchars($dateError) ?>
+            &#9888; <?= htmlspecialchars($dateError) ?>
         </div>
         <?php endif; ?>
 
                 <?php if ($dateSuccess !== ''): ?>
                 <div id="dateSuccessMsg" style="background:rgba(46,125,82,0.08);border:1px solid rgba(46,125,82,0.28);color:#2f7a46;padding:12px 14px;border-radius:10px;margin:14px 0;font-size:.86rem;">
-            ✓ Date request submitted. Admin will review it soon.
+            &#10003; Date request submitted. Admin will review it soon.
         </div>
                 <script>
                     setTimeout(function() {
@@ -710,7 +706,7 @@ $conn->close();
 
             <div class="submit-row" style="margin-top:18px;">
                 <button type="submit" class="btn-donate" style="width:auto; padding:12px 22px;">
-                    📅 Request Date
+                    &#128197; Request Date
                 </button>
             </div>
         </form>
@@ -724,13 +720,13 @@ $conn->close();
     <div class="form-panel">
         <?php if ($errorMsg !== ''): ?>
         <div style="background:rgba(185,64,64,0.08);border:1px solid rgba(185,64,64,0.28);color:#9f2f2f;padding:12px 14px;border-radius:10px;margin-bottom:18px;font-size:.86rem;">
-            ⚠ <?= htmlspecialchars($errorMsg) ?>
+            &#9888; <?= htmlspecialchars($errorMsg) ?>
         </div>
         <?php endif; ?>
 
         <?php if ($successRef !== ''): ?>
         <div style="background:rgba(46,125,82,0.08);border:1px solid rgba(46,125,82,0.28);color:#2f7a46;padding:12px 14px;border-radius:10px;margin-bottom:18px;font-size:.86rem;">
-            ✓ Donation submitted successfully. Reference: DON-<?= htmlspecialchars($successRef) ?>
+            &#10003; Donation submitted successfully. Reference: DON-<?= htmlspecialchars($successRef) ?>
         </div>
         <?php endif; ?>
 
@@ -800,31 +796,31 @@ $conn->close();
                     <div class="cat-option">
                         <input type="radio" name="category" id="cat_general" value="general" checked>
                         <label for="cat_general">
-                            <span class="cat-icon">🏛️</span> General Welfare
+                            <span class="cat-icon">&#127963;</span> General Welfare
                         </label>
                     </div>
                     <div class="cat-option">
                         <input type="radio" name="category" id="cat_health" value="healthcare">
                         <label for="cat_health">
-                            <span class="cat-icon">🏥</span> Healthcare
+                            <span class="cat-icon">&#127973;</span> Healthcare
                         </label>
                     </div>
                     <div class="cat-option">
                         <input type="radio" name="category" id="cat_food" value="food">
                         <label for="cat_food">
-                            <span class="cat-icon">🍚</span> Food & Supplies
+                            <span class="cat-icon">&#127834;</span> Food & Supplies
                         </label>
                     </div>
                     <div class="cat-option">
                         <input type="radio" name="category" id="cat_housing" value="housing">
                         <label for="cat_housing">
-                            <span class="cat-icon">🏠</span> Housing & Rooms
+                            <span class="cat-icon">&#127968;</span> Housing & Rooms
                         </label>
                     </div>
                 </div>
                 <div class="form-group" style="margin-top:14px; margin-bottom:0;">
                     <label for="message">Personal Message (optional)</label>
-                    <textarea id="message" name="message" rows="2" placeholder="A note of blessing or dedication…"></textarea>
+                    <textarea id="message" name="message" rows="2" placeholder="A note of blessing or dedication..."></textarea>
                 </div>
             </div>
 
@@ -836,7 +832,7 @@ $conn->close();
                 </div>
                 <label class="anonymous-row" style="display:flex; cursor:pointer; margin-bottom:16px;">
                     <input type="checkbox" name="anonymous" id="anonymousCheck" onchange="toggleAnon(this)">
-                    <span>🙈 Donate anonymously</span>
+                    <span>&#128584; Donate anonymously</span>
                 </label>
                 <div id="donorFields">
                     <div class="form-row-2">
@@ -866,7 +862,7 @@ $conn->close();
                     <div class="pay-option">
                         <input type="radio" name="pay_method" id="pay_bank" value="bank_slip" checked>
                         <label for="pay_bank">
-                            <span class="pay-icon">🏦</span>
+                            <span class="pay-icon">&#127974;</span>
                             <div class="pay-info">
                                 <div class="pay-name">Bank Transfer + Slip</div>
                                 <div class="pay-sub">Transfer & upload your receipt</div>
@@ -894,9 +890,9 @@ $conn->close();
             <!-- SUBMIT -->
             <div class="submit-row">
                 <button type="submit" class="btn-donate" id="submitBtn">
-                    🙏 Donate Rs. <span id="btnAmount"><?= number_format($amount) ?></span>
+                    &#128591; Donate Rs. <span id="btnAmount"><?= number_format($amount) ?></span>
                 </button>
-                <p class="secure-note">🔒 Secure & encrypted · Instant receipt via email</p>
+                <p class="secure-note">&#128274; Secure & encrypted &middot; Instant receipt via email</p>
             </div>
         </form>
     </div>
@@ -927,34 +923,70 @@ $conn->close();
         <div class="impact-card">
             <div class="impact-title">Your Impact</div>
             <div class="impact-item">
-                <span class="impact-icon">🍚</span>
+                <span class="impact-icon">&#127834;</span>
                 <span>Rs. 500 feeds a monk for a full day</span>
             </div>
             <div class="impact-item">
-                <span class="impact-icon">💊</span>
+                <span class="impact-icon">&#128138;</span>
                 <span>Rs. 2,500 covers one medical consultation</span>
             </div>
             <div class="impact-item">
-                <span class="impact-icon">🛕</span>
+                <span class="impact-icon">&#128725;</span>
                 <span>Rs. 5,000 supports monthly welfare needs</span>
             </div>
             <div class="impact-item">
-                <span class="impact-icon">📊</span>
+                <span class="impact-icon">&#128202;</span>
                 <span>100% of funds are publicly reported</span>
             </div>
             <a href="public_transparency.php" class="transparency-link">
-                View transparency reports →
+                View transparency reports &rarr;
             </a>
         </div>
     </div>
 
 </div>
 
-<button type="button" class="chatbot-fab" id="chatbotFab" aria-label="Open chatbot">💬</button>
+<footer>
+    <div class="foot-grid">
+        <div>
+            <div class="foot-brand">☸ Seela suwa herath</div>
+            <p class="foot-tag">Supporting monastery welfare through community generosity, transparent governance, and compassionate care.</p>
+        </div>
+        <div class="foot-col">
+            <h4>Platform</h4>
+            <ul>
+                <li><a href="public_donate.php">Donate</a></li>
+                <li><a href="public_transparency.php">Transparency</a></li>
+                <li><a href="register.php">Register</a></li>
+                <li><a href="login.php">Sign In</a></li>
+            </ul>
+        </div>
+        <div class="foot-col">
+            <h4>Welfare</h4>
+            <ul>
+                <li><a href="#">Healthcare</a></li>
+                <li><a href="#">Housing</a></li>
+                <li><a href="#">Appointments</a></li>
+                <li><a href="#">Reports</a></li>
+            </ul>
+        </div>
+        <div class="foot-col">
+            <h4>Info</h4>
+            <ul>
+                <li><a href="#">About Us</a></li>
+                <li><a href="#">Contact</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="foot-btm"><span>© 2026 Seela suwa herath Monastery Welfare Platform</span><span>Made with in Sri Lanka</span></div>
+</footer>
+
+<button type="button" class="chatbot-fab" id="chatbotFab" aria-label="Open chatbot">&#128172;</button>
 <div class="chatbot-panel" id="chatbotPanel" aria-live="polite">
     <div class="chatbot-header">
         <div class="chatbot-title">AI Donation Assistant</div>
-        <button type="button" class="chatbot-close" id="chatbotClose" aria-label="Close chatbot">✕</button>
+        <button type="button" class="chatbot-close" id="chatbotClose" aria-label="Close chatbot">&times;</button>
     </div>
     <div class="chatbot-messages" id="chatbotMessages">
         <div class="chat-msg bot">Welcome. Ask about donation process, categories, or account details.</div>
