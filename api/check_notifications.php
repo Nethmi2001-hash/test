@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/init.php';
 /**
  * API Endpoint to Check for New Notifications
  * Returns count of new activities since last check

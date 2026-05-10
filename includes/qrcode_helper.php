@@ -74,7 +74,7 @@ function generateDonationQR($donation_id) {
     // Create verification URL
     $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") 
                 . "://" . $_SERVER['HTTP_HOST'];
-    $verify_url = $base_url . "/test/verify_donation.php?id=" . $donation_id 
+    $verify_url = $base_url . "/test/api/verify_donation.php?id=" . $donation_id 
                   . "&hash=" . md5($donation_id . $donation['amount']);
     
     // Generate QR code
