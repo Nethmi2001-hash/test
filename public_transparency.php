@@ -100,7 +100,18 @@ foreach ($breakdownRows as $r) {
 $breakdownColors = ['#D4622A', '#F0864A', '#F0A050', '#C9A070', '#D4B896'];
 
 $donationRows = [];
-$qDonations = $conn->query("SELECT d.donation_id, COALESCE(NULLIF(d.donor_name,''), 'Anonymous') AS donor_name, COALESCE(c.name, 'General') AS category, d.amount, d.created_at, d.method, d.status FROM donations d LEFT JOIN categories c ON d.category_id = c.category_id ORDER BY d.created_at DESC LIMIT 10");
+$donationsPerPage = 5;
+$donationPage = max(1, (int)($_GET['donation_page'] ?? 1));
+$donationTotalRows = 0;
+$qDonationCount = $conn->query("SELECT COUNT(*) AS cnt FROM donations");
+if ($qDonationCount) {
+    $donationTotalRows = (int)($qDonationCount->fetch_assoc()['cnt'] ?? 0);
+}
+$donationTotalPages = max(1, (int)ceil($donationTotalRows / $donationsPerPage));
+$donationPage = min($donationPage, $donationTotalPages);
+$donationOffset = ($donationPage - 1) * $donationsPerPage;
+
+$qDonations = $conn->query("SELECT d.donation_id, COALESCE(NULLIF(d.donor_name,''), 'Anonymous') AS donor_name, COALESCE(c.name, 'General') AS category, d.amount, d.created_at, d.method, d.status FROM donations d LEFT JOIN categories c ON d.category_id = c.category_id ORDER BY d.created_at DESC LIMIT $donationsPerPage OFFSET $donationOffset");
 if ($qDonations) {
     while ($row = $qDonations->fetch_assoc()) {
         $donationRows[] = $row;
@@ -160,7 +171,18 @@ if ($qRecent) {
 }
 
 $acceptedDatesRows = [];
-$qAcceptedDates = $conn->query("SELECT request_id, donor_name, donor_email, requested_date, meal_type, reviewed_at FROM donation_date_requests WHERE status='approved' ORDER BY requested_date DESC");
+$acceptedDatesPerPage = 5;
+$acceptedDatesPage = max(1, (int)($_GET['alms_page'] ?? 1));
+$acceptedDatesTotalRows = 0;
+$qAcceptedDatesCount = $conn->query("SELECT COUNT(*) AS cnt FROM donation_date_requests WHERE status='approved'");
+if ($qAcceptedDatesCount) {
+    $acceptedDatesTotalRows = (int)($qAcceptedDatesCount->fetch_assoc()['cnt'] ?? 0);
+}
+$acceptedDatesTotalPages = max(1, (int)ceil($acceptedDatesTotalRows / $acceptedDatesPerPage));
+$acceptedDatesPage = min($acceptedDatesPage, $acceptedDatesTotalPages);
+$acceptedDatesOffset = ($acceptedDatesPage - 1) * $acceptedDatesPerPage;
+
+$qAcceptedDates = $conn->query("SELECT request_id, donor_name, donor_email, requested_date, meal_type, reviewed_at FROM donation_date_requests WHERE status='approved' ORDER BY requested_date DESC LIMIT $acceptedDatesPerPage OFFSET $acceptedDatesOffset");
 if ($qAcceptedDates) {
     while ($row = $qAcceptedDates->fetch_assoc()) {
         $acceptedDatesRows[] = $row;
@@ -467,7 +489,7 @@ if ($qAcceptedDates) {
         </div><!-- end top row grid -->
 
         <!-- DONATIONS TABLE -->
-        <div class="card">
+        <div class="card" id="donation-records">
             <div class="card-title"><span></span> Donation Records</div>
 
             <div style="font-size:.8rem;color:var(--text-light);margin-bottom:16px">Showing latest donations from backend records.</div>
@@ -523,6 +545,14 @@ if ($qAcceptedDates) {
                     </tbody>
                 </table>
             </div>
+
+            <?php if ($donationTotalPages > 1): ?>
+            <div class="pagination">
+                <?php for ($p = 1; $p <= $donationTotalPages; $p++): ?>
+                    <a href="?donation_page=<?= $p ?>#donation-records" class="page-btn <?= $p === $donationPage ? 'active' : '' ?>"><?= $p ?></a>
+                <?php endfor; ?>
+            </div>
+            <?php endif; ?>
         </div>
 
         <!-- EXPENDITURE -->
@@ -548,7 +578,7 @@ if ($qAcceptedDates) {
         </div>
 
         <!-- ACCEPTED DONATION DATES -->
-        <div class="card">
+        <div class="card" id="accepted-alms-dates">
             <div class="card-title"><span></span> Accepted Daily Alms Dates</div>
             
             <div style="font-size:.8rem;color:var(--text-light);margin-bottom:16px">Upcoming approved donation dates from community members.</div>
@@ -586,6 +616,14 @@ if ($qAcceptedDates) {
                     </tbody>
                 </table>
             </div>
+
+            <?php if ($acceptedDatesTotalPages > 1): ?>
+            <div class="pagination">
+                <?php for ($p = 1; $p <= $acceptedDatesTotalPages; $p++): ?>
+                    <a href="?alms_page=<?= $p ?>#accepted-alms-dates" class="page-btn <?= $p === $acceptedDatesPage ? 'active' : '' ?>"><?= $p ?></a>
+                <?php endfor; ?>
+            </div>
+            <?php endif; ?>
         </div>
 
     </div><!-- end left col -->
