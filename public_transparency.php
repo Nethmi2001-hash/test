@@ -187,7 +187,7 @@ if ($qAcceptedDates) {
             --rejected:#B94040;--rejected-bg:#FDEAEA;
         }
         html{scroll-behavior:smooth}
-        body{font-family:'Jost',sans-serif;font-weight:300;background:var(--ivory);color:var(--text-dark);overflow-x:hidden}
+        body{font-family:'Jost',sans-serif;font-weight:300;background:var(--white);color:var(--text-dark);overflow-x:hidden}
 
         /* ── NAV (solid — no hero image on this page) ── */
         nav{position:sticky;top:0;left:0;right:0;z-index:200;padding:0 6%;height:72px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
@@ -202,55 +202,55 @@ if ($qAcceptedDates) {
         .nav-donate:hover{background:var(--text-dark)!important}
 
         /* ── PAGE HEADER ── */
-        .page-header{background:linear-gradient(135deg,var(--orange) 0%,var(--orange-mid) 60%,var(--orange-light) 100%);padding:64px 6% 80px;position:relative;overflow:hidden;text-align:center}
-        .page-header::before{content:'☸';position:absolute;font-size:380px;opacity:.06;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;line-height:1}
-        .page-header-inner{position:relative;z-index:1;max-width:640px;margin:0 auto}
-        .page-header-eyebrow{font-size:.72rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:14px}
-        .page-header h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,4vw,3.4rem);font-weight:300;color:#fff;line-height:1.15;margin-bottom:16px}
-        .page-header h1 em{font-style:italic;color:rgba(255,255,255,.85)}
-        .page-header p{font-size:1rem;color:rgba(255,255,255,.72);line-height:1.8;max-width:480px;margin:0 auto}
+        .page-header{background:transparent;padding:80px 6% 50px;position:relative;overflow:visible;text-align:center}
+        .page-header::before{display:none}
+        .page-header-inner{position:relative;z-index:1;max-width:850px;margin:0 auto;background:var(--sand);border-radius:24px;padding:56px 52px;box-shadow:0 8px 32px rgba(0,0,0,.06)}
+        .page-header-eyebrow{font-size:.74rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--text-light);margin-bottom:16px}
+        .page-header h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.3rem,4.5vw,3.3rem);font-weight:300;color:var(--text-dark);line-height:1.15;margin-bottom:18px}
+        .page-header h1 em{font-style:italic;color:var(--orange-light);font-weight:400}
+        .page-header p{font-size:.97rem;color:var(--text-mid);line-height:1.85;max-width:540px;margin:0 auto}
 
         /* ── SUMMARY CARDS (overlapping) ── */
-        .summary-wrap{padding:0 6%;margin-top:-52px;position:relative;z-index:10;margin-bottom:64px}
-        .summary-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;max-width:1100px;margin:0 auto}
-        .s-card{background:var(--white);border-radius:16px;padding:28px 24px;border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,.07);text-align:center;position:relative;overflow:hidden;transition:transform .3s,box-shadow .3s}
-        .s-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(212,98,42,.10)}
-        .s-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--orange),var(--orange-light))}
-        .s-card-icon{font-size:1.8rem;margin-bottom:12px}
-        .s-card-num{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:600;color:var(--orange);line-height:1;margin-bottom:6px}
-        .s-card-label{font-size:.75rem;color:var(--text-light);letter-spacing:.08em;text-transform:uppercase}
-        .s-card-sub{font-size:.78rem;color:var(--text-mid);margin-top:6px}
+        .summary-wrap{padding:0 6%;margin-top:32px;position:relative;z-index:10;margin-bottom:72px}
+        .summary-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;max-width:1160px;margin:0 auto}
+        .s-card{background:var(--cream);border-radius:18px;padding:40px 28px;border:none;box-shadow:0 4px 16px rgba(0,0,0,.04);text-align:center;position:relative;overflow:hidden;transition:transform .3s,box-shadow .3s}
+        .s-card:hover{transform:translateY(-5px);box-shadow:0 14px 44px rgba(212,98,42,.16)}
+        .s-card::after{display:none}
+        .s-card-icon{font-size:1.9rem;margin-bottom:14px}
+        .s-card-num{font-family:'Cormorant Garamond',serif;font-size:2.1rem;font-weight:600;color:var(--orange);line-height:1;margin-bottom:10px}
+        .s-card-label{font-size:.77rem;color:var(--text-light);letter-spacing:.09em;text-transform:uppercase;font-weight:500}
+        .s-card-sub{font-size:.80rem;color:var(--text-mid);margin-top:8px;line-height:1.4}
 
         /* ── MAIN LAYOUT ── */
-        .main{max-width:1160px;margin:0 auto;padding:0 6% 80px;display:grid;grid-template-columns:1fr 320px;gap:36px;align-items:start}
+        .main{max-width:1160px;margin:0 auto;padding:0 6% 100px;display:grid;grid-template-columns:1fr 340px;gap:44px;align-items:start}
 
         /* ── SECTION TITLES ── */
         .sec-label{font-size:.72rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);display:block;margin-bottom:10px}
         .sec-title{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:300;color:var(--text-dark);margin-bottom:24px;line-height:1.2}
 
         /* ── FUND BREAKDOWN ── */
-        .card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:32px;margin-bottom:28px}
-        .card-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--text-dark);margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-        .card-title span{font-size:1.2rem}
+        .card{background:var(--cream);border:1.5px solid rgba(212,98,42,.12);border-radius:18px;padding:40px;margin-bottom:36px;box-shadow:0 4px 16px rgba(0,0,0,.04)}
+        .card-title{font-family:'Cormorant Garamond',serif;font-size:1.32rem;font-weight:600;color:var(--text-dark);margin-bottom:28px;padding-bottom:18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+        .card-title span{font-size:1.25rem}
 
         /* Donut-style bars */
-        .breakdown-item{margin-bottom:18px}
+        .breakdown-item{margin-bottom:22px}
         .breakdown-item:last-child{margin-bottom:0}
-        .bd-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-        .bd-label{font-size:.88rem;color:var(--text-mid);display:flex;align-items:center;gap:8px}
-        .bd-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-        .bd-vals{font-size:.85rem;color:var(--text-dark);font-weight:500}
-        .bd-pct{font-size:.75rem;color:var(--text-light);margin-left:6px}
-        .progress-track{height:8px;background:var(--sand);border-radius:40px;overflow:hidden}
+        .bd-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+        .bd-label{font-size:.90rem;color:var(--text-mid);display:flex;align-items:center;gap:10px}
+        .bd-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+        .bd-vals{font-size:.88rem;color:var(--text-dark);font-weight:500}
+        .bd-pct{font-size:.77rem;color:var(--text-light);margin-left:8px}
+        .progress-track{height:9px;background:var(--sand);border-radius:40px;overflow:hidden}
         .progress-fill{height:100%;border-radius:40px;transition:width 1.2s ease}
 
         /* ── DONATIONS TABLE ── */
-        .table-wrap{overflow-x:auto;margin-top:4px}
-        .dtable{width:100%;border-collapse:collapse;font-size:.85rem}
-        .dtable thead th{padding:10px 14px;text-align:left;font-size:.7rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text-light);border-bottom:2px solid var(--border);background:var(--ivory);white-space:nowrap}
-        .dtable tbody td{padding:14px;border-bottom:1px solid var(--border);color:var(--text-mid);vertical-align:middle}
+        .table-wrap{overflow-x:auto;margin-top:8px}
+        .dtable{width:100%;border-collapse:collapse;font-size:.87rem}
+        .dtable thead th{padding:12px 16px;text-align:left;font-size:.72rem;font-weight:500;letter-spacing:.11em;text-transform:uppercase;color:var(--text-mid);border-bottom:2px solid rgba(212,98,42,.15);background:var(--cream);white-space:nowrap}
+        .dtable tbody td{padding:16px;border-bottom:1px solid rgba(212,98,42,.08);color:var(--text-mid);vertical-align:middle}
         .dtable tbody tr:last-child td{border-bottom:none}
-        .dtable tbody tr:hover td{background:var(--ivory)}
+        .dtable tbody tr:hover td{background:var(--cream)}
         .donor-name{font-weight:500;color:var(--text-dark)}
         .amount-cell{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;color:var(--orange);white-space:nowrap}
         .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:500;letter-spacing:.04em;white-space:nowrap}
@@ -261,75 +261,75 @@ if ($qAcceptedDates) {
 
         /* ── FILTER BAR ── */
         .filter-bar{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
-        .filter-bar select,.filter-bar input{padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--white);color:var(--text-mid);font-family:'Jost',sans-serif;font-size:.83rem;outline:none;transition:border-color .2s}
+        .filter-bar select,.filter-bar input{padding:9px 14px;border:1.5px solid rgba(212,98,42,.12);border-radius:8px;background:var(--cream);color:var(--text-mid);font-family:'Jost',sans-serif;font-size:.83rem;outline:none;transition:border-color .2s}
         .filter-bar select:focus,.filter-bar input:focus{border-color:var(--orange)}
         .filter-bar input{flex:1;min-width:180px}
-        .filter-tag{padding:7px 16px;border:1.5px solid var(--border);border-radius:20px;font-size:.78rem;color:var(--text-mid);cursor:pointer;transition:all .2s;background:var(--white)}
+        .filter-tag{padding:7px 16px;border:1.5px solid rgba(212,98,42,.12);border-radius:20px;font-size:.78rem;color:var(--text-mid);cursor:pointer;transition:all .2s;background:var(--cream)}
         .filter-tag:hover,.filter-tag.on{background:var(--orange);border-color:var(--orange);color:#fff}
 
         /* ── EXPENDITURE TABLE ── */
-        .exp-item{display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid var(--border)}
+        .exp-item{display:flex;align-items:center;gap:18px;padding:18px 0;border-bottom:1px solid var(--border)}
         .exp-item:last-child{border-bottom:none}
-        .exp-icon{width:44px;height:44px;border-radius:12px;background:var(--orange-pale);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+        .exp-icon{width:48px;height:48px;border-radius:14px;background:var(--orange-pale);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
         .exp-info{flex:1}
-        .exp-name{font-size:.9rem;font-weight:500;color:var(--text-dark);margin-bottom:3px}
-        .exp-meta{font-size:.75rem;color:var(--text-light)}
-        .exp-amount{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--text-dark);white-space:nowrap}
+        .exp-name{font-size:.93rem;font-weight:500;color:var(--text-dark);margin-bottom:4px}
+        .exp-meta{font-size:.77rem;color:var(--text-light)}
+        .exp-amount{font-family:'Cormorant Garamond',serif;font-size:1.13rem;font-weight:600;color:var(--text-dark);white-space:nowrap}
 
         /* ── SIDEBAR ── */
-        .sidebar>*{margin-bottom:24px}
-        .mini-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:24px}
-        .mini-card-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--text-dark);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+        .sidebar>*{margin-bottom:32px}
+        .mini-card{background:var(--cream);border:1.5px solid rgba(212,98,42,.12);border-radius:18px;padding:32px;box-shadow:0 4px 16px rgba(0,0,0,.04)}
+        .mini-card-title{font-family:'Cormorant Garamond',serif;font-size:1.16rem;font-weight:600;color:var(--text-dark);margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
 
         /* Monthly chart bars */
-        .bar-chart{display:flex;align-items:flex-end;gap:6px;height:100px;margin-bottom:10px}
-        .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
-        .bar{width:100%;border-radius:4px 4px 0 0;background:var(--orange-pale);transition:background .2s;position:relative;min-height:4px}
+        .bar-chart{display:flex;align-items:flex-end;gap:7px;height:110px;margin-bottom:14px}
+        .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+        .bar{width:100%;border-radius:5px 5px 0 0;background:linear-gradient(to top,var(--orange),var(--orange-light));transition:background .2s;position:relative;min-height:4px}
         .bar:hover{background:var(--orange)}
-        .bar-lbl{font-size:.65rem;color:var(--text-light);letter-spacing:.04em}
-        .bar-val{font-size:.65rem;color:var(--orange);font-weight:500}
+        .bar-lbl{font-size:.68rem;color:var(--text-light);letter-spacing:.05em;font-weight:500}
+        .bar-val{font-size:.68rem;color:var(--orange);font-weight:500}
 
         /* Recent donors list */
-        .donor-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+        .donor-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
         .donor-row:last-child{border-bottom:none}
-        .donor-avatar{width:36px;height:36px;border-radius:50%;background:var(--orange-pale);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:600;color:var(--orange);flex-shrink:0}
+        .donor-avatar{width:40px;height:40px;border-radius:50%;background:var(--orange-pale);display:flex;align-items:center;justify-content:center;font-size:.88rem;font-weight:600;color:var(--orange);flex-shrink:0}
         .donor-info{flex:1}
-        .donor-info .name{font-size:.88rem;font-weight:500;color:var(--text-dark)}
-        .donor-info .time{font-size:.72rem;color:var(--text-light)}
-        .donor-amt{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;color:var(--orange)}
+        .donor-info .name{font-size:.91rem;font-weight:500;color:var(--text-dark)}
+        .donor-info .time{font-size:.76rem;color:var(--text-light)}
+        .donor-amt{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;color:var(--orange)}
 
         /* Utilisation ring */
-        .util-ring-wrap{text-align:center;padding:8px 0 16px}
-        .util-ring{position:relative;width:120px;height:120px;margin:0 auto 12px}
+        .util-ring-wrap{text-align:center;padding:12px 0 20px}
+        .util-ring{position:relative;width:130px;height:130px;margin:0 auto 16px}
         .util-ring svg{transform:rotate(-90deg)}
         .util-ring-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
-        .util-ring-pct{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;color:var(--orange);line-height:1}
-        .util-ring-sub{font-size:.65rem;color:var(--text-light);letter-spacing:.05em}
-        .util-legend{display:flex;justify-content:center;gap:16px;font-size:.75rem;color:var(--text-mid)}
-        .util-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+        .util-ring-pct{font-family:'Cormorant Garamond',serif;font-size:1.75rem;font-weight:600;color:var(--orange);line-height:1}
+        .util-ring-sub{font-size:.68rem;color:var(--text-light);letter-spacing:.06em}
+        .util-legend{display:flex;justify-content:center;gap:18px;font-size:.78rem;color:var(--text-mid)}
+        .util-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px}
 
         /* Download CTA */
-        .dl-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:.85rem;color:var(--text-mid);text-decoration:none;transition:all .2s;margin-bottom:10px;background:var(--ivory)}
+        .dl-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border:1.5px solid rgba(212,98,42,.15);border-radius:12px;font-size:.88rem;color:var(--text-mid);text-decoration:none;transition:all .2s;margin-bottom:12px;background:var(--cream)}
         .dl-btn:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-pale)}
         .dl-btn:last-child{margin-bottom:0}
 
         /* ── FOOTER ── */
-        footer{background:var(--text-dark);padding:48px 6% 24px}
-        .foot-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
-        .foot-brand{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:#fff}
-        .foot-links{display:flex;gap:24px;list-style:none}
-        .foot-links a{color:rgba(255,255,255,.4);text-decoration:none;font-size:.82rem;transition:color .2s}
+        footer{background:var(--text-dark);padding:56px 6% 32px}
+        .foot-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px}
+        .foot-brand{font-family:'Cormorant Garamond',serif;font-size:1.35rem;color:#fff}
+        .foot-links{display:flex;gap:28px;list-style:none}
+        .foot-links a{color:rgba(255,255,255,.45);text-decoration:none;font-size:.85rem;transition:color .2s}
         .foot-links a:hover{color:var(--orange-light)}
-        .foot-copy{width:100%;text-align:center;font-size:.75rem;color:rgba(255,255,255,.2);margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06)}
+        .foot-copy{width:100%;text-align:center;font-size:.78rem;color:rgba(255,255,255,.25);margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,.08)}
 
         /* ── PAGINATION ── */
-        .pagination{display:flex;justify-content:center;gap:8px;margin-top:20px}
-        .page-btn{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--border);background:var(--white);font-size:.82rem;color:var(--text-mid);cursor:pointer;text-decoration:none;transition:all .2s}
+        .pagination{display:flex;justify-content:center;gap:10px;margin-top:24px}
+        .page-btn{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--border);background:var(--white);font-size:.85rem;color:var(--text-mid);cursor:pointer;text-decoration:none;transition:all .2s;font-weight:500}
         .page-btn:hover,.page-btn.active{background:var(--orange);border-color:var(--orange);color:#fff}
 
         /* ── RESPONSIVE ── */
-        @media(max-width:960px){.main{grid-template-columns:1fr}.summary-cards{grid-template-columns:repeat(2,1fr)}.sidebar{display:grid;grid-template-columns:1fr 1fr;gap:24px}}
-        @media(max-width:600px){.summary-cards{grid-template-columns:1fr 1fr}.nav-links{display:none}.filter-bar{flex-direction:column;align-items:stretch}.sidebar{grid-template-columns:1fr}}
+        @media(max-width:960px){.main{grid-template-columns:1fr}.summary-cards{grid-template-columns:repeat(2,1fr)}.sidebar{display:grid;grid-template-columns:1fr 1fr;gap:28px}.page-header-inner{padding:48px 40px}}
+        @media(max-width:600px){.summary-cards{grid-template-columns:1fr 1fr}.nav-links{display:none}.filter-bar{flex-direction:column;align-items:stretch}.sidebar{grid-template-columns:1fr}.page-header-inner{padding:40px 28px}.main{padding:0 6% 80px}}
 
         /* ── ANIMATIONS ── */
         @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
@@ -374,25 +374,25 @@ if ($qAcceptedDates) {
 <div class="summary-wrap">
     <div class="summary-cards">
         <div class="s-card">
-            <div class="s-card-icon">💰</div>
+            <div class="s-card-icon"></div>
             <div class="s-card-num"><?= moneyFmt($totalDonations) ?></div>
             <div class="s-card-label">Total Donations</div>
             <div class="s-card-sub">Paid + verified donations</div>
         </div>
         <div class="s-card">
-            <div class="s-card-icon">✅</div>
+            <div class="s-card-icon"></div>
             <div class="s-card-num"><?= moneyFmt($fundsUtilised) ?></div>
             <div class="s-card-label">Funds Utilised</div>
             <div class="s-card-sub"><?= $utilPercent ?>% utilisation rate</div>
         </div>
         <div class="s-card">
-            <div class="s-card-icon">🙏</div>
+            <div class="s-card-icon"></div>
             <div class="s-card-num"><?= number_format($totalDonors) ?></div>
             <div class="s-card-label">Total Donors</div>
             <div class="s-card-sub">Unique donor identities</div>
         </div>
         <div class="s-card">
-            <div class="s-card-icon">🏥</div>
+            <div class="s-card-icon"></div>
             <div class="s-card-num"><?= number_format($livesImpacted) ?></div>
             <div class="s-card-label">Lives Impacted</div>
             <div class="s-card-sub">Active monks in care</div>
@@ -406,9 +406,11 @@ if ($qAcceptedDates) {
     <!-- ─── LEFT COLUMN ─── -->
     <div>
 
-        <!-- FUND BREAKDOWN -->
-        <div class="card">
-            <div class="card-title"><span>📊</span> Fund Allocation Breakdown</div>
+        <!-- TOP ROW: FUND BREAKDOWN + UTILISATION -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:44px;margin-bottom:36px;align-items:start">
+            <!-- FUND BREAKDOWN -->
+            <div class="card">
+            <div class="card-title"><span></span> Fund Allocation Breakdown</div>
 
             <?php foreach($breakdownRows as $idx => $row):
                 $label = $row['category'] ?: 'Uncategorized';
@@ -435,11 +437,38 @@ if ($qAcceptedDates) {
             <?php if (empty($breakdownRows)): ?>
             <div style="font-size:.88rem;color:var(--text-light)">No verified financial records yet.</div>
             <?php endif; ?>
-        </div>
+            </div>
+
+            <!-- UTILISATION RING (moved to top row) -->
+            <div class="mini-card">
+                <div class="mini-card-title">Funds Utilisation</div>
+                <div class="util-ring-wrap">
+                    <div class="util-ring">
+                        <svg width="120" height="120" viewBox="0 0 120 120">
+                            <circle cx="60" cy="60" r="50" fill="none" stroke="#F5E0C8" stroke-width="12"/>
+                            <circle cx="60" cy="60" r="50" fill="none" stroke="#D4622A" stroke-width="12"
+                                stroke-dasharray="314" stroke-dashoffset="<?= number_format($utilOffset, 1, '.', '') ?>"
+                                    stroke-linecap="round"/>
+                        </svg>
+                        <div class="util-ring-label">
+                            <div class="util-ring-pct"><?= $utilPercent ?>%</div>
+                            <div class="util-ring-sub">USED</div>
+                        </div>
+                    </div>
+                    <div class="util-legend">
+                        <span><span class="util-dot" style="background:var(--orange)"></span>Utilised</span>
+                        <span><span class="util-dot" style="background:var(--sand)"></span>Reserve</span>
+                    </div>
+                </div>
+                <div style="font-size:.8rem;color:var(--text-light);text-align:center;line-height:1.6">
+                    <?= moneyFmt($fundsUtilised) ?> of <?= moneyFmt($totalDonations) ?><br>allocated to welfare programs
+                </div>
+            </div>
+        </div><!-- end top row grid -->
 
         <!-- DONATIONS TABLE -->
         <div class="card">
-            <div class="card-title"><span>📋</span> Donation Records</div>
+            <div class="card-title"><span></span> Donation Records</div>
 
             <div style="font-size:.8rem;color:var(--text-light);margin-bottom:16px">Showing latest donations from backend records.</div>
 
@@ -498,7 +527,7 @@ if ($qAcceptedDates) {
 
         <!-- EXPENDITURE -->
         <div class="card">
-            <div class="card-title"><span>🧾</span> Recent Expenditures</div>
+            <div class="card-title"><span></span> Recent Expenditures</div>
             <?php
             $expenseIcons = ['🏥', '🍚', '💊', '🏠', '🚌', '📦'];
             foreach($expenseRows as $idx => $row):
@@ -520,7 +549,7 @@ if ($qAcceptedDates) {
 
         <!-- ACCEPTED DONATION DATES -->
         <div class="card">
-            <div class="card-title"><span>📅</span> Accepted Donation Dates</div>
+            <div class="card-title"><span></span> Accepted Daily Alms Dates</div>
             
             <div style="font-size:.8rem;color:var(--text-light);margin-bottom:16px">Upcoming approved donation dates from community members.</div>
 
@@ -563,32 +592,6 @@ if ($qAcceptedDates) {
 
     <!-- ─── SIDEBAR ─── -->
     <div class="sidebar">
-
-        <!-- UTILISATION RING -->
-        <div class="mini-card">
-            <div class="mini-card-title">Funds Utilisation</div>
-            <div class="util-ring-wrap">
-                <div class="util-ring">
-                    <svg width="120" height="120" viewBox="0 0 120 120">
-                        <circle cx="60" cy="60" r="50" fill="none" stroke="#F5E0C8" stroke-width="12"/>
-                        <circle cx="60" cy="60" r="50" fill="none" stroke="#D4622A" stroke-width="12"
-                            stroke-dasharray="314" stroke-dashoffset="<?= number_format($utilOffset, 1, '.', '') ?>"
-                                stroke-linecap="round"/>
-                    </svg>
-                    <div class="util-ring-label">
-                        <div class="util-ring-pct"><?= $utilPercent ?>%</div>
-                        <div class="util-ring-sub">USED</div>
-                    </div>
-                </div>
-                <div class="util-legend">
-                    <span><span class="util-dot" style="background:var(--orange)"></span>Utilised</span>
-                    <span><span class="util-dot" style="background:var(--sand)"></span>Reserve</span>
-                </div>
-            </div>
-            <div style="font-size:.8rem;color:var(--text-light);text-align:center;line-height:1.6">
-                <?= moneyFmt($fundsUtilised) ?> of <?= moneyFmt($totalDonations) ?><br>allocated to welfare programs
-            </div>
-        </div>
 
         <!-- MONTHLY CHART -->
         <div class="mini-card">
@@ -638,11 +641,11 @@ if ($qAcceptedDates) {
         </div>
 
         <!-- DONATE CTA -->
-        <div style="background:linear-gradient(135deg,var(--orange),var(--orange-mid));border-radius:16px;padding:28px;text-align:center">
-            <div style="font-size:2rem;margin-bottom:10px">🙏</div>
-            <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:#fff;margin-bottom:8px">Be Part of This</div>
-            <div style="font-size:.82rem;color:rgba(255,255,255,.75);margin-bottom:20px;line-height:1.6">Your donation appears in this report — fully transparent, fully accountable.</div>
-            <a href="public_donate.php" style="display:block;background:#fff;color:var(--orange);padding:12px;border-radius:10px;text-decoration:none;font-size:.9rem;font-weight:600;transition:all .2s">Donate Now →</a>
+        <div style="background:linear-gradient(135deg,var(--orange),var(--orange-mid));border-radius:20px;padding:36px 28px;text-align:center;box-shadow:0 8px 32px rgba(212,98,42,.25)">
+            <div style="font-size:2.4rem;margin-bottom:14px">🙏</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:#fff;margin-bottom:12px;font-weight:400">Be Part of This</div>
+            <div style="font-size:.86rem;color:rgba(255,255,255,.85);margin-bottom:24px;line-height:1.7">Your donation appears in this report — fully transparent, fully accountable.</div>
+            <a href="public_donate.php" style="display:inline-block;background:#fff;color:var(--orange);padding:14px 28px;border-radius:12px;text-decoration:none;font-size:.93rem;font-weight:600;transition:all .2s;box-shadow:0 4px 12px rgba(0,0,0,.12)">Contribute Now →</a>
         </div>
 
     </div><!-- end sidebar -->

@@ -22,11 +22,11 @@
         nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:0 6%;height:76px;display:flex;align-items:center;justify-content:space-between;transition:background .4s,box-shadow .4s;background:rgba(0,0,0,.3);backdrop-filter:blur(6px)}
         nav.scrolled{background:rgba(255,255,255,.96);backdrop-filter:blur(16px);box-shadow:0 1px 0 var(--border)}
         .nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
-        .nav-logo-mark{width:38px;height:38px;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.35);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;transition:background .4s,border-color .4s}
+        .nav-logo-mark{width:38px;height:38px;background:var(--orange);border:2px solid var(--orange-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;transition:background .4s,border-color .4s;color:var(--white)}
         nav.scrolled .nav-logo-mark{background:linear-gradient(135deg,var(--orange),var(--orange-light));border-color:transparent}
-        .nav-logo-name{font-family:'EB Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--white);transition:color .4s}
+        .nav-logo-name{font-family:'EB Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--orange-light);transition:color .4s}
         nav.scrolled .nav-logo-name{color:var(--text-dark)}
-        .nav-logo-sub{font-size:.6rem;color:rgba(255,255,255,.55);letter-spacing:.13em;text-transform:uppercase;display:block;margin-top:-4px;transition:color .4s}
+        .nav-logo-sub{font-size:.6rem;color:var(--orange);letter-spacing:.13em;text-transform:uppercase;display:block;margin-top:-4px;transition:color .4s}
         nav.scrolled .nav-logo-sub{color:var(--text-light)}
         .nav-links{display:flex;align-items:center;gap:32px;list-style:none}
         .nav-links a{text-decoration:none;color:rgba(255,255,255,.85);font-size:.83rem;font-weight:400;letter-spacing:.07em;text-transform:uppercase;transition:color .2s}
@@ -49,12 +49,14 @@
         .hero-badge span{color:var(--orange-light)}
         .hero-title{font-family:'EB Garamond',serif;font-size:clamp(3rem,6.5vw,5.8rem);font-weight:500;line-height:1.05;color:var(--white);margin-bottom:24px;text-shadow:0 2px 32px rgba(0,0,0,.3)}
         .hero-title em{font-style:italic;color:var(--orange-light)}
-        .hero-desc{font-size:1.05rem;color:rgba(255,255,255,.72);max-width:480px;line-height:1.85;margin-bottom:40px}
-        .hero-btns{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+        .hero-desc{font-size:1.05rem;color:rgba(255,255,255,.72);max-width:480px;line-height:1.85;margin-bottom:20px}
+        .hero-btns{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
         .btn-hp{background:var(--orange);color:var(--white);padding:16px 44px;border-radius:50px;text-decoration:none;font-size:.95rem;font-weight:500;letter-spacing:.04em;transition:all .3s;border:2px solid var(--orange)}
         .btn-hp:hover{background:var(--orange-mid);border-color:var(--orange-mid);transform:translateY(-2px);box-shadow:0 12px 36px rgba(212,98,42,.4)}
-        .btn-hg{background:rgba(255,255,255,.1);color:var(--white);padding:16px 36px;border-radius:50px;text-decoration:none;font-size:.95rem;font-weight:400;letter-spacing:.04em;transition:all .3s;border:1.5px solid rgba(255,255,255,.35);backdrop-filter:blur(6px)}
-        .btn-hg:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.6)}
+        .btn-hg{background:rgba(240,134,74,.1);color:var(--orange-mid);padding:16px 36px;border-radius:50px;text-decoration:none;font-size:.95rem;font-weight:400;letter-spacing:.04em;transition:all .3s;border:2px solid var(--orange-mid);backdrop-filter:blur(6px)}
+        .btn-hg:hover{background:rgba(240,134,74,.2);border-color:var(--orange-light);color:var(--orange-light);box-shadow:0 8px 24px rgba(212,98,42,.25)}
+        .hero .btn-hg{background:var(--orange-light);border-color:var(--orange-light);color:var(--white);font-weight:500}
+        .hero .btn-hg:hover{background:var(--orange);border-color:var(--orange);color:var(--white);box-shadow:0 12px 36px rgba(212,98,42,.4);transform:translateY(-2px)}
 
         /* STATS BAR — separate section after hero */
         .stats-bar{display:flex;width:100%;background:transparent;padding:40px 6%;justify-content:center;align-items:center;position:relative;z-index:5}
@@ -183,7 +185,7 @@
         <h1 class="hero-title">Caring for Those<br>Who <em>Serve</em><br>Our World</h1>
         <p class="hero-desc">Supporting the health, welfare, and dignified living of monks and clergy through transparent, community-driven generosity.</p>
         <div class="hero-btns">
-            <a href="public_donate.php" class="btn-hp">🙏 Donate Today</a>
+            <a href="public_donate.php" class="btn-hp">Donate Today</a>
             <a href="#mission" class="btn-hg">Learn More</a>
         </div>
     </div>
@@ -261,7 +263,7 @@
         <div class="foot-col"><h4>Welfare</h4><ul><li><a href="#">Healthcare</a></li><li><a href="#">Housing</a></li><li><a href="#">Appointments</a></li><li><a href="#">Reports</a></li></ul></div>
         <div class="foot-col"><h4>Info</h4><ul><li><a href="#">About Us</a></li><li><a href="#">Contact</a></li><li><a href="#">Privacy Policy</a></li></ul></div>
     </div>
-    <div class="foot-btm"><span>© 2026 Seela suwa herath Monastery Welfare Platform</span><span>Made with 🙏 in Sri Lanka</span></div>
+    <div class="foot-btm"><span>© 2026 Seela suwa herath Monastery Welfare Platform</span><span>Made with in Sri Lanka</span></div>
 </footer>
 
 <script>
