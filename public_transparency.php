@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once __DIR__ . '/includes/db_config.php';
 
@@ -194,9 +194,9 @@ if ($qAcceptedDates) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transparency & Reports — Seela suwa herath</title>
+    <title>Transparency &amp; Reports &mdash; Seela suwa herath</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=EB+Garamond:wght@600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         :root{
@@ -209,13 +209,13 @@ if ($qAcceptedDates) {
             --rejected:#B94040;--rejected-bg:#FDEAEA;
         }
         html{scroll-behavior:smooth}
-        body{font-family:'Jost',sans-serif;font-weight:300;background:var(--white);color:var(--text-dark);overflow-x:hidden}
+        body{font-family:'Raleway',sans-serif;font-weight:300;background:var(--white);color:var(--text-dark);overflow-x:hidden}
 
-        /* ── NAV (solid — no hero image on this page) ── */
+        /* â”€â”€ NAV (solid â€” no hero image on this page) â”€â”€ */
         nav{position:sticky;top:0;left:0;right:0;z-index:200;padding:0 6%;height:72px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
         .nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
         .nav-logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--orange),var(--orange-light));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff}
-        .nav-logo-name{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--text-dark)}
+        .nav-logo-name{font-family:'EB Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--text-dark)}
         .nav-logo-sub{font-size:.6rem;color:var(--text-light);letter-spacing:.13em;text-transform:uppercase;display:block;margin-top:-4px}
         .nav-links{display:flex;align-items:center;gap:28px;list-style:none}
         .nav-links a{text-decoration:none;color:var(--text-mid);font-size:.83rem;font-weight:400;letter-spacing:.06em;text-transform:uppercase;transition:color .2s}
@@ -223,36 +223,36 @@ if ($qAcceptedDates) {
         .nav-donate{background:var(--orange)!important;color:#fff!important;padding:9px 24px!important;border-radius:40px!important;font-weight:500!important}
         .nav-donate:hover{background:var(--text-dark)!important}
 
-        /* ── PAGE HEADER ── */
+        /* â”€â”€ PAGE HEADER â”€â”€ */
         .page-header{background:#EDE6DC;padding:24px 6% 28px;position:relative;overflow:visible;text-align:center}
         .page-header::before{display:none}
         .page-header-inner{position:relative;z-index:1;max-width:1160px;margin:0 auto;background:transparent;border-radius:0;padding:28px 52px;box-shadow:none}
         .page-header-eyebrow{font-size:.74rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--text-light);margin-bottom:16px}
-        .page-header h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.3rem,4.5vw,3.3rem);font-weight:300;color:var(--text-dark);line-height:1.15;margin-bottom:18px}
+        .page-header h1{font-family:'EB Garamond',serif;font-size:clamp(2.3rem,4.5vw,3.3rem);font-weight:300;color:var(--text-dark);line-height:1.15;margin-bottom:18px}
         .page-header h1 em{font-style:italic;color:var(--orange-light);font-weight:400}
         .page-header p{font-size:.97rem;color:var(--text-mid);line-height:1.85;max-width:540px;margin:0 auto}
 
-        /* ── SUMMARY CARDS (overlapping) ── */
+        /* â”€â”€ SUMMARY CARDS (overlapping) â”€â”€ */
         .summary-wrap{padding:0 6%;margin-top:32px;position:relative;z-index:10;margin-bottom:72px}
         .summary-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;max-width:1160px;margin:0 auto}
         .s-card{background:var(--cream);border-radius:18px;padding:40px 28px;border:none;box-shadow:0 4px 16px rgba(0,0,0,.04);text-align:center;position:relative;overflow:hidden;transition:transform .3s,box-shadow .3s}
         .s-card:hover{transform:translateY(-5px);box-shadow:0 14px 44px rgba(212,98,42,.16)}
         .s-card::after{display:none}
         .s-card-icon{font-size:1.9rem;margin-bottom:14px}
-        .s-card-num{font-family:'Cormorant Garamond',serif;font-size:2.1rem;font-weight:600;color:var(--orange);line-height:1;margin-bottom:10px}
+        .s-card-num{font-family:'EB Garamond',serif;font-size:2.1rem;font-weight:600;color:var(--orange);line-height:1;margin-bottom:10px}
         .s-card-label{font-size:.77rem;color:var(--text-light);letter-spacing:.09em;text-transform:uppercase;font-weight:500}
         .s-card-sub{font-size:.80rem;color:var(--text-mid);margin-top:8px;line-height:1.4}
 
-        /* ── MAIN LAYOUT ── */
+        /* â”€â”€ MAIN LAYOUT â”€â”€ */
         .main{width:88%;max-width:1160px;margin:0 auto 100px;padding:0;display:grid;grid-template-columns:1fr 340px;gap:44px;align-items:start}
 
-        /* ── SECTION TITLES ── */
+        /* â”€â”€ SECTION TITLES â”€â”€ */
         .sec-label{font-size:.72rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);display:block;margin-bottom:10px}
-        .sec-title{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:300;color:var(--text-dark);margin-bottom:24px;line-height:1.2}
+        .sec-title{font-family:'EB Garamond',serif;font-size:1.9rem;font-weight:300;color:var(--text-dark);margin-bottom:24px;line-height:1.2}
 
-        /* ── FUND BREAKDOWN ── */
+        /* â”€â”€ FUND BREAKDOWN â”€â”€ */
         .card{background:var(--cream);border:1.5px solid rgba(212,98,42,.12);border-radius:18px;padding:40px;margin-bottom:36px;box-shadow:0 4px 16px rgba(0,0,0,.04)}
-        .card-title{font-family:'Cormorant Garamond',serif;font-size:1.32rem;font-weight:600;color:var(--text-dark);margin-bottom:28px;padding-bottom:18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+        .card-title{font-family:'EB Garamond',serif;font-size:1.32rem;font-weight:600;color:var(--text-dark);margin-bottom:28px;padding-bottom:18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
         .card-title span{font-size:1.25rem}
 
         /* Donut-style bars */
@@ -266,7 +266,7 @@ if ($qAcceptedDates) {
         .progress-track{height:9px;background:var(--sand);border-radius:40px;overflow:hidden}
         .progress-fill{height:100%;border-radius:40px;transition:width 1.2s ease}
 
-        /* ── DONATIONS TABLE ── */
+        /* â”€â”€ DONATIONS TABLE â”€â”€ */
         .table-wrap{overflow-x:auto;margin-top:8px}
         .dtable{width:100%;border-collapse:collapse;font-size:.87rem}
         .dtable thead th{padding:12px 16px;text-align:left;font-size:.72rem;font-weight:500;letter-spacing:.11em;text-transform:uppercase;color:var(--text-mid);border-bottom:2px solid rgba(212,98,42,.15);background:var(--cream);white-space:nowrap}
@@ -274,34 +274,34 @@ if ($qAcceptedDates) {
         .dtable tbody tr:last-child td{border-bottom:none}
         .dtable tbody tr:hover td{background:var(--cream)}
         .donor-name{font-weight:500;color:var(--text-dark)}
-        .amount-cell{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;color:var(--orange);white-space:nowrap}
+        .amount-cell{font-family:'EB Garamond',serif;font-size:1.05rem;font-weight:600;color:var(--orange);white-space:nowrap}
         .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:500;letter-spacing:.04em;white-space:nowrap}
         .badge-verified{background:var(--success-bg);color:var(--success)}
         .badge-pending{background:var(--pending-bg);color:var(--pending)}
         .badge-rejected{background:var(--rejected-bg);color:var(--rejected)}
         .category-tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;background:var(--orange-pale);color:var(--orange);font-weight:400}
 
-        /* ── FILTER BAR ── */
+        /* â”€â”€ FILTER BAR â”€â”€ */
         .filter-bar{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
-        .filter-bar select,.filter-bar input{padding:9px 14px;border:1.5px solid rgba(212,98,42,.12);border-radius:8px;background:var(--cream);color:var(--text-mid);font-family:'Jost',sans-serif;font-size:.83rem;outline:none;transition:border-color .2s}
+        .filter-bar select,.filter-bar input{padding:9px 14px;border:1.5px solid rgba(212,98,42,.12);border-radius:8px;background:var(--cream);color:var(--text-mid);font-family:'Raleway',sans-serif;font-size:.83rem;outline:none;transition:border-color .2s}
         .filter-bar select:focus,.filter-bar input:focus{border-color:var(--orange)}
         .filter-bar input{flex:1;min-width:180px}
         .filter-tag{padding:7px 16px;border:1.5px solid rgba(212,98,42,.12);border-radius:20px;font-size:.78rem;color:var(--text-mid);cursor:pointer;transition:all .2s;background:var(--cream)}
         .filter-tag:hover,.filter-tag.on{background:var(--orange);border-color:var(--orange);color:#fff}
 
-        /* ── EXPENDITURE TABLE ── */
+        /* â”€â”€ EXPENDITURE TABLE â”€â”€ */
         .exp-item{display:flex;align-items:center;gap:18px;padding:18px 0;border-bottom:1px solid var(--border)}
         .exp-item:last-child{border-bottom:none}
         .exp-icon{width:48px;height:48px;border-radius:14px;background:var(--orange-pale);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
         .exp-info{flex:1}
         .exp-name{font-size:.93rem;font-weight:500;color:var(--text-dark);margin-bottom:4px}
         .exp-meta{font-size:.77rem;color:var(--text-light)}
-        .exp-amount{font-family:'Cormorant Garamond',serif;font-size:1.13rem;font-weight:600;color:var(--text-dark);white-space:nowrap}
+        .exp-amount{font-family:'EB Garamond',serif;font-size:1.13rem;font-weight:600;color:var(--text-dark);white-space:nowrap}
 
-        /* ── SIDEBAR ── */
+        /* â”€â”€ SIDEBAR â”€â”€ */
         .sidebar>*{margin-bottom:32px}
         .mini-card{background:var(--cream);border:1.5px solid rgba(212,98,42,.12);border-radius:18px;padding:32px;box-shadow:0 4px 16px rgba(0,0,0,.04)}
-        .mini-card-title{font-family:'Cormorant Garamond',serif;font-size:1.16rem;font-weight:600;color:var(--text-dark);margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+        .mini-card-title{font-family:'EB Garamond',serif;font-size:1.16rem;font-weight:600;color:var(--text-dark);margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
 
         /* Monthly chart bars */
         .bar-chart{display:flex;align-items:flex-end;gap:7px;height:110px;margin-bottom:14px}
@@ -318,14 +318,14 @@ if ($qAcceptedDates) {
         .donor-info{flex:1}
         .donor-info .name{font-size:.91rem;font-weight:500;color:var(--text-dark)}
         .donor-info .time{font-size:.76rem;color:var(--text-light)}
-        .donor-amt{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;color:var(--orange)}
+        .donor-amt{font-family:'EB Garamond',serif;font-size:1.05rem;font-weight:600;color:var(--orange)}
 
         /* Utilisation ring */
         .util-ring-wrap{text-align:center;padding:12px 0 20px}
         .util-ring{position:relative;width:130px;height:130px;margin:0 auto 16px}
         .util-ring svg{transform:rotate(-90deg)}
         .util-ring-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
-        .util-ring-pct{font-family:'Cormorant Garamond',serif;font-size:1.75rem;font-weight:600;color:var(--orange);line-height:1}
+        .util-ring-pct{font-family:'EB Garamond',serif;font-size:1.75rem;font-weight:600;color:var(--orange);line-height:1}
         .util-ring-sub{font-size:.68rem;color:var(--text-light);letter-spacing:.06em}
         .util-legend{display:flex;justify-content:center;gap:18px;font-size:.78rem;color:var(--text-mid)}
         .util-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px}
@@ -335,7 +335,7 @@ if ($qAcceptedDates) {
         .dl-btn:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-pale)}
         .dl-btn:last-child{margin-bottom:0}
 
-        /* ── FOOTER ── */
+        /* â”€â”€ FOOTER â”€â”€ */
         footer{background:#4A3B32;padding:60px 6% 28px}
         .foot-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:24px}
         .foot-brand{font-family:'EB Garamond',serif;font-size:1.5rem;color:#fff;margin-bottom:12px;font-weight:600}
@@ -347,16 +347,16 @@ if ($qAcceptedDates) {
         .foot-col ul a:hover{color:var(--orange-light)}
         .foot-btm{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;font-size:.77rem;color:rgba(255,255,255,.22)}
 
-        /* ── PAGINATION ── */
+        /* â”€â”€ PAGINATION â”€â”€ */
         .pagination{display:flex;justify-content:center;gap:10px;margin-top:24px}
         .page-btn{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--border);background:var(--white);font-size:.85rem;color:var(--text-mid);cursor:pointer;text-decoration:none;transition:all .2s;font-weight:500}
         .page-btn:hover,.page-btn.active{background:var(--orange);border-color:var(--orange);color:#fff}
 
-        /* ── RESPONSIVE ── */
+        /* â”€â”€ RESPONSIVE â”€â”€ */
         @media(max-width:960px){.main{grid-template-columns:1fr}.summary-cards{grid-template-columns:repeat(2,1fr)}.sidebar{display:grid;grid-template-columns:1fr 1fr;gap:28px}.page-header-inner{padding:48px 40px}.foot-grid{grid-template-columns:1fr 1fr}}
         @media(max-width:600px){.summary-cards{grid-template-columns:1fr 1fr}.nav-links{display:none}.filter-bar{flex-direction:column;align-items:stretch}.sidebar{grid-template-columns:1fr}.page-header-inner{padding:40px 28px}.main{margin-bottom:80px}.foot-grid{grid-template-columns:1fr}.foot-btm{flex-direction:column;gap:8px}}
 
-        /* ── ANIMATIONS ── */
+        /* â”€â”€ ANIMATIONS â”€â”€ */
         @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
         .s-card{animation:fadeUp .5s both}
         .s-card:nth-child(1){animation-delay:.05s}
@@ -368,10 +368,10 @@ if ($qAcceptedDates) {
 </head>
 <body>
 
-<!-- ═══ NAV ═══ -->
+<!-- â•â•â• NAV â•â•â• -->
 <nav>
     <a href="index.php" class="nav-logo">
-        <div class="nav-logo-mark">☸</div>
+        <div class="nav-logo-mark">&#9784;</div>
         <div>
             <span class="nav-logo-name">Seela suwa herath</span>
             <span class="nav-logo-sub">Monastery Welfare</span>
@@ -386,16 +386,16 @@ if ($qAcceptedDates) {
     </ul>
 </nav>
 
-<!-- ═══ PAGE HEADER ═══ -->
+<!-- â•â•â• PAGE HEADER â•â•â• -->
 <div class="page-header">
     <div class="page-header-inner">
-        <div class="page-header-eyebrow">Open Books · Public Accountability</div>
+        <div class="page-header-eyebrow">Open Books &middot; Public Accountability</div>
         <h1>Full <em>Transparency</em> Reports</h1>
         <p>Every donation received and every rupee spent is recorded here publicly, permanently, and honestly.</p>
     </div>
 </div>
 
-<!-- ═══ SUMMARY CARDS (overlapping) ═══ -->
+<!-- â•â•â• SUMMARY CARDS (overlapping) â•â•â• -->
 <div class="summary-wrap">
     <div class="summary-cards">
         <div class="s-card">
@@ -425,10 +425,10 @@ if ($qAcceptedDates) {
     </div>
 </div>
 
-<!-- ═══ MAIN CONTENT ═══ -->
+<!-- â•â•â• MAIN CONTENT â•â•â• -->
 <div class="main">
 
-    <!-- ─── LEFT COLUMN ─── -->
+    <!-- â”€â”€â”€ LEFT COLUMN â”€â”€â”€ -->
     <div>
 
         <!-- TOP ROW: FUND BREAKDOWN + UTILISATION -->
@@ -513,12 +513,12 @@ if ($qAcceptedDates) {
                     <tbody>
                         <?php
                         $statusMap = [
-                            'verified' => ['badge-verified','✓ Verified'],
-                            'pending'  => ['badge-pending', '⏳ Pending'],
-                            'rejected' => ['badge-rejected','✕ Rejected'],
-                            'paid'     => ['badge-verified','✓ Paid'],
-                            'failed'   => ['badge-rejected','✕ Failed'],
-                            'cancelled'=> ['badge-rejected','✕ Cancelled'],
+                            'verified' => ['badge-verified','&#10003; Verified'],
+                            'pending'  => ['badge-pending', '&#9203; Pending'],
+                            'rejected' => ['badge-rejected','&#10005; Rejected'],
+                            'paid'     => ['badge-verified','&#10003; Paid'],
+                            'failed'   => ['badge-rejected','&#10005; Failed'],
+                            'cancelled'=> ['badge-rejected','&#10005; Cancelled'],
                         ];
                         foreach($donationRows as $row):
                             $status = strtolower((string)$row['status']);
@@ -562,7 +562,7 @@ if ($qAcceptedDates) {
         <div class="card">
             <div class="card-title"><span></span> Recent Expenditures</div>
             <?php
-            $expenseIcons = ['🏥', '🍚', '💊', '🏠', '🚌', '📦'];
+            $expenseIcons = ['&#127973;', '&#127834;', '&#128138;', '&#127968;', '&#128652;', '&#128230;'];
             foreach($expenseRows as $idx => $row):
                 $icon = $expenseIcons[$idx % count($expenseIcons)];
             ?>
@@ -608,7 +608,7 @@ if ($qAcceptedDates) {
                             <td style="font-size:.82rem">
                                 <span class="category-tag"><?= ucfirst(htmlspecialchars($row['meal_type'])) ?></span>
                             </td>
-                            <td style="font-size:.75rem;color:var(--text-light)"><?= !empty($row['reviewed_at']) ? date('d M Y', strtotime((string)$row['reviewed_at'])) : '—' ?></td>
+                            <td style="font-size:.75rem;color:var(--text-light)"><?= !empty($row['reviewed_at']) ? date('d M Y', strtotime((string)$row['reviewed_at'])) : '&mdash;' ?></td>
                         </tr>
                         <?php endforeach; ?>
                         <?php if (empty($acceptedDatesRows)): ?>
@@ -631,7 +631,7 @@ if ($qAcceptedDates) {
 
     </div><!-- end left col -->
 
-    <!-- ─── SIDEBAR ─── -->
+    <!-- â”€â”€â”€ SIDEBAR â”€â”€â”€ -->
     <div class="sidebar">
 
         <!-- MONTHLY CHART -->
@@ -672,31 +672,22 @@ if ($qAcceptedDates) {
             <?php endif; ?>
         </div>
 
-        <!-- DOWNLOAD REPORTS -->
-        <div class="mini-card">
-            <div class="mini-card-title">Download Reports</div>
-            <a href="export_report.php?type=annual&year=2025" class="dl-btn">📄 Annual Report 2025 (PDF)</a>
-            <a href="export_report.php?type=q1&year=2026"     class="dl-btn">📊 Q1 2026 Summary (PDF)</a>
-            <a href="export_report.php?type=donations"        class="dl-btn">📋 All Donations (CSV)</a>
-            <a href="export_report.php?type=expenditure"      class="dl-btn">🧾 Expenditure Log (CSV)</a>
-        </div>
-
         <!-- DONATE CTA -->
         <div style="background:#EDE6DC;border:1.5px solid rgba(210,170,130,.28);border-radius:20px;padding:36px 28px;text-align:center;box-shadow:0 6px 24px rgba(50,38,25,.08)">
-            <div style="font-size:2.4rem;margin-bottom:14px">🙏</div>
-            <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--text-dark);margin-bottom:12px;font-weight:400">Be Part of This</div>
-            <div style="font-size:.86rem;color:var(--text-mid);margin-bottom:24px;line-height:1.7">Your donation appears in this report — fully transparent, fully accountable.</div>
-            <a href="public_donate.php" style="display:inline-block;background:var(--orange);color:#fff;padding:14px 28px;border-radius:12px;text-decoration:none;font-size:.93rem;font-weight:600;transition:all .2s;box-shadow:0 4px 12px rgba(212,98,42,.18)">Contribute Now →</a>
+            <div style="font-size:2.4rem;margin-bottom:14px">&#128591;</div>
+            <div style="font-family:'EB Garamond',serif;font-size:1.4rem;color:var(--text-dark);margin-bottom:12px;font-weight:400">Be Part of This</div>
+            <div style="font-size:.86rem;color:var(--text-mid);margin-bottom:24px;line-height:1.7">Your donation appears in this report &mdash; fully transparent, fully accountable.</div>
+            <a href="public_donate.php" style="display:inline-block;background:var(--orange);color:#fff;padding:14px 28px;border-radius:12px;text-decoration:none;font-size:.93rem;font-weight:600;transition:all .2s;box-shadow:0 4px 12px rgba(212,98,42,.18)">Contribute Now &rarr;</a>
         </div>
 
     </div><!-- end sidebar -->
 </div><!-- end main -->
 
-<!-- ═══ FOOTER ═══ -->
+<!-- â•â•â• FOOTER â•â•â• -->
 <footer>
     <div class="foot-grid">
         <div>
-            <div class="foot-brand">☸ Seela suwa herath</div>
+            <div class="foot-brand">&#9784; Seela suwa herath</div>
             <p class="foot-tag">Supporting monastery welfare through community generosity, transparent governance, and compassionate care.</p>
         </div>
         <div class="foot-col">
@@ -726,7 +717,7 @@ if ($qAcceptedDates) {
             </ul>
         </div>
     </div>
-    <div class="foot-btm"><span>© 2026 Seela suwa herath Monastery Welfare Platform</span><span>Made with in Sri Lanka</span></div>
+    <div class="foot-btm"><span>&copy; 2026 Seela suwa herath Monastery Welfare Platform</span><span>Made with in Sri Lanka</span></div>
 </footer>
 
 <script>
@@ -747,3 +738,4 @@ document.querySelectorAll('.bar').forEach(b => {
 </script>
 </body>
 </html>
+

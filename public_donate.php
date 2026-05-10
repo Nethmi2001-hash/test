@@ -44,7 +44,7 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Make a Donation &mdash; Seela suwa herath</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=EB+Garamond:wght@600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
@@ -64,7 +64,7 @@ $conn->close();
             --success:    #C05520;
         }
         html, body {
-            font-family: 'Jost', sans-serif;
+            font-family: 'Raleway', sans-serif;
             font-weight: 300;
             background: var(--ivory);
             color: var(--text-dark);
@@ -74,7 +74,7 @@ $conn->close();
         nav{position:sticky;top:0;left:0;right:0;z-index:200;padding:0 6%;height:72px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
         .nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
         .nav-logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--deep-sage),var(--gold));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff}
-        .nav-logo-name{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--text-dark)}
+        .nav-logo-name{font-family:'EB Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--text-dark)}
         .nav-logo-sub{font-size:.6rem;color:var(--text-light);letter-spacing:.13em;text-transform:uppercase;display:block;margin-top:-4px}
         .nav-links{display:flex;align-items:center;gap:28px;list-style:none}
         .nav-links a{text-decoration:none;color:var(--text-mid);font-size:.83rem;font-weight:400;letter-spacing:.06em;text-transform:uppercase;transition:color .2s}
@@ -105,7 +105,7 @@ $conn->close();
             color: var(--text-light); margin-bottom: 12px;
         }
         .donate-hero h1 {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'EB Garamond', serif;
             font-size: clamp(2rem, 4vw, 3rem);
             font-weight: 300; line-height: 1.2;
         }
@@ -158,6 +158,8 @@ $conn->close();
         .date-request-panel p {
             color: var(--text-mid);
             font-size: 0.92rem;
+            margin-bottom: 20px;
+            line-height: 1.7;
         }
 
         .date-request-grid {
@@ -194,7 +196,7 @@ $conn->close();
         }
         .panel-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .panel-section-title {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'EB Garamond', serif;
             font-size: 1.3rem; font-weight: 600;
             color: var(--text-dark); margin-bottom: 20px;
         }
@@ -228,7 +230,7 @@ $conn->close();
             letter-spacing: 0.06em; display: block; margin-bottom: 2px;
         }
         .amount-chip .val {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'EB Garamond', serif;
             font-size: 1.4rem; font-weight: 600;
             color: var(--text-dark);
         }
@@ -248,7 +250,7 @@ $conn->close();
             width: 100%; padding: 13px 14px 13px 40px;
             border: 1.5px solid var(--border); border-radius: 10px;
             background: var(--ivory); color: var(--text-dark);
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'EB Garamond', serif;
             font-size: 1.3rem; font-weight: 400;
             outline: none; transition: border-color 0.2s;
         }
@@ -286,7 +288,7 @@ $conn->close();
             width: 100%; padding: 12px 14px;
             border: 1.5px solid var(--border); border-radius: 10px;
             background: var(--ivory); color: var(--text-dark);
-            font-family: 'Jost', sans-serif; font-size: 0.92rem; font-weight: 300;
+            font-family: 'Raleway', sans-serif; font-size: 0.92rem; font-weight: 300;
             outline: none; transition: border-color 0.2s, background 0.2s;
         }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
@@ -361,7 +363,7 @@ $conn->close();
             width: 100%; padding: 16px;
             background: var(--gold); color: var(--text-dark);
             border: none; border-radius: 12px;
-            font-family: 'Jost', sans-serif; font-size: 1.05rem; font-weight: 500;
+            font-family: 'Raleway', sans-serif; font-size: 1.05rem; font-weight: 500;
             letter-spacing: 0.04em; cursor: pointer; transition: all 0.3s;
         }
         .btn-donate:hover {
@@ -387,7 +389,7 @@ $conn->close();
             margin-bottom: 16px;
         }
         .summary-title {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'EB Garamond', serif;
             font-size: 1.1rem; font-weight: 600;
             color: var(--text-dark); margin-bottom: 20px;
             padding-bottom: 16px; border-bottom: 1px solid var(--border);
@@ -408,7 +410,7 @@ $conn->close();
             letter-spacing: 0.05em; color: var(--text-mid);
         }
         .summary-total .amount {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'EB Garamond', serif;
             font-size: 2rem; font-weight: 600;
             color: var(--deep-sage);
         }
@@ -563,7 +565,7 @@ $conn->close();
             border: 1.5px solid var(--border);
             border-radius: 10px;
             background: var(--ivory);
-            font-family: 'Jost', sans-serif;
+            font-family: 'Raleway', sans-serif;
             font-size: 0.84rem;
             outline: none;
         }
@@ -686,7 +688,7 @@ $conn->close();
                 <div class="form-group" style="margin-bottom:0;">
                     <label for="meal_type">Meal</label>
                     <select id="meal_type" name="meal_type" required>
-                        <option value="morning_food">Morning Food</option>
+                        <option value="morning_food">Morning</option>
                         <option value="lunch" selected>Lunch</option>
                     </select>
                 </div>
@@ -833,7 +835,7 @@ $conn->close();
                 </div>
                 <label class="anonymous-row" style="display:flex; cursor:pointer; margin-bottom:16px;">
                     <input type="checkbox" name="anonymous" id="anonymousCheck" onchange="toggleAnon(this)">
-                    <span>&#128584; Donate anonymously</span>
+                    <span>Donate anonymously</span>
                 </label>
                 <div id="donorFields">
                     <div class="form-row-2">
@@ -891,9 +893,9 @@ $conn->close();
             <!-- SUBMIT -->
             <div class="submit-row">
                 <button type="submit" class="btn-donate" id="submitBtn">
-                    &#128591; Donate Rs. <span id="btnAmount"><?= number_format($amount) ?></span>
+                    Donate Rs. <span id="btnAmount"><?= number_format($amount) ?></span>
                 </button>
-                <p class="secure-note">&#128274; Secure & encrypted &middot; Instant receipt via email</p>
+                <p class="secure-note">Secure & encrypted &middot; Instant receipt via email</p>
             </div>
         </form>
     </div>
@@ -924,19 +926,19 @@ $conn->close();
         <div class="impact-card">
             <div class="impact-title">Your Impact</div>
             <div class="impact-item">
-                <span class="impact-icon">&#127834;</span>
+                <span class="impact-icon"></span>
                 <span>Rs. 500 feeds a monk for a full day</span>
             </div>
             <div class="impact-item">
-                <span class="impact-icon">&#128138;</span>
+                <span class="impact-icon"></span>
                 <span>Rs. 2,500 covers one medical consultation</span>
             </div>
             <div class="impact-item">
-                <span class="impact-icon">&#128725;</span>
+                <span class="impact-icon"></span>
                 <span>Rs. 5,000 supports monthly welfare needs</span>
             </div>
             <div class="impact-item">
-                <span class="impact-icon">&#128202;</span>
+                <span class="impact-icon"></span>
                 <span>100% of funds are publicly reported</span>
             </div>
             <a href="public_transparency.php" class="transparency-link">
@@ -1133,3 +1135,4 @@ function sendChatbotMessage() {
 </script>
 </body>
 </html>
+

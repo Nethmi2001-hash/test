@@ -137,7 +137,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: grid;
             grid-template-columns: 1fr 1fr;
             min-height: 100vh;
+            padding-top: 72px;
         }
+
+        nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:0 6%;height:72px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+        .nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+        .nav-logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--deep-sage),var(--gold));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff}
+        .nav-logo-name{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--text-dark)}
+        .nav-logo-sub{font-size:.6rem;color:var(--text-light);letter-spacing:.13em;text-transform:uppercase;display:block;margin-top:-4px}
+        .nav-links{display:flex;align-items:center;gap:28px;list-style:none}
+        .nav-links a{text-decoration:none;color:var(--text-mid);font-size:.83rem;font-weight:400;letter-spacing:.06em;text-transform:uppercase;transition:color .2s}
+        .nav-links a:hover,.nav-links a.active{color:var(--deep-sage)}
+        .nav-donate{background:var(--deep-sage)!important;color:#fff!important;padding:9px 24px!important;border-radius:40px!important;font-weight:500!important}
+        .nav-donate:hover{background:var(--text-dark)!important}
 
         /* ── LEFT ── */
         .left-panel {
@@ -149,6 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             position: relative;
             overflow: hidden;
             border-right: 1px solid var(--border);
+            min-height: calc(100vh - 72px);
         }
         .left-panel-bg {
             position: absolute; inset: 0; z-index: 0;
@@ -216,6 +229,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 48px 72px;
             display: flex; flex-direction: column; justify-content: center;
             overflow-y: auto;
+            min-height: calc(100vh - 72px);
         }
         .form-wrapper { max-width: 400px; width: 100%; margin: 0 auto; }
         .form-header { margin-bottom: 32px; }
@@ -337,6 +351,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .back-link a:hover { color: var(--orange); }
 
         @media (max-width: 768px) {
+            .nav-links { display: none; }
             body { grid-template-columns: 1fr; }
             .left-panel { display: none; }
             .right-panel { padding: 40px 24px; }
@@ -352,17 +367,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 
+<nav>
+    <a href="index.php" class="nav-logo">
+        <div class="nav-logo-mark">&#9784;</div>
+        <div>
+            <span class="nav-logo-name">Seela suwa herath</span>
+            <span class="nav-logo-sub">Monastery Welfare</span>
+        </div>
+    </a>
+    <ul class="nav-links">
+        <li><a href="index.php#mission">Our Mission</a></li>
+        <li><a href="index.php#how">How It Works</a></li>
+        <li><a href="public_transparency.php">Transparency</a></li>
+        <li><a href="register.php" class="active">Register</a></li>
+        <li><a href="login.php">Sign In</a></li>
+        <li><a href="public_donate.php" class="nav-donate">Donate Now</a></li>
+    </ul>
+</nav>
+
 <!-- LEFT PANEL -->
 <div class="left-panel">
     <div class="left-panel-bg"></div>
     <div class="left-content">
-        <a href="index.php" class="brand">
+        <!-- <a href="index.php" class="brand">
             <div class="brand-mark">☸</div>
             <div>
                 <span class="brand-name">Seela suwa herath</span>
                 <span class="brand-sub">Monastery Welfare</span>
             </div>
-        </a>
+        </a> -->
         <h2 class="left-headline">
             Join Our<br>
             <em>Community</em>
