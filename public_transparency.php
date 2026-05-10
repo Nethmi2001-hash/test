@@ -196,7 +196,7 @@ if ($qAcceptedDates) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transparency & Reports — Seela suwa herath</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=EB+Garamond:wght@600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         :root{
@@ -336,13 +336,16 @@ if ($qAcceptedDates) {
         .dl-btn:last-child{margin-bottom:0}
 
         /* ── FOOTER ── */
-        footer{background:var(--text-dark);padding:56px 6% 32px}
-        .foot-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px}
-        .foot-brand{font-family:'Cormorant Garamond',serif;font-size:1.35rem;color:#fff}
-        .foot-links{display:flex;gap:28px;list-style:none}
-        .foot-links a{color:rgba(255,255,255,.45);text-decoration:none;font-size:.85rem;transition:color .2s}
-        .foot-links a:hover{color:var(--orange-light)}
-        .foot-copy{width:100%;text-align:center;font-size:.78rem;color:rgba(255,255,255,.25);margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,.08)}
+        footer{background:#4A3B32;padding:60px 6% 28px}
+        .foot-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:24px}
+        .foot-brand{font-family:'EB Garamond',serif;font-size:1.5rem;color:#fff;margin-bottom:12px;font-weight:600}
+        .foot-tag{font-size:.84rem;color:rgba(255,255,255,.38);line-height:1.7;max-width:240px}
+        .foot-col h4{font-size:.68rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:14px}
+        .foot-col ul{list-style:none}
+        .foot-col ul li{margin-bottom:9px}
+        .foot-col ul a{color:rgba(255,255,255,.48);text-decoration:none;font-size:.86rem;transition:color .2s}
+        .foot-col ul a:hover{color:var(--orange-light)}
+        .foot-btm{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;font-size:.77rem;color:rgba(255,255,255,.22)}
 
         /* ── PAGINATION ── */
         .pagination{display:flex;justify-content:center;gap:10px;margin-top:24px}
@@ -350,8 +353,8 @@ if ($qAcceptedDates) {
         .page-btn:hover,.page-btn.active{background:var(--orange);border-color:var(--orange);color:#fff}
 
         /* ── RESPONSIVE ── */
-        @media(max-width:960px){.main{grid-template-columns:1fr}.summary-cards{grid-template-columns:repeat(2,1fr)}.sidebar{display:grid;grid-template-columns:1fr 1fr;gap:28px}.page-header-inner{padding:48px 40px}}
-        @media(max-width:600px){.summary-cards{grid-template-columns:1fr 1fr}.nav-links{display:none}.filter-bar{flex-direction:column;align-items:stretch}.sidebar{grid-template-columns:1fr}.page-header-inner{padding:40px 28px}.main{margin-bottom:80px}}
+        @media(max-width:960px){.main{grid-template-columns:1fr}.summary-cards{grid-template-columns:repeat(2,1fr)}.sidebar{display:grid;grid-template-columns:1fr 1fr;gap:28px}.page-header-inner{padding:48px 40px}.foot-grid{grid-template-columns:1fr 1fr}}
+        @media(max-width:600px){.summary-cards{grid-template-columns:1fr 1fr}.nav-links{display:none}.filter-bar{flex-direction:column;align-items:stretch}.sidebar{grid-template-columns:1fr}.page-header-inner{padding:40px 28px}.main{margin-bottom:80px}.foot-grid{grid-template-columns:1fr}.foot-btm{flex-direction:column;gap:8px}}
 
         /* ── ANIMATIONS ── */
         @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
@@ -691,16 +694,39 @@ if ($qAcceptedDates) {
 
 <!-- ═══ FOOTER ═══ -->
 <footer>
-    <div class="foot-inner">
-        <div class="foot-brand">☸ Seela suwa herath</div>
-        <ul class="foot-links">
-            <li><a href="index.php">Home</a></li>
-            <li><a href="public_donate.php">Donate</a></li>
-            <li><a href="login.php">Sign In</a></li>
-            <li><a href="#">Contact</a></li>
-        </ul>
-        <div class="foot-copy">© 2026 Seela suwa herath Monastery Welfare Platform · Made with 🙏 in Sri Lanka</div>
+    <div class="foot-grid">
+        <div>
+            <div class="foot-brand">☸ Seela suwa herath</div>
+            <p class="foot-tag">Supporting monastery welfare through community generosity, transparent governance, and compassionate care.</p>
+        </div>
+        <div class="foot-col">
+            <h4>Platform</h4>
+            <ul>
+                <li><a href="public_donate.php">Donate</a></li>
+                <li><a href="public_transparency.php">Transparency</a></li>
+                <li><a href="register.php">Register</a></li>
+                <li><a href="login.php">Sign In</a></li>
+            </ul>
+        </div>
+        <div class="foot-col">
+            <h4>Welfare</h4>
+            <ul>
+                <li><a href="#">Healthcare</a></li>
+                <li><a href="#">Housing</a></li>
+                <li><a href="#">Appointments</a></li>
+                <li><a href="#">Reports</a></li>
+            </ul>
+        </div>
+        <div class="foot-col">
+            <h4>Info</h4>
+            <ul>
+                <li><a href="#">About Us</a></li>
+                <li><a href="#">Contact</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+            </ul>
+        </div>
     </div>
+    <div class="foot-btm"><span>© 2026 Seela suwa herath Monastery Welfare Platform</span><span>Made with in Sri Lanka</span></div>
 </footer>
 
 <script>
