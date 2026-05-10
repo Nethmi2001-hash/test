@@ -739,6 +739,7 @@ $conn->close();
 
             <!-- STEP 1: Amount -->
             <div class="panel-section">
+                <div style="font-size:.72rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--deep-sage);margin-bottom:8px;">For Donation</div>
                 <div class="panel-section-title">
                     <span class="panel-section-num">1</span>
                     Choose Amount
@@ -838,7 +839,7 @@ $conn->close();
                     <div class="form-row-2">
                         <div class="form-group">
                             <label for="donor_name">Full Name</label>
-                            <input type="text" id="donor_name" name="donor_name" placeholder="Perera Saman">
+                            <input type="text" id="donor_name" name="donor_name" placeholder="Perera Saman" required>
                         </div>
                         <div class="form-group">
                             <label for="donor_phone">Phone (optional)</label>
@@ -847,7 +848,7 @@ $conn->close();
                     </div>
                     <div class="form-group">
                         <label for="donor_email">Email (for receipt)</label>
-                        <input type="email" id="donor_email" name="donor_email" placeholder="you@example.com">
+                        <input type="email" id="donor_email" name="donor_email" placeholder="you@example.com" required>
                     </div>
                 </div>
             </div>
@@ -882,7 +883,7 @@ $conn->close();
                     </p>
                     <div class="form-group" style="margin-bottom:0;">
                         <label for="bank_slip">Upload Bank Slip (JPG, PNG, PDF)</label>
-                        <input type="file" id="bank_slip" name="bank_slip" accept="image/*,.pdf">
+                        <input type="file" id="bank_slip" name="bank_slip" accept="image/*,.pdf" required>
                     </div>
                 </div>
             </div>
@@ -1026,11 +1027,18 @@ function showPayment(method) {
     document.getElementById('hiddenMethod').value = method;
     const bs = document.getElementById('bankSlipSection');
     bs.classList.toggle('visible', method === 'bank_slip');
+    document.getElementById('bank_slip').required = method === 'bank_slip';
     document.getElementById('summaryPayment').textContent = 'Bank Transfer';
 }
 
 function toggleAnon(cb) {
     document.getElementById('donorFields').style.display = cb.checked ? 'none' : 'block';
+    document.getElementById('donor_name').required = !cb.checked;
+    document.getElementById('donor_email').required = !cb.checked;
+}
+
+if (window.location.search.includes('error=') || window.location.search.includes('success_ref=')) {
+    window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
 }
 
 // Update category summary

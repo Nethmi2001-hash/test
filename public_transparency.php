@@ -224,9 +224,9 @@ if ($qAcceptedDates) {
         .nav-donate:hover{background:var(--text-dark)!important}
 
         /* ── PAGE HEADER ── */
-        .page-header{background:transparent;padding:36px 6% 42px;position:relative;overflow:visible;text-align:center}
+        .page-header{background:#EDE6DC;padding:24px 6% 28px;position:relative;overflow:visible;text-align:center}
         .page-header::before{display:none}
-        .page-header-inner{position:relative;z-index:1;max-width:1160px;margin:0 auto;background:var(--sand);border-radius:24px;padding:56px 52px;box-shadow:0 8px 32px rgba(0,0,0,.06)}
+        .page-header-inner{position:relative;z-index:1;max-width:1160px;margin:0 auto;background:transparent;border-radius:0;padding:28px 52px;box-shadow:none}
         .page-header-eyebrow{font-size:.74rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--text-light);margin-bottom:16px}
         .page-header h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.3rem,4.5vw,3.3rem);font-weight:300;color:var(--text-dark);line-height:1.15;margin-bottom:18px}
         .page-header h1 em{font-style:italic;color:var(--orange-light);font-weight:400}
@@ -682,11 +682,11 @@ if ($qAcceptedDates) {
         </div>
 
         <!-- DONATE CTA -->
-        <div style="background:linear-gradient(135deg,var(--orange),var(--orange-mid));border-radius:20px;padding:36px 28px;text-align:center;box-shadow:0 8px 32px rgba(212,98,42,.25)">
+        <div style="background:#EDE6DC;border:1.5px solid rgba(210,170,130,.28);border-radius:20px;padding:36px 28px;text-align:center;box-shadow:0 6px 24px rgba(50,38,25,.08)">
             <div style="font-size:2.4rem;margin-bottom:14px">🙏</div>
-            <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:#fff;margin-bottom:12px;font-weight:400">Be Part of This</div>
-            <div style="font-size:.86rem;color:rgba(255,255,255,.85);margin-bottom:24px;line-height:1.7">Your donation appears in this report — fully transparent, fully accountable.</div>
-            <a href="public_donate.php" style="display:inline-block;background:#fff;color:var(--orange);padding:14px 28px;border-radius:12px;text-decoration:none;font-size:.93rem;font-weight:600;transition:all .2s;box-shadow:0 4px 12px rgba(0,0,0,.12)">Contribute Now →</a>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--text-dark);margin-bottom:12px;font-weight:400">Be Part of This</div>
+            <div style="font-size:.86rem;color:var(--text-mid);margin-bottom:24px;line-height:1.7">Your donation appears in this report — fully transparent, fully accountable.</div>
+            <a href="public_donate.php" style="display:inline-block;background:var(--orange);color:#fff;padding:14px 28px;border-radius:12px;text-decoration:none;font-size:.93rem;font-weight:600;transition:all .2s;box-shadow:0 4px 12px rgba(212,98,42,.18)">Contribute Now →</a>
         </div>
 
     </div><!-- end sidebar -->
