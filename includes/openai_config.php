@@ -5,11 +5,11 @@
  */
 
 // OpenAI API Configuration
-define('OPENAI_API_KEY', 'sk-your-api-key-here'); // Replace with your actual API key
-define('OPENAI_MODEL', 'gpt-4'); // Options: 'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo'
+define('OPENAI_API_KEY', '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'); // OpenAI API key
+define('OPENAI_MODEL', 'gpt-3.5-turbo'); // Options: 'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo'
 define('OPENAI_MAX_TOKENS', 500); // Maximum response length
 define('OPENAI_TEMPERATURE', 0.7); // 0.0 = focused, 1.0 = creative
-define('OPENAI_ENABLED', false); // Set to true when API key is configured
+define('OPENAI_ENABLED', false); // Set to false to use free fallback mode
 
 // API Endpoint
 define('OPENAI_API_URL', 'https://api.openai.com/v1/chat/completions');

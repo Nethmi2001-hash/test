@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/init.php';
 /**
  * API Endpoint for Advanced Search
  * Handles complex queries with multiple filters

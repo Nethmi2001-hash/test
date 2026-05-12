@@ -174,7 +174,7 @@ HTML;
         </div>
         
         <p style="text-align: center;">
-            <a href="{$monastery_website}generate_receipt.php?id={$donation['donation_id']}" class="button">
+            <a href="{$monastery_website}api/generate_receipt.php?id={$donation['donation_id']}" class="button">
                 📄 View Your Receipt
             </a>
         </p>
